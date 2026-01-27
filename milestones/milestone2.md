@@ -37,5 +37,5 @@ The final goal of this milestone is to develop a team plan that will keep you on
 
 ## Questions
 
-1. {A *numbered** list of questions for us to respond to.}
+1. first question goes here
 2. {...}
