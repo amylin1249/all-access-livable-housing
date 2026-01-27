@@ -3,6 +3,16 @@
 ## Abstract
 
 {Update your project abstract from Milestone 1 with any changes.}
+{To update below abstract that has been copied from Milestone 1}
+Several cities in the US are experiencing a homelessness crisis, with San Francisco often cited due to its high housing prices and low supply. Our project aims to analyze homelessness patterns in San Francisco (and potentially the nearby cities of Oakland and Berkeley). 
+
+Some questions we have are: 
+-	How have homelessness rates changed in relation to housing prices over time?
+-	Are there spatial patterns for where homeless encampments are located, especially compared with indicators like income levels, property values, and rent burden?
+-	Are the locations and concentrations of homeless shelters aligned with encampments?
+-	How have encampment locations shifted as the frequency of enforcement actions, like sweeps, increased?
+
+Our project focus lends itself naturally to mapping. Since the city already publishes a map with the locations of encampments, we plan to use statistical analysis to improve the accuracy of estimates, and to pair these preexisting known locations with other relevant information (e.g., neighborhood composition, shelter locations). We want to include a time component, where the user could specify a date, and it will return multiple maps and relevant statistics. 
 
 ## Data Sources
 
