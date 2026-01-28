@@ -92,5 +92,9 @@ The final goal of this milestone is to develop a team plan that will keep you on
 
 ## Questions
 
+<<<<<<< HEAD
 1. Help with statistical analysis
 2. Help with Zillow or other place to get rental data
+=======
+1. How can we measure sweeps through articles?
+>>>>>>> 9a11e896f0d7d85051ae989b3c9785c756561c6e
