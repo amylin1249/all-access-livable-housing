@@ -49,5 +49,4 @@ The final goal of this milestone is to develop a team plan that will keep you on
 
 ## Questions
 
-1. first question goes here
-2. {...}
+1. How can we measure sweeps through articles?
