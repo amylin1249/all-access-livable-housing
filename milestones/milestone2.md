@@ -3,7 +3,8 @@
 ## Abstract
 
 {Update your project abstract from Milestone 1 with any changes.}
-{To update below abstract that has been copied from Milestone 1}
+
+{ORIGINAL ABSTRACT}
 Several cities in the US are experiencing a homelessness crisis, with San Francisco often cited due to its high housing prices and low supply. Our project aims to analyze homelessness patterns in San Francisco (and potentially the nearby cities of Oakland and Berkeley). 
 
 Some questions we have are: 
@@ -14,20 +15,62 @@ Some questions we have are:
 
 Our project focus lends itself naturally to mapping. Since the city already publishes a map with the locations of encampments, we plan to use statistical analysis to improve the accuracy of estimates, and to pair these preexisting known locations with other relevant information (e.g., neighborhood composition, shelter locations). We want to include a time component, where the user could specify a date, and it will return multiple maps and relevant statistics. 
 
+{NEW ABSTRACT IDEAS}
+Finding the relationship between homelessness and housing prices, to demonstrate how the housing crisis has exacerbated homelessness in San Francisco. This one is pretty straightforward -- we would use the shelter waitlist size and tent locations/counts as a measure of homelessness and combine those with housing pricing data from the census (e.g., median rent) to see the relationship between the two. We'll also probably pull in demographic data. As you mentioned, there is an option for simulation here where we can see how changing one variable affects the others.
+*** Also wanting to add in something about encampement volatility
+
 ## Data Sources
 
-*Note that the requirements have been updated from Milestone 1!*
-
-### Data Source #1..N
+### Data Source #1
 
 Source URL: {https://...}
-Source Type: {API}
-Source URL: {https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/about_data, 2) https://data.sfgov.org/Housing-and-Buildings/Quarterly-count-of-tents-structures-and-lived-in-v/w9ip-yrij/about_data, 3) https://data.sfgov.org/Health-and-Social-Services/HSH-Shelter-Waitlist/w4sk-nq57/about_data}
 Source Type: {Scraped/Bulk Data/API}
 Approximate Number of Records (rows):
 Approximate Number of Attributes (columns): 
 Current Status: {At this point, you should have interacted with your data, describe the current status. Have you written code for an API or web scraper yet, explored the data, etc.?}
 Challenges: {Any challenges or uncertainty about the data at this point?}
+
+### Data Source #1: DataSF Open Data Portal
+Source URL: {https://...}
+Source Type: {Scraped/Bulk Data/API}
+Approximate Number of Records (rows):
+Approximate Number of Attributes (columns): 
+Current Status: {At this point, you should have interacted with your data, describe the current status. Have you written code for an API or web scraper yet, explored the data, etc.?}
+Challenges: {Any challenges or uncertainty about the data at this point?}
+
+[OLD INFO]
+-	Summary: This data portal, published by the City of San Francisco, contains many datasets of interest. In particular, “311 Cases” provides a comprehensive list of 311 service calls (non-emergency municipal service requests) in SF, and there is a filtering category for “Homeless Concerns.” Because each call includes location (latitude and longitude), we will be able to map the calls to their respective tracts within the city. “Quarterly count of tents, structures, and lived-in vehicles” includes a quarterly count and locations of the tents, structures, and vehicles (both passenger + non-passenger) that seem to be lived in, which will enable us to analyze how their counts and locations have evolved over time, especially with external factors (e.g., raids). “HSH Shelter Waitlist” contains the current San Francisco adult shelter reservation waitlist. This dataset could be used to see trends in shelter demand. 
+-	Source URL: 1) https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/about_data, 2) https://data.sfgov.org/Housing-and-Buildings/Quarterly-count-of-tents-structures-and-lived-in-v/w9ip-yrij/about_data, 3) https://data.sfgov.org/Health-and-Social-Services/HSH-Shelter-Waitlist/w4sk-nq57/about_data
+-	Source Type: API
+-	Challenges: For “311 Cases”, there could be reporting bias (vs. official counts), since this data reflects citizen reporting behavior rather than a verified census. This may lead to higher densities in neighborhoods where residents are more likely to report issues, which might not perfectly align with the actual distribution of the unhoused population. There could also be issues with duplication, as multiple people could call for the same incident. For “Quarterly count of tents, structures, and lived-in vehicles”, the counts are conducted on a tent/structure/vehicle level rather than the count of individuals and may not provide a complete view of the density of homeless people in each neighborhood. For “HSH Shelter Waitlist,” the dataset is updated daily, which means that we would have to find an efficient way to look through all the archived datasets to have a count of the number of people on the waitlist over time. 
+
+### Data Source #2: Census Data
+Source URL: {https://...}
+Source Type: {Scraped/Bulk Data/API}
+Approximate Number of Records (rows):
+Approximate Number of Attributes (columns): 
+Current Status: {At this point, you should have interacted with your data, describe the current status. Have you written code for an API or web scraper yet, explored the data, etc.?}
+Challenges: {Any challenges or uncertainty about the data at this point?}
+
+[OLD INFO]
+-	Summary: The National Historical Geographic Information System (NHGIS) is a popular source for census data. Usually going all the way down to the census tract, it includes demographic information and housing information, including median rent, median property value, and rent burden. It is published by IPUMS at the University of Minnesota.
+-	Source URL: https://data2.nhgis.org/main
+-	Source Type: Bulk data
+-	Challenges: Since some of us have worked with census data before, we don’t have any major concerns about it. We will just need to be thoughtful about how we spatially join it to the other data that we have. 
+
+### Data Source #3: Zillow Renter Index
+Source URL: {https://...}
+Source Type: {Scraped/Bulk Data/API}
+Approximate Number of Records (rows):
+Approximate Number of Attributes (columns): 
+Current Status: {At this point, you should have interacted with your data, describe the current status. Have you written code for an API or web scraper yet, explored the data, etc.?}
+Challenges: {Any challenges or uncertainty about the data at this point?}
+
+[OLD INFO]
+-	Summary: This is a smoothed measure of the typical observed market rate of rent across a given region. ZORI is a repeat-rent index that is weighted to the rental housing stock to ensure representativeness across the entire market, not just those homes currently listed for-rent. The index is dollar-denominated by computing the mean of listed rents that fall into the 35th to 65th percentile range for all homes and apartments in a given region, which is weighted to reflect the rental housing stock. It comes from Zillow.
+-	Source URL: https://www.zillow.com/research/data/ 
+-	Source Type: Bulk data
+-	Challenges: The data is only available at the zip code level, which may not be granular enough for our analysis. In addition, it is only an approximation of rental price over a band. Alternatively, we may scrape rental data from Zillow to get a neighborhood index of renter affordability and develop a clearer sense of the rental price distribution. 
 
 ## Data Reconciliation Plan
 
@@ -49,5 +92,5 @@ The final goal of this milestone is to develop a team plan that will keep you on
 
 ## Questions
 
-1. first question goes here
-2. {...}
+1. Help with statistical analysis
+2. Help with Zillow or other place to get rental data
