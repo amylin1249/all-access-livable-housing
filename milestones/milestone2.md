@@ -21,28 +21,34 @@ Finding the relationship between homelessness and housing prices, to demonstrate
 
 ## Data Sources
 
-### Data Source #1
-
-Source URL: {https://...}
-Source Type: {Scraped/Bulk Data/API}
-Approximate Number of Records (rows):
-Approximate Number of Attributes (columns): 
-Current Status: {At this point, you should have interacted with your data, describe the current status. Have you written code for an API or web scraper yet, explored the data, etc.?}
-Challenges: {Any challenges or uncertainty about the data at this point?}
-
 ### Data Source #1: DataSF Open Data Portal
-Source URL: {https://...}
-Source Type: {Scraped/Bulk Data/API}
-Approximate Number of Records (rows):
-Approximate Number of Attributes (columns): 
+#### Data Source #1.1: 311 Cases
+Source URL: {https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/about_data}
+Source Type: {API}
+Approximate Number of Records (rows): 4,717(limited to category : encampment)
+Approximate Number of Attributes (columns): 25
+Current Status: {Data cntains~}
+Challenges: {There could be reporting bias (vs. official counts), since this data reflects citizen reporting behavior rather than a verified census. This may lead to higher densities in neighborhoods where residents are more likely to report issues, which might not perfectly align with the actual distribution of the unhoused population. There could also be issues with duplication, as multiple people could call for the same incident.}
+
+#### Data Source #1.2: Quarterly count of tents, structures, and lived-in vehicles
+Source URL: {https://data.sfgov.org/Housing-and-Buildings/Quarterly-count-of-tents-structures-and-lived-in-v/w9ip-yrij/about_data}
+Source Type: {API}
+Approximate Number of Records (rows): 1,747
+Approximate Number of Attributes (columns): 13
 Current Status: {At this point, you should have interacted with your data, describe the current status. Have you written code for an API or web scraper yet, explored the data, etc.?}
-Challenges: {Any challenges or uncertainty about the data at this point?}
+Challenges: {The data is only provided on a quarterly basis, which presents a limitation in terms of temporal resolution when attempting to match it with monthly fluctuations in rental prices. Furthermore, because the counts are based on the number of tents or structures rather than an individual census, there are inherent limitations in accurately estimating the actual size of the unhoused population.}
+
+#### Data Source #1.3: HSH Shelter Waitlist
+Source URL: {https://data.sfgov.org/Health-and-Social-Services/HSH-Shelter-Waitlist/w4sk-nq57/about_data}
+Source Type: {API}
+Approximate Number of Records (rows): 426(per day)
+Approximate Number of Attributes (columns): 6
+Current Status: {Explored the data}
+Challenges: {The dataset is updated daily, which means that we would have to find an efficient way to look through all the archived datasets to have a count of the number of people on the waitlist over time.}
 
 [OLD INFO]
 -	Summary: This data portal, published by the City of San Francisco, contains many datasets of interest. In particular, “311 Cases” provides a comprehensive list of 311 service calls (non-emergency municipal service requests) in SF, and there is a filtering category for “Homeless Concerns.” Because each call includes location (latitude and longitude), we will be able to map the calls to their respective tracts within the city. “Quarterly count of tents, structures, and lived-in vehicles” includes a quarterly count and locations of the tents, structures, and vehicles (both passenger + non-passenger) that seem to be lived in, which will enable us to analyze how their counts and locations have evolved over time, especially with external factors (e.g., raids). “HSH Shelter Waitlist” contains the current San Francisco adult shelter reservation waitlist. This dataset could be used to see trends in shelter demand. 
--	Source URL: 1) https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/about_data, 2) https://data.sfgov.org/Housing-and-Buildings/Quarterly-count-of-tents-structures-and-lived-in-v/w9ip-yrij/about_data, 3) https://data.sfgov.org/Health-and-Social-Services/HSH-Shelter-Waitlist/w4sk-nq57/about_data
--	Source Type: API
--	Challenges: For “311 Cases”, there could be reporting bias (vs. official counts), since this data reflects citizen reporting behavior rather than a verified census. This may lead to higher densities in neighborhoods where residents are more likely to report issues, which might not perfectly align with the actual distribution of the unhoused population. There could also be issues with duplication, as multiple people could call for the same incident. For “Quarterly count of tents, structures, and lived-in vehicles”, the counts are conducted on a tent/structure/vehicle level rather than the count of individuals and may not provide a complete view of the density of homeless people in each neighborhood. For “HSH Shelter Waitlist,” the dataset is updated daily, which means that we would have to find an efficient way to look through all the archived datasets to have a count of the number of people on the waitlist over time. 
+ 
 
 ### Data Source #2: Census Data
 Source URL: {https://...}
@@ -87,6 +93,7 @@ Example 2: You have three data sets: a list of companies that were fined for ill
 The final goal of this milestone is to develop a team plan that will keep you on track for the remainder of the quarter.
 
 1. Identify the key components of your project based on the criteria and your intended end result. (e.g. "Web scrape data source #1", "Merge code for Data Sources #2 and #3", "Map-based visualization")
+
 2. For each component identify who will be responsible, and when it should be ready. Consider if any components rely on others and how to mitigate the effect on the dependent team members (e.g. mock data for the visualization until the real data is ready)
 3. Put this together into a (rough) weekly plan. What will be built by Week 7's prototype? 
 
