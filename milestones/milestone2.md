@@ -43,8 +43,8 @@ Source URL: {https://data.sfgov.org/Health-and-Social-Services/HSH-Shelter-Waitl
 Source Type: {API}
 Approximate Number of Records (rows): 426(per day)
 Approximate Number of Attributes (columns): 6
-Current Status: {Explored the data}
-Challenges: {The dataset is updated daily, which means that we would have to find an efficient way to look through all the archived datasets to have a count of the number of people on the waitlist over time.}
+Current Status: {Explored the data, which contains daily data. So, writing a loop scode that iterates through hundreds of daily API endpoints to systematically extract and consolidate the data.}
+Challenges: {The primary technical challenge is the high volume of API requests required to reconstruct the historical trend. Fetching hundreds of individual files increases the risk of API rate-limiting and potential data gaps if certain daily files are missing or corrupted.}
 
 [OLD INFO]
 -	Summary: This data portal, published by the City of San Francisco, contains many datasets of interest. In particular, “311 Cases” provides a comprehensive list of 311 service calls (non-emergency municipal service requests) in SF, and there is a filtering category for “Encampments.” Because each call includes location (latitude and longitude), we will be able to map the calls to their respective tracts within the city. “Quarterly count of tents, structures, and lived-in vehicles” includes a quarterly count and locations of the tents, structures, and vehicles (both passenger + non-passenger) that seem to be lived in, which will enable us to analyze how their counts and locations have evolved over time, especially with external factors (e.g., raids). “HSH Shelter Waitlist” contains the current San Francisco adult shelter reservation waitlist. This dataset could be used to see trends in shelter demand. 
@@ -83,6 +83,10 @@ Challenges: {Any challenges or uncertainty about the data at this point?}
 One of the most important steps for this milestone is to have a plan as to how your data sources will connect.
 
 For each data set, you will need to identify the "unique key" that will allow you to connect it to other data sets.
+- key
+1.1 311 : address, street, supervisor district, neighbor, police district, lat, long
+1.2 quarterly : observed month, police district, lat/long
+1.3 HSH shelter : x (useing for the total num of size)
 
 Example 1: You have two data sets: healthcare costs on a zip code level & employment figures on a county level. You will need to determine a mapping between zip code & county. You aren't sure how you'll go about joining them-- figuring that gap out now helps us identify that this will require a third data set available from the US Census so you can plan accordingly.
 
@@ -93,6 +97,7 @@ Example 2: You have three data sets: a list of companies that were fined for ill
 The final goal of this milestone is to develop a team plan that will keep you on track for the remainder of the quarter.
 
 1. Identify the key components of your project based on the criteria and your intended end result. (e.g. "Web scrape data source #1", "Merge code for Data Sources #2 and #3", "Map-based visualization")
+
 
 2. For each component identify who will be responsible, and when it should be ready. Consider if any components rely on others and how to mitigate the effect on the dependent team members (e.g. mock data for the visualization until the real data is ready)
 3. Put this together into a (rough) weekly plan. What will be built by Week 7's prototype? 
