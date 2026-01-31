@@ -97,7 +97,13 @@ Example 2: You have three data sets: a list of companies that were fined for ill
 The final goal of this milestone is to develop a team plan that will keep you on track for the remainder of the quarter.
 
 1. Identify the key components of your project based on the criteria and your intended end result. (e.g. "Web scrape data source #1", "Merge code for Data Sources #2 and #3", "Map-based visualization")
-
+- API-based Data Extraction and Consolidation (Data Source #1.1,#1.2,#1.3)
+- Temporal Resampling & Data Normalization(data scales match)
+- Data Integration & Alignment
+- Map-based Visualization
+- Encampment Volatility Mapping
+- Cross-Variable Correlation Modeling
+- Predictive Simulation Analysis
 
 2. For each component identify who will be responsible, and when it should be ready. Consider if any components rely on others and how to mitigate the effect on the dependent team members (e.g. mock data for the visualization until the real data is ready)
 3. Put this together into a (rough) weekly plan. What will be built by Week 7's prototype? 
