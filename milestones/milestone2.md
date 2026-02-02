@@ -2,18 +2,9 @@
 
 ## Abstract
 
-{Update your project abstract from Milestone 1 with any changes.}
+Several cities in the United States are experiencing a homelessness crisis, with San Francisco often being cited due to its high housing prices and limited housing supply. Our project aims to compare the monthly count of unsheltered persons to the average monthly rent cost for 2019-2023, at the census tract level in San Francisco. Building on the city’s publicly available maps of encampment locations, we will use statistical methods to extend structure-based counts to monthly estimates of unsheltered individuals. We will combine this quarterly measure of tents, structures, and lived-in vehicles that is geocoded by latitude and longitude with monthly aggregates of homelessness-related 311 service requests (also geocoded by latitude and longitude) and monthly shelter waitlist totals.
 
-{ORIGINAL ABSTRACT}
-Several cities in the US are experiencing a homelessness crisis, with San Francisco often cited due to its high housing prices and low supply. Our project aims to analyze homelessness patterns in San Francisco (and potentially the nearby cities of Oakland and Berkeley). 
-
-Some questions we have are: 
--	How have homelessness rates changed in relation to housing prices over time?
--	Are there spatial patterns for where homeless encampments are located, especially compared with indicators like income levels, property values, and rent burden?
--	Are the locations and concentrations of homeless shelters aligned with encampments?
--	How have encampment locations shifted as the frequency of enforcement actions, like sweeps, increased?
-
-Our project focus lends itself naturally to mapping. Since the city already publishes a map with the locations of encampments, we plan to use statistical analysis to improve the accuracy of estimates, and to pair these preexisting known locations with other relevant information (e.g., neighborhood composition, shelter locations). We want to include a time component, where the user could specify a date, and it will return multiple maps and relevant statistics. 
+Our project naturally lends itself to spatial analysis and mapping. We will visualize the flow and scale of encampments across the city on a monthly basis. In addition, we will pair our monthly estimates of unsheltered homelessness with neighborhood demographics to examine the relationship between property values, rent burden, and the spatial concentration of unsheltered populations. To do so, we construct a measure of monthly rental prices by using annual tract-level rent estimates from the American Community Survey to assess baseline neighborhood rent levels and temporally enhance these estimates with monthly Zillow Observed Rent Index data at the ZIP code level.
 
 {NEW ABSTRACT IDEAS}
 Finding the relationship between homelessness and housing prices, to demonstrate how the housing crisis has exacerbated homelessness in San Francisco. This one is pretty straightforward -- we would use the shelter waitlist size and tent locations/counts as a measure of homelessness and combine those with housing pricing data from the census (e.g., median rent) to see the relationship between the two. We'll also probably pull in demographic data. As you mentioned, there is an option for simulation here where we can see how changing one variable affects the others.
@@ -23,74 +14,61 @@ Finding the relationship between homelessness and housing prices, to demonstrate
 
 ### Data Source #1: DataSF Open Data Portal
 #### Data Source #1.1: 311 Cases
-Source URL: {https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/about_data}
-Source Type: {API}
-Approximate Number of Records (rows): 8,829(Filtered for category : encampment and encampments) 
+Source URL: https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/about_data
+Source Type: API
+Approximate Number of Records (rows): 210,804 (Filtered for category: encampment and encampments and dates: 2019-2023)
 Approximate Number of Attributes (columns): 25
-Current Status: {Explored the data, GPS coordinates(lat/long) and address might be used as reconciliation key. Started writing an initial code to convert api into a Pandas DataFrameata.}
-Challenges: {There could be reporting bias (vs. official counts), since this data reflects citizen reporting behavior rather than a verified census. This may lead to higher densities in neighborhoods where residents are more likely to report issues, which might not perfectly align with the actual distribution of the unhoused population. There could also be issues with duplication, as multiple people could call for the same incident. Also, the data provides provides specific GPS coordinates (lat/long), a major technical hurdle will be the spatial join required to aggregate these points into Census Tracts or Zip Codes to match from Zillow and the Census data.}
+Current Status: We have explored the data -- this one gives us 311 service calls with a specific date of the call and a location of the call (latitude/longitude). We started writing the initial code to convert the API into a Pandas dataframe.
+Challenges: There could be reporting bias (vs. official counts), since this data reflects citizen reporting behavior rather than a verified census. This may lead to higher densities in neighborhoods where residents are more likely to report issues, which might not perfectly align with the actual distribution of the unhoused population. There could also be issues with duplication, as multiple people could call for the same incident. Unfortunately, these challenges are unavoidable, but we still want to include this dataset in order to make sure our estimation of homelessness in SF is as accurate as possible, as there is always a risk of undercounting the population (so potential duplication can, in a way, counterbalance the undercounting).
 
 #### Data Source #1.2: Quarterly count of tents, structures, and lived-in vehicles
-Source URL: {https://data.sfgov.org/Housing-and-Buildings/Quarterly-count-of-tents-structures-and-lived-in-v/w9ip-yrij/about_data}
-Source Type: {API}
-Approximate Number of Records (rows): 1,747
-Approximate Number of Attributes (columns): 13
-Current Status: {Explored the data, GPS coordinates(lat/long). Started writing a code to extract data. }
-Challenges: {The most significant challenge is the temporal mismatch between datasets. While the 311 service requests provide daily, high-frequency data, the official tent counts are only released every three months (quarterly). This discrepancy requires a strategic data alignment approach; we must decide whether to aggregate the 311 and Zillow rental data into quarterly averages or use statistical interpolation to estimate monthly tent trends. Failing to reconcile these different time scales could lead to inaccurate correlations between rising rents and homelessness counts. Furthermore, because the counts are based on the number of tents or structures rather than an individual census, there are inherent limitations in accurately estimating the actual size of the unhoused population.}
+Source URL: https://app.powerbigov.us/view?r=eyJrIjoiY2FmZDNiY2ItMjA2OS00YjU5LWFkMDUtODlkNTgyZmQ3MmNhIiwidCI6IjIyZDVjMmNmLWNlM2UtNDQzZC05YTdmLWRmY2MwMjMxZjczZiJ9
+Source Type: Webscraping
+Approximate Number of Records (rows): 20
+Approximate Number of Attributes (columns): TBD (see explanation below)
+Current Status: This map shows the location of different encampments in SF on a quarterly basis. We were initially planning to use what is allegedly the underlying dataset for this map (https://data.sfgov.org/Housing-and-Buildings/Quarterly-count-of-tents-structures-and-lived-in-v/w9ip-yrij/about_data), but it actually only has data from 2024 and 2025 (despite the map clearly having data from April 2019 through Dec 2025). Now, we will have to extract this historical encampment data by webscraping JSON responses from Power BI network traffic. We know there are 20 quarterly time points between our target range of 2019 to 2023, but the number of attributes is unknown at this point since each scrape of the website (20 in total) will have all of the latitudes and longitudes of the encampment locations as well as the type (tent vs. structure vs. large vehicle vs. small vehicle). This is exactly what we will need to extract to estimate the number of street homeless individuals in each census tract. 
+Challenges: One challenge is the temporal mismatch between this dataset and the others. While the 311 service requests provide daily, high-frequency data, as do the shelter counts, the official tent counts are only released every three months (quarterly). This discrepancy means we will need to make a strategic decision about how to align the data, as failing to reconcile these different time scales could lead to inaccurate correlations between rising rents and homelessness counts. We plan to use statistical interpolation to estimate monthly trends. In addition, because the counts are based on the number of tents or structures rather than an individual census, there are inherent limitations in accurately estimating the actual size of the unhoused population.
 
 #### Data Source #1.3: HSH Shelter Waitlist
-Source URL: {https://data.sfgov.org/Health-and-Social-Services/HSH-Shelter-Waitlist/w4sk-nq57/about_data}
-Source Type: {API}
-Approximate Number of Records (rows): 426(per day)
+Source URL: https://data.sfgov.org/Health-and-Social-Services/HSH-Shelter-Waitlist/w4sk-nq57/about_data
+Source Type: API
+Approximate Number of Records (rows): 426 (per day)
 Approximate Number of Attributes (columns): 6
-Current Status: {Explored the data, which contains daily data. So, writing a loop scode that iterates through hundreds of daily API endpoints to systematically extract and consolidate the data.}
-Challenges: {The primary technical challenge is the high volume of API requests required to reconstruct the historical trend. Fetching hundreds of individual files increases the risk of API rate-limiting and potential data gaps if certain daily files are missing or corrupted.}
-
-[OLD INFO]
--	Summary: This data portal, published by the City of San Francisco, contains many datasets of interest. In particular, “311 Cases” provides a comprehensive list of 311 service calls (non-emergency municipal service requests) in SF, and there is a filtering category for “Encampments.” Because each call includes location (latitude and longitude), we will be able to map the calls to their respective tracts within the city. “Quarterly count of tents, structures, and lived-in vehicles” includes a quarterly count and locations of the tents, structures, and vehicles (both passenger + non-passenger) that seem to be lived in, which will enable us to analyze how their counts and locations have evolved over time, especially with external factors (e.g., raids). “HSH Shelter Waitlist” contains the current San Francisco adult shelter reservation waitlist. This dataset could be used to see trends in shelter demand. 
- 
+Current Status: We have explored the data -- this one in particular is updated every day with the current shelter waitlist. We will need to write code that loops through hundreds of daily API endpoints to systematically extract and consolidate the data.
+Challenges: The primary technical challenge here is the high volume of API requests that we will need to make to reconstruct the historical trend. Fetching hundreds of individual files increases the risk of API rate-limiting and potential data gaps if certain daily files are missing or corrupted. In addition, since this data has no geographic fields, we will need to use the geographic distribution of the homeless population according to data sources 1.1 and 1.2 to estimate the shelter waitlist count for each census tract (so, some accuracy is lost through estimation).
 
 ### Data Source #2: Census Data
-Source URL: {https://...}
-Source Type: {Scraped/Bulk Data/API}
-Approximate Number of Records (rows):
-Approximate Number of Attributes (columns): 
-Current Status: {At this point, you should have interacted with your data, describe the current status. Have you written code for an API or web scraper yet, explored the data, etc.?}
-Challenges: {Any challenges or uncertainty about the data at this point?}
+#### Data Source #2.1: ACS data on rental costs and demographic data
+Source URL: https://data2.nhgis.org/main
+Source Type: Bulk data
+Approximate Number of Records (rows): 244 (filtered for census tracts in SF)
+Approximate Number of Attributes (columns): >10, included census tract identifiers (GEOID), geographic coordinates (latitude, longitude), median gross rent by tract, total population by tract, racial composition breakdown by tract, household income measures by tract
+Current Status: We have downloaded the relevant ACS datasets for our analysis. We will be using the 5-year estimate from 2019 to 2023. Apart from median rent which will be used as a proxy for housing prices, we have identified several demographic indicators such as population density, racial composition, and income levels to observe if they have any correlation with housing costs and homelessness counts across tracts. While we have these datasets available for use, we are still refining the structure of our analysis to determine how these demographic variables can complement homelessness indicators to provide more insights into the homelessness landscape in SF.
+Challenges: While we do not have any major concerns about the data, the main challenge that we are currently facing is on how to spatially integrate different datasets. Census and ACS data are available at the tract level (identified by GEOIDs as well as their coordinates), while data from our other sources (e.g., encampment data) are often provided as observations with individual latitude and longitude coordinates. We plan to spatially match these point-based data to census tracts for tract-level comparison. We previously conducted similar matching using ArcGIS, but we will have to implement this in Python to integrate it with overall data cleaning, analysis, and visualization. 
 
-[OLD INFO]
--	Summary: The National Historical Geographic Information System (NHGIS) is a popular source for census data. Usually going all the way down to the census tract, it includes demographic information and housing information, including median rent, median property value, and rent burden. It is published by IPUMS at the University of Minnesota.
--	Source URL: https://data2.nhgis.org/main
--	Source Type: Bulk data
--	Challenges: Since some of us have worked with census data before, we don’t have any major concerns about it. We will just need to be thoughtful about how we spatially join it to the other data that we have. 
+#### Data Source #2.2: Listing and geographic boundaries of census tracts in SF
+Source URL: https://data.sfgov.org/Geographic-Locations-and-Boundaries/Census-2020-Tracts-for-San-Francisco/tmph-tgz9/about_data
+Source Type: Bulk data
+Approximate Number of Records (rows): 244
+Approximate Number of Attributes (columns): 15
+Current Status: We will use this dataset to limit our analysis to the census tracts of San Francisco. 
+Challenges: See above, data source #2.1.
 
-### Data Source #3: Zillow Renter Index
-Source URL: {https://...}
-Source Type: {Scraped/Bulk Data/API}
-Approximate Number of Records (rows):
-Approximate Number of Attributes (columns): 
-Current Status: {At this point, you should have interacted with your data, describe the current status. Have you written code for an API or web scraper yet, explored the data, etc.?}
-Challenges: {Any challenges or uncertainty about the data at this point?}
-
-[OLD INFO]
--	Summary: This is a smoothed measure of the typical observed market rate of rent across a given region. ZORI is a repeat-rent index that is weighted to the rental housing stock to ensure representativeness across the entire market, not just those homes currently listed for-rent. The index is dollar-denominated by computing the mean of listed rents that fall into the 35th to 65th percentile range for all homes and apartments in a given region, which is weighted to reflect the rental housing stock. It comes from Zillow.
--	Source URL: https://www.zillow.com/research/data/ 
--	Source Type: Bulk data
--	Challenges: The data is only available at the zip code level, which may not be granular enough for our analysis. In addition, it is only an approximation of rental price over a band. Alternatively, we may scrape rental data from Zillow to get a neighborhood index of renter affordability and develop a clearer sense of the rental price distribution. 
+### Data Source #3: Zillow Observed Renter Index (ZORI)
+Source URL: https://www.zillow.com/research/data/
+Source Type: Bulk data
+Approximate Number of Records (rows): 23 (after filtering for San Francisco)
+Approximate Number of Attributes (columns): 60 (after filtering for 2019-2023)
+Current Status: We have explored this dataset -- it provides a monthly estimate of average rent in each zip code of SF. 
+Challenges: One challenge is missing data. SF has over 40 zip codes, but this dataset only includes 23. In addition, certain months are missing for certain zip codes. The second challenge is that this dataset is at the zip code level, but we plan to do our overall analysis at the census tract level. We plan to reconcile this by combining the ACS data (which will provide one monthly rent estimate for each census tract over the 2019-2023 period) with this dataset (which provides a monthly rent estimate for each zip code for every month from 2019 to 2023), to overall get an estimate of the monthly rent in each census tract for every month from 2019 t0 2023. 
 
 ## Data Reconciliation Plan
 
-One of the most important steps for this milestone is to have a plan as to how your data sources will connect.
-
-For each data set, you will need to identify the "unique key" that will allow you to connect it to other data sets.
-- key
-1.1 311 : address, street, supervisor district, neighbor, police district, lat, long
-1.2 quarterly : observed month, police district, lat/long
-1.3 HSH shelter : x (useing for the total num of size)
-
-Example 1: You have two data sets: healthcare costs on a zip code level & employment figures on a county level. You will need to determine a mapping between zip code & county. You aren't sure how you'll go about joining them-- figuring that gap out now helps us identify that this will require a third data set available from the US Census so you can plan accordingly.
-
-Example 2: You have three data sets: a list of companies that were fined for illegal emissions, a list of companies that have government contracts, and a list of company addresses. You identify that there won't be a perfect match between the three data sets, but you will need to put some effort into matching irregularly formatted company names.
+Source 1.1 (311 calls): location = lat, long; date = requested_datetime
+Source 1.2 (Tents): location = lat, long; date = 
+Source 1.3 (HSH shelter): date = data_as_of
+Source 2 (ACS): location = GEOID
+Source 3 (ZORI): location = RegionName; date = individual columns (there is a column for every month)
 
 ## Project Plan
 
@@ -110,5 +88,5 @@ The final goal of this milestone is to develop a team plan that will keep you on
 
 ## Questions
 
-1. Help with statistical analysis
-2. Help with Zillow or other place to get rental data
+1. Getting what we need from data source #1.2 will probably be the most challenging part of this project. We wanted to double check with you that you also cannot find the raw dataset for the map dashboard (for 2019 to 2023) before we proceed with figuring out how to scrape the map. 
+2. 
