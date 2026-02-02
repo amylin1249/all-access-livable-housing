@@ -18,7 +18,7 @@ Source URL: https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/about
 Source Type: Bulk data
 Approximate Number of Records (rows): 210,804 (Filtered for category: encampment and encampments and dates: 2019-2023)
 Approximate Number of Attributes (columns): 25
-Current Status: We have explored the data -- this one gives us 311 service calls with a specific date of the call and a location of the call (latitude/longitude). We started writing the initial code to convert the API into a Pandas dataframe.
+Current Status: We have downloaded and explored the data -- this one gives us 311 service calls with a specific date of the call and a location of the call (latitude/longitude). 
 Challenges: There could be reporting bias (vs. official counts), since this data reflects citizen reporting behavior rather than a verified census. This may lead to higher densities in neighborhoods where residents are more likely to report issues, which might not perfectly align with the actual distribution of the unhoused population. There could also be issues with duplication, as multiple people could call for the same incident. Unfortunately, these challenges are unavoidable, but we still want to include this dataset in order to make sure our estimation of homelessness in SF is as accurate as possible, as there is always a risk of undercounting the population (so potential duplication can, in a way, counterbalance the undercounting).
 
 #### Data Source #1.2: Quarterly count of tents, structures, and lived-in vehicles
