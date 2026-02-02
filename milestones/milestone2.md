@@ -15,7 +15,7 @@ Finding the relationship between homelessness and housing prices, to demonstrate
 ### Data Source #1: DataSF Open Data Portal
 #### Data Source #1.1: 311 Cases
 Source URL: https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/about_data
-Source Type: API
+Source Type: Bulk data
 Approximate Number of Records (rows): 210,804 (Filtered for category: encampment and encampments and dates: 2019-2023)
 Approximate Number of Attributes (columns): 25
 Current Status: We have explored the data -- this one gives us 311 service calls with a specific date of the call and a location of the call (latitude/longitude). We started writing the initial code to convert the API into a Pandas dataframe.
@@ -65,26 +65,32 @@ Challenges: One challenge is missing data. SF has over 40 zip codes, but this da
 ## Data Reconciliation Plan
 
 Source 1.1 (311 calls): location = lat, long; date = requested_datetime
-Source 1.2 (Tents): location = lat, long; date = 
+Source 1.2 (Tents): location = lat, long; date = quarterly
 Source 1.3 (HSH shelter): date = data_as_of
 Source 2 (ACS): location = GEOID
 Source 3 (ZORI): location = RegionName; date = individual columns (there is a column for every month)
 
 ## Project Plan
 
-The final goal of this milestone is to develop a team plan that will keep you on track for the remainder of the quarter.
+1. Finish extracting all data. (Week 5)
+- We currently have data sources 1.1, 2.1, 2.2, and 3 downloaded as CSV files.
+- We will need to webscrape to get the data we need from 1.2. (Lily/Haeji)
+- We will need to use get requests to get the data we need from 1.3. (Amy/Amanda)
 
-1. Identify the key components of your project based on the criteria and your intended end result. (e.g. "Web scrape data source #1", "Merge code for Data Sources #2 and #3", "Map-based visualization")
-- API-based Data Extraction and Consolidation (Data Source #1.1,#1.2,#1.3)
-- Temporal Resampling & Data Normalization(data scales match)
-- Data Integration & Alignment
-- Map-based Visualization
-- Encampment Volatility Mapping
-- Cross-Variable Correlation Modeling
-- Predictive Simulation Analysis
+2. Clean and process data across all sources, including addressing missing values and doing interpolations as needed to estimate locations and dates. (Week 6)
+- Data source 1.1: This is daily data with specific latitudes/longitudes. We will need to aggregate it into monthly counts. (Amanda)
+- Data source 1.2: This is quarterly data with specific latitudes/longitudes. We will need to interpolate it so that it is monthly. (Lily)
+- Data source 1.3: This is daily data with no location. We will need to aggregate it into monthly counts and then estimate its geographic distribution based on data sources 1.2 and 1.3. (Haeji)
+- Data sources 2.1 and 2.2: We need to combine these so that we have the census data for the census tracts specifically within SF. (Amanda)
+- Data source 3: This is monthly data with zip code for location. We will need to combine it with data sources 2.1 and 2.2 to estimate its geographic distribution within census tracts. (Amy)
 
-2. For each component identify who will be responsible, and when it should be ready. Consider if any components rely on others and how to mitigate the effect on the dependent team members (e.g. mock data for the visualization until the real data is ready)
-3. Put this together into a (rough) weekly plan. What will be built by Week 7's prototype? 
+3. ⁠Integrate data sources via spatial joins, matching point-level data to SF census tracts. (Week 7) (Amanda/Amy)
+
+4. ⁠Conduct statistical analysis to assess correlations between homelessness measures, housing prices, and demographic indicators across census tracts over time. (Week 7) (Lily/Haeji)
+
+5. ⁠Develop a predictive or simulation model to examine potential changes in homelessness measures against changes in rent prices. (Week 8) (Amanda/Amy/Lily/Haeji)
+
+6. ⁠Create map-based and time-series visualizations to communicate patterns and relationships in homelessness, housing costs, and demographics. (Week 9) (Amanda/Amy/Lily/Haeji)
 
 ## Questions
 
