@@ -93,4 +93,3 @@ Source 3 (ZORI): location = RegionName; date = individual columns (there is a co
 ## Questions
 
 1. Getting what we need from data source #1.2 will probably be the most challenging part of this project. We wanted to double check with you that you also cannot find the raw dataset for the map dashboard (for 2019 to 2023) before we proceed with figuring out how to scrape the map. 
-2. 
