@@ -1,16 +1,19 @@
 import sys
 import lxml.html
-from .utils import make_request, make_link_absolute
+import httpx
+import time
+
+REQUEST_DELAY = 0.5
 
 
-def scrape_park_page(url):
+def scrape_page(url):
     """
     This function takes a URL to a park page and returns a
     dictionary with the title, address, description,
     and history of the park.
 
     Parameters:
-        * url:  a URL to a park page
+        * url:  a URL to the page
 
     Returns:
         A dictionary with the following keys:
@@ -20,6 +23,13 @@ def scrape_park_page(url):
             * description:  the description of the park
             * history:      the history of the park
     """
+    ### TBD - if we want to create a cache directory (similar to PA1)
+    ### TBD - if we want to check if URL starts with an allowed domain name
+
+    # Make HTTP request to server
+    time.sleep(REQUEST_DELAY)
+    resp = httpx.get(url)
+
     response = make_request(url)
     root = lxml.html.fromstring(response.text)
 
