@@ -5,5 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "httpx>=0.28.1",
     "pandas>=3.0.0",
+    "ruff>=0.15.0",
+    "sodapy>=2.2.0",
 ]
