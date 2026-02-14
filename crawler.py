@@ -5,119 +5,100 @@ import time
 import json
 import datetime
 
-REQUEST_DELAY = 0.5
+REQUEST_DELAY = 1
+EXPORT_URL_TEMPLATE = "https://data.sfgov.org/api/archival.csv?id=w4sk-nq57&version=VERSION&method=export"
+API_URL = "https://data.sfgov.org/api/publishing/v1/revision/w4sk-nq57/changes?cursor="
 
 
-def get_data(
-    starting_url="https://data.sfgov.org/api/archival.csv?id=w4sk-nq57&version=4867&method=export",
-):
+def get_data():
     """
+    ADD DOCSTRING
     """
-    url = starting_url
-    # current version number Feb 8 2026
-    version = 4867
+    export_url = EXPORT_URL_TEMPLATE
+    next_page_url = API_URL
 
-    # total counts of people on waitlist in any given month
+    # Total counts of people on waitlist in any given month
     counts_per_month = {}
 
-    # number of days that had data for any given month
+    # Number of days that had data for any given month
     days_per_month = {}
 
-    # oldest version number July 5 2024
-    while version >= 4286:
+    # Dummy value to ensure shelters_next_page is not 0 and will run in while loop
+    shelters_next_page = 1
+
+    while shelters_next_page:
+        # Access first page of hidden API (i.e., most recent records)
         time.sleep(REQUEST_DELAY)
-        resp = httpx.get(url)
-        # split data into rows
-        data = resp.text.split("\n")[1:-1]
-        # grab yyyy-mm for current file
-        date = data[1][-24:-17]
-        # issue with timeout error
-        if date != "":
-            counts_per_month[date] = counts_per_month.get(date, 0) + len(data)
-            days_per_month[date] = days_per_month.get(date, 0) + 1
-        url = url.replace(f"version={version}", f"version={version - 1}")
-        version -= 1
+        shelters_json = httpx.get(API_URL).json() ### SHOULD WE CREATE CACHE SINCE THIS IS REPEATED ACROSS BOTH FUNCTIONS?
+
+        # Get key fields of each record (i.e., counts per day)
+        for record in shelters_json["resource"]:
+            version = record["value"]["version"]
+            year_month = record["value"]["created_at"][:7]
+            export_url = EXPORT_URL_TEMPLATE.replace("VERSION", version)
+
+            time.sleep(REQUEST_DELAY)
+            export_resp = httpx.get(export_url)
+
+            # Split data into rows, excluding header and last blank row
+            data = export_resp.text.split("\n")[1:-1]
+
+            # HAVEN'T ACCOUNTED FOR TIMEOUT ERRORS YET
+            counts_per_month[year_month] = counts_per_month.get(year_month, 0) + len(data)
+            days_per_month[year_month] = days_per_month.get(year_month, 0) + 1
+    
+        # Check if next page exists -- not using helper function yet
+        shelters_next_page = shelters_json["meta"]["next"]
+
+        if shelters_next_page:
+            next_page_url = next_page_url + shelters_next_page
+
+    return counts_per_month, days_per_month
 
 
-# def scrape_page(url):
+def get_next_page_url(url):
+    """
+    This function takes a URL to a page of shelter information (incl. version
+    number and date) and returns a URL to the next page if one exists.
+
+    If no next page exists, this function returns None.
+    """
+    pass
+
+
+### OLD FUNCTION WE WROTE
+# def get_data(
+#     starting_url="https://data.sfgov.org/api/archival.csv?id=w4sk-nq57&version=4867&method=export",
+# ):
 #     """
-#     This function takes a URL to a park page and returns a
-#     dictionary with the title, address, description,
-#     and history of the park.
-
-#     Parameters:
-#         * url:  a URL to the page
-
-#     Returns:
-#         A dictionary with the following keys:
-#             * url:          the URL of the park page
-#             * name:         the name of the park
-#             * address:      the address of the park
-#             * description:  the description of the park
-#             * history:      the history of the park
 #     """
-#     ### TBD - if we want to create a cache directory (similar to PA1)
-#     ### TBD - if we want to check if URL starts with an allowed domain name
+#     url = starting_url
+#     # current version number Feb 8 2026
+#     version = 4867
 
-#     # Make HTTP request to server
-#     time.sleep(REQUEST_DELAY)
-#     resp = httpx.get(url)
+#     # total counts of people on waitlist in any given month
+#     counts_per_month = {}
 
-#     response = make_request(url)
-#     root = lxml.html.fromstring(response.text)
+#     # number of days that had data for any given month
+#     days_per_month = {}
 
-#     # Extract park name, address, and description from the park page
-#     park_name = root.cssselect("div.page-title h2")[0]
-#     park_address = root.cssselect("p.address")[0]
-#     park_description = root.xpath(
-#         "//h3[contains(text(), 'Description')]/following-sibling::div"
-#     )[0]
-
-#     # Extract park history only if it has a history section
-#     if len(root.xpath("//h3[contains(text(), 'History')]")) == 0:
-#         park_history = ""
-#     else:
-#         history = root.xpath(
-#             "//h3[contains(text(), 'History')]/following-sibling::div"
-#         )[0]
-#         park_history = history.text_content()
-
-#     park_data = {
-#         "url": url,
-#         "name": park_name.text_content(),
-#         "address": park_address.text_content(),
-#         "description": park_description.text_content(),
-#         "history": park_history,
-#     }
-
-#     return park_data
+#     # oldest version number July 5 2024
+#     while version >= 4286:
+#         time.sleep(REQUEST_DELAY)
+#         resp = httpx.get(url)
+#         # split data into rows
+#         data = resp.text.split("\n")[1:-1]
+#         # grab yyyy-mm for current file
+#         date = data[1][-24:-17]
+#         # issue with timeout error
+#         if date != "":
+#             counts_per_month[date] = counts_per_month.get(date, 0) + len(data)
+#             days_per_month[date] = days_per_month.get(date, 0) + 1
+#         url = url.replace(f"version={version}", f"version={version - 1}")
+#         version -= 1
 
 
-# parks_json = make_request(url).json()
-
-# for park in parks_json["parks"]:
-#     park_rel_url = "/parks/" + str(park["id"])
-#     park_urls.append(make_link_absolute(park_rel_url, url))
-
-# return park_urls
-
-# def get_next_page_url(url):
-#     """
-#     This function takes a URL to a page of parks and returns a
-#     URL to the next page of parks if one exists.
-
-#     If no next page exists, this function returns None.
-#     """
-#     parks_json = make_request(url).json()
-#     parks_next_page = parks_json["next_page"]
-
-#     if parks_next_page:
-#         next_page_rel_url = "?page=" + parks_next_page
-#         next_page_url = make_link_absolute(next_page_rel_url, url)
-#         return next_page_url
-#     return None
-
-
+# NEED TO MODIFY THIS
 if __name__ == "__main__":
     """
     Tip: It can be convenient to add small entrypoints to submodules

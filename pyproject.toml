@@ -10,4 +10,5 @@ dependencies = [
     "pandas>=3.0.0",
     "ruff>=0.15.0",
     "sodapy>=2.2.0",
+    "lxml>=6.0.2",
 ]
