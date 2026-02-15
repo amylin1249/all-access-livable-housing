@@ -29,13 +29,13 @@ def get_data():
     while shelters_next_page:
         # Access first page of hidden API (i.e., most recent records)
         time.sleep(REQUEST_DELAY)
-        shelters_json = httpx.get(API_URL).json() ### SHOULD WE CREATE CACHE SINCE THIS IS REPEATED ACROSS BOTH FUNCTIONS?
+        shelters_json = httpx.get(API_URL).json()
 
         # Get key fields of each record (i.e., counts per day)
         for record in shelters_json["resource"]:
             version = record["value"]["version"]
             year_month = record["value"]["created_at"][:7]
-            export_url = EXPORT_URL_TEMPLATE.replace("VERSION", version)
+            export_url = EXPORT_URL_TEMPLATE.replace("VERSION", str(version))
 
             time.sleep(REQUEST_DELAY)
             export_resp = httpx.get(export_url)
@@ -47,23 +47,10 @@ def get_data():
             counts_per_month[year_month] = counts_per_month.get(year_month, 0) + len(data)
             days_per_month[year_month] = days_per_month.get(year_month, 0) + 1
     
-        # Check if next page exists -- not using helper function yet
         shelters_next_page = shelters_json["meta"]["next"]
-
-        if shelters_next_page:
-            next_page_url = next_page_url + shelters_next_page
+        next_page_url = next_page_url + shelters_next_page
 
     return counts_per_month, days_per_month
-
-
-def get_next_page_url(url):
-    """
-    This function takes a URL to a page of shelter information (incl. version
-    number and date) and returns a URL to the next page if one exists.
-
-    If no next page exists, this function returns None.
-    """
-    pass
 
 
 ### OLD FUNCTION WE WROTE
