@@ -8,7 +8,8 @@
 (Lily) work in progress
 
 #### Data Source #1.2: Quarterly count of tents, structures, and lived-in vehicles
-(Amy) email with bryan.v.wong@sfgov.org on 02/09/2026 - trying to get access to underlying dataset for map
+(Amy) email with bryan.v.wong@sfgov.org on 02/09/2026 - trying to get access to underlying dataset for map, rebumped on 02/15/2026
+(Amy) tried to webscrape map directly, can go Network --> largest querydata file, but access issues to direct url
 
 #### Data Source #1.3: HSH Shelter Waitlist
 (Amy) email with HSHSunshine@sfgov.org on 02/09/2026 - trying to get access to archives past July 5, 2024

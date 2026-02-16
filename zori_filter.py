@@ -7,7 +7,7 @@ def get_cleaned_zori_dict() :
     -return2 : rent_dict {mon-year : [(zipcode, dollar amount)]}
     """
     # load data
-    df = pd.read_csv('data/zori_by_zip.csv')
+    df = pd.read_csv('clean_data/zori_by_zip.csv')
 
     # column(City) ==  'San Francisco'
     zip_sf = df[df['City'] == 'San Francisco'].copy()
