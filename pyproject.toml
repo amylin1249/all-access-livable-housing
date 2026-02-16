@@ -11,4 +11,5 @@ dependencies = [
     "ruff>=0.15.0",
     "sodapy>=2.2.0",
     "lxml>=6.0.2",
+    "shapely>=2.1.2",
 ]
