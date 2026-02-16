@@ -48,7 +48,8 @@ def get_data():
             days_per_month[year_month] = days_per_month.get(year_month, 0) + 1
 
         shelters_next_page = shelters_json["meta"]["next"]
-        next_page_url = API_URL + shelters_next_page
+        if shelters_next_page:
+            next_page_url = API_URL + shelters_next_page
 
     return counts_per_month, days_per_month
 
@@ -83,6 +84,7 @@ def get_data():
 #             days_per_month[date] = days_per_month.get(date, 0) + 1
 #         url = url.replace(f"version={version}", f"version={version - 1}")
 #         version -= 1
+#     return counts_per_month, days_per_month
 
 
 # NEED TO MODIFY THIS
