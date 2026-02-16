@@ -27,3 +27,6 @@ results = client.get("w4sk-nq57_version_4863", limit=2000)
 
 # Convert to pandas DataFrame
 results_df = pd.DataFrame.from_records(results)
+
+
+#https://data.sfgov.org/api/publishing/v1/revision/w4sk-nq57/changes?cursor=&limit=100000000
