@@ -6,7 +6,9 @@ import json
 import datetime
 
 REQUEST_DELAY = 1
-EXPORT_URL_TEMPLATE = "https://data.sfgov.org/api/archival.csv?id=w4sk-nq57&version=VERSION&method=export"
+EXPORT_URL_TEMPLATE = (
+    "https://data.sfgov.org/api/archival.csv?id=w4sk-nq57&version=VERSION&method=export"
+)
 API_URL = "https://data.sfgov.org/api/publishing/v1/revision/w4sk-nq57/changes?cursor="
 
 
@@ -43,11 +45,12 @@ def get_data():
             # Only include URLs that autodownload CSV file in the counts;
             # excludes any URL that leads to timeout error
             if export_resp.headers.get("Content-Type").startswith("text/csv"):
-
                 # Split data into rows, excluding header and last blank row
                 data = export_resp.text.split("\n")[1:-1]
 
-                counts_per_month[year_month] = counts_per_month.get(year_month, 0) + len(data)
+                counts_per_month[year_month] = counts_per_month.get(
+                    year_month, 0
+                ) + len(data)
                 days_per_month[year_month] = days_per_month.get(year_month, 0) + 1
 
         shelters_next_page = shelters_json["meta"]["next"]
