@@ -1,5 +1,6 @@
 # Research on homeless estimates
 (Haeji) 2024 SF point-in-time counts -- mentions that families tend to live in vehicles while singles live in tents
+-- defined weighting logic -- Established conservative multipliers for unsheltered populations: Families (Vehicles): 2.1 persons per vehicle (Conservative vs. 2.72 estimate dactual average-Based on 2024 PIT data: 1,103 persons across 405 families); Singles (Tents/Structures): 1.1 persons per unit (Accounting for primarily single occupancy with minimal overlap)-> Justification: Using lower multipliers ensures the model remains robust against overestimation while acknowledging different living patterns between families and singles
 
 ## Data Sources
 
