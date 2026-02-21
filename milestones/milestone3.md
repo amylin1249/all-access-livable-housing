@@ -18,10 +18,10 @@ Evictions
 - 
 
 Census & ACS
-- 
+- Downloaded related files (2020-24 ACS 5-year csv, SF census tracts csv, California census tracts shapefiles)
 
 Shelter waitlist (archived)
-- Wrote code to scrape archives and download files from hidden API to get counts, but decided to put this dataset aside for now due to the lack of data availability for the full period of analysis (partial data available only from July 2024-present; data are also estimates)
+- Wrote a working code to scrape archives and download files from hidden API to get counts, but put this dataset aside for now due to the lack of data availability for the full period of analysis (partial data available only from July 2024-present; data are also estimates)
 
 
 # An initial draft of data reconciliation/cleaning process.
