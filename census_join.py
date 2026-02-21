@@ -67,6 +67,11 @@ def join_acs_data():
     ### Change function to use PD? 
     csv.field_size_limit(sys.maxsize)
 
+    cleaned_pop_acs = clean_acs_data(POP_PATH, POP_ID)
+    cleaned_race_acs = clean_acs_data(RACE_PATH, WHITE_POP_ID)
+    cleaned_rent_acs = clean_acs_data(RENT_PATH, RENT_ID)
+    cleaned_hh_inc_acs = clean_acs_data(HH_INC_PATH, HH_INC_ID)
+
     with open(SF_CENSUS_PATH) as f:
         reader = csv.DictReader(f)
 
@@ -76,12 +81,10 @@ def join_acs_data():
 
             for row in reader:
                 geo_id = row["geoid"]
-                population = clean_acs_data(POP_PATH, POP_ID)[geo_id]
+                population = cleaned_pop_acs[geo_id]
 
                 if population > 0:
-                    white_pct = (
-                        clean_acs_data(RACE_PATH, WHITE_POP_ID)[geo_id] / population
-                    )
+                    white_pct = (cleaned_race_acs[geo_id] / population)
                 else:
                     white_pct = None
 
@@ -89,8 +92,8 @@ def join_acs_data():
                     {
                         KEYS[0]: geo_id,
                         KEYS[1]: population,
-                        KEYS[2]: clean_acs_data(RENT_PATH, RENT_ID)[geo_id],
-                        KEYS[3]: clean_acs_data(HH_INC_PATH, HH_INC_ID)[geo_id],
+                        KEYS[2]: cleaned_rent_acs[geo_id],
+                        KEYS[3]: cleaned_hh_inc_acs[geo_id],
                         KEYS[4]: white_pct,
                     }
                 )
@@ -170,7 +173,7 @@ def add_sf_tract_data():
 
 def visualize_sf_tracts():
     """
-    Add docstring
+    Visualize SF tracts on a map
     """
     sf_tracts = gpd.read_file("clean-data/sf_tracts_shapefiles/sf_tracts.shp")
     sf_tracts.plot()
