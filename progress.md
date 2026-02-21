@@ -25,7 +25,9 @@ request formally submitted 02/10/2026 - follow-up from department required by 02
 
 #### Data Source #2.2: Listing and geographic boundaries of census tracts in SF
 (Amanda) download done -- downloaded SF 2020 census tracts
-(Amanda) wrote code to match ACS data to the SF census tracts (that only have geometry and GEOID fields populated); still debugging an issue about exceeding the field limit
+(Amanda) wrote code to combine ACS data for each SF census tract
+(Amanda) wrote code to filter Califonia shapefiles for SF-specific shapefiles
+(Amanda) wrote code to add SF ACS data (in CSV) as attributes in SF shapefiles
 
 ### Data Source #3: Zillow Observed Renter Index (ZORI)
 (Haeji) download done --  downloaded ZORI zip-level data
