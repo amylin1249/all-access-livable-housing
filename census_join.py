@@ -1,11 +1,8 @@
 import csv
 import sys
-import shapefile
 import pandas as pd
 import geopandas as gpd
-import matplotlib.pyplot as plt
 from pathlib import Path
-from shapely.geometry import Point, Polygon
 
 
 SF_CENSUS_PATH = "raw-data/census/sf_census_tracts_2020.csv"
@@ -149,41 +146,7 @@ def add_sf_tract_data():
     return sf_acs_data
 
 
-# def load_shapefiles(path: Path) -> Tract:
-#     """
-#     Extract and parse polygons from Census shapefiles.
-#     """
-#     tracts = []
-#     with shapefile.Reader(path) as sf:
-#         # This iterates over all shapes with their associated data.
-#         for shape_rec in sf.shapeRecords():
-#             # the shape_rec object here has two properties of interest
-#             #    shape_rec.record - dict containing the data attributes
-#             #                       associated with the shape
-#             #    shape_rec.shape.points - list of WKT points, used to construct
-#             #                             a shapely.Polygon
-#             tracts.append(
-#                 Tract(
-#                     id=shape_rec.record["TRACTCE"],
-#                     polygon=Polygon(shape_rec.shape.points),
-#                 )
-#             )
-#     return tracts
-
-
-def visualize_sf_tracts():
-    """
-    Visualize SF tracts on a map
-    """
-    sf_tracts = gpd.read_file(MERGED_SF_TRACTS_SHP)
-    sf_tracts.plot()
-    plt.show()
-
-
 if __name__ == "__main__":
-    # join_acs_data()
-    # create_sf_shapefiles()
-    # add_sf_tract_data()
-    visualize_sf_tracts()
-    
-
+    join_acs_data()
+    create_sf_shapefiles()
+    add_sf_tract_data()  

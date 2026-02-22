@@ -16,12 +16,14 @@
 (Amy) email with HSHSunshine@sfgov.org on 02/09/2026 - trying to get access to archives past July 5, 2024
 request formally submitted 02/10/2026 - follow-up from department required by 02/19/2026 
 (Amy/Amanda) wrote code that scrapes the archives, functional aside from when loading a webpage takes too long - emailed James 02/09/2026
-(Amanda) updated code to use the method that gets the date and version number of each (daily) dataset from a hidden API, instead of manually extracting start/end version numbers and changing version numbers as we iterate through. issue persists where the data is not downloaded if loading the webpage takes too long after we run the code  
+(Amanda) updated code to use the method that gets the date and version number of each (daily) dataset from a hidden API, instead of manually extracting start/end version numbers and changing version numbers as we iterate through. issue persists where the data is not downloaded if loading the webpage takes too long after we run the code
 
 ### Data Source #2: Census Data
 #### Data Source #2.1: ACS data on rental costs and demographic data 
 (Amanda) download done -- downloaded ACS data for 2020-24 5-year period for population, rent, household income, and race; uploaded data (specifically for San Francisco county) in the data/census folder
 (Amanda) wrote code to clean and extract data from the relevant column for each ACS dataset
+(Amanda) wrote code on quadtrees (mainly from PA 4) to match points to census tracts; slight changes from PA 4 to store match output as a dictionary instead of a tuple, and changed to SF bounding box 
+(Amanda) started visualization of SF tracts (mainly used code from Lab 3 on GIS); to be further improved and re-evaluated post-visualizations class to make it interactive
 
 #### Data Source #2.2: Listing and geographic boundaries of census tracts in SF
 (Amanda) download done -- downloaded SF 2020 census tracts

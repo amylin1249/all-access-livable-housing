@@ -3,9 +3,24 @@ import shapefile
 import folium
 import pathlib
 import webbrowser
+import geopandas as gpd
+import seaborn as sns
+import matplotlib.pyplot as plt
 from pyproj import Transformer, CRS
 from shapely import geometry
 from shapely.ops import transform
+
+
+MERGED_SF_TRACTS_SHP = "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+
+
+def visualize_sf_tracts():
+    """
+    Visualize SF tracts using MatPlotLib
+    """
+    sf_tracts = gpd.read_file(MERGED_SF_TRACTS_SHP)
+    sf_tracts.plot()
+    plt.show()
 
 
 def load_shapefile(
@@ -72,44 +87,43 @@ def get_epsg_from_file(filename: str):
     return CRS.from_wkt(prj_text).to_epsg()
 
 
-def shapefile_stats(shapefile_data: list[tuple]):
+def create_scatterplot():
     """
-    Given a shapefile, print some basic stats:
+    Docstring
+    """
+    sns.set_theme(style="whitegrid")
 
-    Number of records:
-    Feature attributes:
+    # Load the example diamonds dataset
+    diamonds = sns.load_dataset("diamonds")
 
-    Note: Every feature in a dataset will have the same attributes,
-    you can use a single one of the feature dictionaries & do not need
-    to compare/combine keys from multiple features.
-    """    
-    print(f"Number of records: {len(shapefile_data)}")
-    print("Feature attributes:")
-    for key in shapefile_data[0][1]:
-        print(key)
+    # Draw a scatter plot while assigning point colors and sizes to different
+    # variables in the dataset
+    f, ax = plt.subplots(figsize=(6.5, 6.5))
+    sns.despine(f, left=True, bottom=True)
+    clarity_ranking = ["I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF"]
+    sns.scatterplot(x="carat", y="price",
+                    hue="clarity", size="depth",
+                    palette="ch:r=-.2,d=.3_r",
+                    hue_order=clarity_ranking,
+                    sizes=(1, 8), linewidth=0,
+                    data=diamonds, ax=ax)
 
 
 TO_PROJ_EPSG = "EPSG:4326"  # WGS 84 global projection
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 2:
         print(
-            "Usage: uv run python visualize.py (stats|map) path/to/shapefile.shp"
+            "Usage: uv run python visualize.py path/to/shapefile.shp"
         )
         sys.exit(1)
 
-    command = sys.argv[1]
-    filename = sys.argv[2]
+    filename = sys.argv[1]
 
     shapefile_data = load_shapefile(filename)
     prj_file = filename.replace("shp", "prj")
     from_epsg = get_epsg_from_file(prj_file)
     data = reproject_geometries(shapefile_data, from_epsg, TO_PROJ_EPSG)
 
-    match command:
-        case "stats":
-            print(f"Filename: {filename}")
-            shapefile_stats(data)
-        case "map":
-            quick_map(data)
-    # uv run python visualize.py map clean-data/merged_sf_shapefiles/merged_sf_tracts.shp
+    quick_map(data)
+    # uv run python visualize.py clean-data/merged_sf_shapefiles/merged_sf_tracts.shp
