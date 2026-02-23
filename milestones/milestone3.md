@@ -1,7 +1,9 @@
 # All Access Livable Housing
 
 ## A repository with an appropriate project layout.
-- 
+- Updated repository to have a src directory which contains all our source codes, where each file serves a different function (e.g., get_data.py to extract data, process_data.py to clean and merge data, etc.)
+- Note: Code in process_zori.py will be moved to process_data.py once the code is cleaned
+- Other directories include raw-data and clean-data, which differentiate our raw data files from our processed data files
 
 
 ## Working data import code for at least one of your sources.
@@ -12,7 +14,7 @@
 
 
 ## An initial draft of data reconciliation/cleaning process.
-- Cleaned data for 311 cases, ZORI, encampments (TBD), census and ACS; imputed missing data for ZORI (refer to process_data.py for code)
+- Cleaned data for 311 cases, ZORI, encampments, census and ACS; imputed missing/odd data for ZORI and census (refer to process_data.py for code)
 - Started reconciling data by joining ACS data to the respective census tracts in the shapefiles (refer to process_data.py for code) and wrote code to match point data to census tracts via quadtrees (refer to quadtree.py for code)
 
 
