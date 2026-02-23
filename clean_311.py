@@ -18,7 +18,7 @@ class Encampment(NamedTuple):
     status_notes: str
 
 
-DATA_DIR = Path(__file__).parent / "data"
+DATA_DIR = Path(__file__).parent / "raw-data"
 
 
 ### data - reformat into new csv that generalizes dates into year and month and preserve lat/lon
