@@ -1,6 +1,7 @@
 import csv
 import sys
 import pandas as pd
+import numpy as np
 import geopandas as gpd
 
 
@@ -21,78 +22,49 @@ RENT_ID = "AUWGE001"
 HH_INC_ID = "AURUE001"
 WHITE_POP_ID = "AUO7E002"
 
-KEYS = ["geo_id", "population", "med_rent", "med_hh_inc", "white_pct"]
+EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
 
 
-def clean_acs_data(file_path: str, col_name: str) -> dict:
+def process_acs_data():
     """
-    This function will load the data from the ACS files saved and
-    return a list of CleanedData tuples.
+    Load the data from the ACS files saved, impute negative or zero values in
+    rent and household income, merge them based on GeoID, and save the merged
+    dataframe to a new file.
 
-    In each file:
+    In each ACS file:
     - Tracts will be identified by their GeoID ("TL_GEO_ID")
-    - Data to be saved will be found in the column with the unique identifier
-
-    Parameters:
-        col_name: Identifier for the column with the relevant data in that file
-
-    Returns:
-        A dictionary of GeoID keys that map to their data fields
-        (None if the original data is a negative value)
+    - Data to be merged will be found in the column with the unique identifier
     """
-    cleaned_data = {}
-
-    with open(file_path) as f:
-        reader = csv.DictReader(f)
-
-        for row in reader:
-            geo_id = row["TL_GEO_ID"]
-            data = int(row[col_name])
-            if data >= 0:
-                cleaned_data[geo_id] = data
-            else:
-                cleaned_data[geo_id] = None
-
-    return cleaned_data
-
-
-def join_acs_data():
-    """
-    Docstring
-    """
-    ### Change function to use PD?
     csv.field_size_limit(sys.maxsize)
 
-    cleaned_pop_acs = clean_acs_data(POP_PATH, POP_ID)
-    cleaned_race_acs = clean_acs_data(RACE_PATH, WHITE_POP_ID)
-    cleaned_rent_acs = clean_acs_data(RENT_PATH, RENT_ID)
-    cleaned_hh_inc_acs = clean_acs_data(HH_INC_PATH, HH_INC_ID)
+    pop_df = pd.read_csv(POP_PATH, usecols=["TL_GEO_ID", POP_ID], dtype={"TL_GEO_ID": "str"})
+    race_df = pd.read_csv(RACE_PATH, usecols=["TL_GEO_ID", WHITE_POP_ID], dtype={"TL_GEO_ID": "str"})
+    rent_df = pd.read_csv(RENT_PATH, usecols=["TL_GEO_ID", RENT_ID], dtype={"TL_GEO_ID": "str"})
+    hh_inc_df = pd.read_csv(HH_INC_PATH, usecols=["TL_GEO_ID", HH_INC_ID], dtype={"TL_GEO_ID": "str"})
 
-    with open(SF_CENSUS_PATH) as f:
-        reader = csv.DictReader(f)
+    # Impute negative or zero values in rent and household income dataframes
+    # with the mean of their positive values
+    mean_rent = round(rent_df.loc[rent_df[RENT_ID] > 0, RENT_ID].mean())
+    rent_df.loc[rent_df[RENT_ID] <= 0, RENT_ID] = mean_rent
 
-        with open(SF_ACS_JOIN, "w") as f:
-            writer = csv.DictWriter(f, KEYS)
-            writer.writeheader()
+    mean_hh_inc = round(hh_inc_df.loc[hh_inc_df[HH_INC_ID] > 0, HH_INC_ID].mean())
+    hh_inc_df.loc[hh_inc_df[HH_INC_ID] <= 0, HH_INC_ID] = mean_hh_inc
 
-            for row in reader:
-                geo_id = row["geoid"]
-                population = cleaned_pop_acs[geo_id]
+    # Rename population, race, rent, and household income column names
+    pop_df = pop_df.rename(columns={POP_ID: "population"})
+    race_df = race_df.rename(columns={WHITE_POP_ID: "white_pop"})
+    rent_df = rent_df.rename(columns={RENT_ID: "med_rent"})
+    hh_inc_df = hh_inc_df.rename(columns={HH_INC_ID: "med_hh_inc"})
 
-                if population > 0:
-                    white_pct = cleaned_race_acs[geo_id] / population
-                else:
-                    white_pct = None
+    # Merge individual dataframes based on GEO_ID 
+    joined_df = pd.merge(pop_df, race_df, on="TL_GEO_ID", how='left')
+    joined_df = pd.merge(joined_df, rent_df, on="TL_GEO_ID", how='left')
+    joined_df = pd.merge(joined_df, hh_inc_df, on="TL_GEO_ID", how='left')
 
-                writer.writerow(
-                    {
-                        KEYS[0]: geo_id,
-                        KEYS[1]: population,
-                        KEYS[2]: cleaned_rent_acs[geo_id],
-                        KEYS[3]: cleaned_hh_inc_acs[geo_id],
-                        KEYS[4]: white_pct,
-                    }
-                )
+    # Add white_pct to df
+    joined_df["white_pct"] = np.where(joined_df["population"] > 0, joined_df["white_pop"] / joined_df["population"], 0)
+
+    joined_df.to_csv(SF_ACS_JOIN, index=False)
 
 
 def get_sf_geoid() -> list[str]:
@@ -110,7 +82,9 @@ def get_sf_geoid() -> list[str]:
     with open(SF_CENSUS_PATH) as f:
         reader = csv.DictReader(f)
         for row in reader:
-            sf_geoid.append(row["geoid"])
+            geoid = row["geoid"]
+            if geoid not in EXCLUDE_GEOIDS:
+                sf_geoid.append(geoid)
 
     return sf_geoid
 
@@ -133,11 +107,11 @@ def add_sf_tract_data():
     Add SF ACS data to SF census tract shapefiles as attributes
     """
     sf_tracts = gpd.read_file(SF_TRACTS_SHP)
-    sf_acs_data = pd.read_csv(SF_ACS_JOIN, dtype={"geo_id": "str"})
+    sf_acs_data = pd.read_csv(SF_ACS_JOIN, dtype={"TL_GEO_ID": "str"})
 
     # Align geo_id column name in sf_acs_data with GEOID column name in
     # sf_tracts shapefile
-    sf_acs_data.rename(columns={"geo_id": "GEOID"}, inplace=True)
+    sf_acs_data.rename(columns={"TL_GEO_ID": "GEOID"}, inplace=True)
 
     updated_sf_tracts = sf_tracts.merge(sf_acs_data, on="GEOID", how="left")
     updated_sf_tracts.to_file(MERGED_SF_TRACTS_SHP)
@@ -146,6 +120,6 @@ def add_sf_tract_data():
 
 
 if __name__ == "__main__":
-    join_acs_data()
+    process_acs_data()
     create_sf_shapefiles()
     add_sf_tract_data()
