@@ -37,8 +37,11 @@ request formally submitted 02/10/2026 - follow-up from department required by 02
 ### Data Source #3: Zillow Observed Renter Index (ZORI)
 (Haeji) download done --  downloaded ZORI zip-level data
 (Haeji) wrote code to filter and clean -- isolated 23 San Francisco ZIP codes and filtered time series for the 2020-2024 period
-(Haeji) wrote code to reshape and match -- reshaped wide-format data into long-format (melted) to support time-series analysis
-(Haeji) completed data architecture -- developed `zori_filter.py` to auto-generate both a cleaned CSV file and a `rent_dict` {month: (zip, rent)} for seamless merging with homeless datasets.
+(Amy) imputed data to fill missing/odd values and reshaped file for use
+
+### Data Source #3: HUD Crosswalks
+(Amy) downloaded HUD crosswalk data
+(Amy) wrote code to convert from XLSX, filter by relevant zip codes, and output desired columns to csv
 
 
 ## Data Reconciliation Plan
