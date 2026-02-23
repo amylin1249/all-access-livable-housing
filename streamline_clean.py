@@ -3,6 +3,7 @@ from typing import NamedTuple
 from pathlib import Path
 from openpyxl import load_workbook
 from datetime import datetime
+import jellyfish
 
 class encampment(NamedTuple):
     tents: int
@@ -26,6 +27,14 @@ class encampment_report(NamedTuple):
     longitude: float
     neighborhood: str
     status_notes: str
+    report_ids: str
+
+def rate(score):
+    if score >= 0.95:
+        return "high"
+    if score < 0.95 and score >= 0.80:
+        return "medium"
+    return "low"   
 
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -39,7 +48,7 @@ def clean_311():
         """
         Given a CSV containing 311, return a list of Encampment report objects.
         """
-        output = []
+        output_report = []
         reader = csv.DictReader(csvfile)
         for row in reader:
             ### Clean the date ####
@@ -58,15 +67,16 @@ def clean_311():
                 float(row.get("Longitude")),
                 row.get("Neighborhood"),
                 row.get("Status Notes").lower(),
+                []
             )
-            output.append(tuple_out)
+            output_report.append(tuple_out)
 
-    return output
+    return output_report
 
 ### Clean encampment data ###
 def clean_encampment():
-    file_input = DATA_DIR / "Historical Tent Counts"
-    wb = load_workbook("Historical Tent Counts.xlsx")
+    file_input = DATA_DIR / "Historical Tent Counts.xlsx"
+    wb = load_workbook(file_input)
     sheet_obj = wb.active
 
     for i in range(1, sheet_obj.max_column + 1):
@@ -83,7 +93,7 @@ def clean_encampment():
     assert sheet_obj.cell(row=2, column=10).value == 'Latitude'
     assert sheet_obj.cell(row=2, column=11).value == 'Longitude'
 
-    output = []
+    output_encampment = []
     for i in range(3, sheet_obj.max_row+1):
 
         sheet_obj.cell(row=3, column=1).value 
@@ -105,10 +115,21 @@ def clean_encampment():
         lat,
         lon,
         neighborhood)
-        output.append(obj)
-    return output
+        output_encampment.append(obj)
+    return output_encampment
 
 
+#### Merge the two files to filter out 311 reports associatd with marked/observed encampments ####
+
+def attached_311_reports(output_encampment, output_report):
+
+    associated_encamp = []
+
+    for encampment in output_encampment:
+        for report in output_report: 
+            if report.month == encampment.month and report.year == encampment.year:
+                if rate(jellyfish.jaro_winkler_similarity(encampment.neighborhood.lower(), report.neighborhood.lower())) == "high":
+                    associated_encamp.append((encampment, report))
 
 
  
