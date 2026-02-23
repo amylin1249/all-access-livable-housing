@@ -9,17 +9,17 @@ from openpyxl import load_workbook
 from datetime import datetime
 import jellyfish
 
-SF_CENSUS_PATH = "raw-data/census/sf_census_tracts_2020.csv"
-CALI_TRACTS_SHP = "raw-data/census/cali_tracts_shapefiles/tl_2025_06_tract.shp"
+SF_CENSUS_PATH = Path(__file__).parent.parent / "raw-data/census/sf_census_tracts_2020.csv"
+CALI_TRACTS_SHP = Path(__file__).parent.parent / "raw-data/census/cali_tracts_shapefiles/tl_2025_06_tract.shp"
 
-POP_PATH = "raw-data/census/acs_sf_population_2020_24.csv"
-RENT_PATH = "raw-data/census/acs_sf_median_rent_2020_24.csv"
-HH_INC_PATH = "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
-RACE_PATH = "raw-data/census/acs_sf_race_2020_24.csv"
+POP_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_population_2020_24.csv"
+RENT_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_median_rent_2020_24.csv"
+HH_INC_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
+RACE_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_race_2020_24.csv"
 
-SF_ACS_JOIN = "clean-data/census_acs_join.csv"
-SF_TRACTS_SHP = "clean-data/sf_shapefiles/sf_tracts.shp"
-MERGED_SF_TRACTS_SHP = "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+SF_ACS_JOIN = Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
+SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
+MERGED_SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
 
 POP_ID = "AUO6E001"
 RENT_ID = "AUWGE001"
@@ -61,12 +61,12 @@ def rate(score):
     return "low"   
 
 
-DATA_DIR = Path(__file__).parent / "raw-data"
+RAW_DATA_DIR = Path(__file__).parent.parent / "raw-data"
 
 ## Clean 311 data
 def clean_311():
 
-    file_input = DATA_DIR / "311_cases.csv"
+    file_input = RAW_DATA_DIR / "311_cases.csv"
 
     with open(file_input, newline="") as csvfile:
         """

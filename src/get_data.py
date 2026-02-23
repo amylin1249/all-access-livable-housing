@@ -2,6 +2,7 @@ import httpx
 import csv
 import os
 import time
+from pathlib import Path
 
 
 def get_evictions_data() -> list[tuple]:
@@ -40,7 +41,7 @@ def save_evictions_to_csv(data_list, filename="clean-data/evictions_api_data.csv
     """
     Save data from evictions API as a csv file
     """
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    os.makedirs(os.path.dirname(Path(__file__).parent.parent / filename), exist_ok=True)
 
     with open(filename, "w", newline="") as f:
         writer = csv.writer(f)

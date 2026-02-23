@@ -7,12 +7,13 @@ import pandas as pd
 import geopandas as gpd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from pathlib import Path
 from pyproj import Transformer, CRS
 from shapely import geometry
 from shapely.ops import transform
 
 
-MERGED_SF_TRACTS_SHP = "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+MERGED_SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
 
 
 def visualize_sf_tracts():
@@ -96,7 +97,7 @@ def create_scatterplot():
 
     # Load dataset
     dataset = pd.read_csv(
-        "clean-data/census_acs_join.csv"
+        Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
     )  ### To update string with the dataset name
 
     # Filter dataset to remove tracts with population of 0
