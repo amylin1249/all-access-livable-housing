@@ -8,9 +8,16 @@ EXPORT_URL_TEMPLATE = (
 API_URL = "https://data.sfgov.org/api/publishing/v1/revision/w4sk-nq57/changes?cursor="
 
 
-def get_data():
+def get_shelter_data():
     """
-    ADD DOCSTRING
+    Get monthly counts of people on the shelter waitlist, and the number of days
+    to which we have data access.
+
+    Returns:
+        counts_per_month: Total counts of people on the shelter waitlist for a
+                          given month
+        days_per_month: Total number of days to which we have data access for a
+                        given month
     """
     export_url = EXPORT_URL_TEMPLATE
     next_page_url = API_URL
@@ -57,4 +64,4 @@ def get_data():
 
 
 if __name__ == "__main__":
-    get_data()
+    get_shelter_data()
