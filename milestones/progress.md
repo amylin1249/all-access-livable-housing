@@ -12,6 +12,8 @@
 #### Data Source #1.2: Quarterly count of tents, structures, and lived-in vehicles
 (Amy) email with bryan.v.wong@sfgov.org on 02/09/2026 - trying to get access to underlying dataset for map, rebumped on 02/15/2026
 (Amy) tried to webscrape map directly, can go Network --> largest querydata file, but access issues to direct url
+(Lily) downloaded the Historical Tent Counts excel file data
+(Lily) wrote cleaning code to standardize the encampment data into named tuples and prepped data for 311 data match.
 
 #### Data Source #1.3: HSH Shelter Waitlist
 (Amy) email with HSHSunshine@sfgov.org on 02/09/2026 - trying to get access to archives past July 5, 2024
@@ -38,9 +40,6 @@ request formally submitted 02/10/2026 - follow-up from department required by 02
 (Haeji) wrote code to reshape and match -- reshaped wide-format data into long-format (melted) to support time-series analysis
 (Haeji) completed data architecture -- developed `zori_filter.py` to auto-generate both a cleaned CSV file and a `rent_dict` {month: (zip, rent)} for seamless merging with homeless datasets.
 
-## Data Source #4: 
-(Lily) downloaded the Historical Tent Counts excel file data
-(Lily) wrote cleaning code to standardize the encampment data into named tuples and prepped data for 311 data match.
 
 ## Data Reconciliation Plan
 
