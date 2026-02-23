@@ -131,20 +131,21 @@ def create_scatterplot():
 TO_PROJ_EPSG = "EPSG:4326"  # WGS 84 global projection
 
 if __name__ == "__main__":
-    # if len(sys.argv) != 2:
-    #     print(
-    #         "Usage: uv run python visualize.py path/to/shapefile.shp"
-    #     )
-    #     sys.exit(1)
+    if len(sys.argv) != 2:
+        print(
+            "Usage: uv run python visualize.py path/to/shapefile.shp"
+        )
+        sys.exit(1)
 
-    # filename = sys.argv[1]
+    filepath = Path(__file__).parent.parent / sys.argv[1]
 
-    # shapefile_data = load_shapefile(filename)
-    # prj_file = filename.replace("shp", "prj")
-    # from_epsg = get_epsg_from_file(prj_file)
-    # data = reproject_geometries(shapefile_data, from_epsg, TO_PROJ_EPSG)
+    shapefile_data = load_shapefile(filepath)
+    prj_file = str(filepath).replace("shp", "prj")
+    from_epsg = get_epsg_from_file(prj_file)
+    data = reproject_geometries(shapefile_data, from_epsg, TO_PROJ_EPSG)
 
-    # quick_map(data)
-    # # uv run python visualize.py clean-data/merged_sf_shapefiles/merged_sf_tracts.shp
+    quick_map(data)
+    # uv run python visualize.py clean-data/merged_sf_shapefiles/merged_sf_tracts.shp
 
-    create_scatterplot()
+    # visualize_sf_tracts()
+    # create_scatterplot()
