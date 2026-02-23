@@ -38,7 +38,7 @@ Overall, our project will have a strong focus on spatial analysis and mapping, v
 #### Data Source #1.3: Evictions data
 - https://data.sfgov.org/Housing-and-Buildings/Eviction-Notices/5cei-gny5/about_data
 
-#### Data Source #1.4: HSH Shelter Waitlist (archieved)
+#### Data Source #1.4: HSH Shelter Waitlist (archived)
 - https://data.sfgov.org/Health-and-Social-Services/HSH-Shelter-Waitlist/w4sk-nq57/about_data
 
 ### Data Source #2: Census Data
@@ -51,6 +51,9 @@ Overall, our project will have a strong focus on spatial analysis and mapping, v
 
 ### Data Source #3: Zillow Observed Renter Index (ZORI)
 - https://www.zillow.com/research/data/
+
+### Data Source #4: HUD Crosswalks
+- https://www.huduser.gov/portal/datasets/usps_crosswalk.html
 
 
 ## Link to project video
