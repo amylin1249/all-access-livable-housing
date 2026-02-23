@@ -37,7 +37,6 @@ def save_eviction_to_csv(data_list, filename="clean-data/evictions_api_data.csv"
     """
     save api_eviction as a csv file
     """
-    # 2. 저장할 폴더가 없으면 생성 (FileNotFoundError 방지)
     os.makedirs(os.path.dirname(filename), exist_ok=True)
 
     with open(filename, "w", newline="") as f:
