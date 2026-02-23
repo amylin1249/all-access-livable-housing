@@ -9,17 +9,31 @@ from openpyxl import load_workbook
 from datetime import datetime
 import jellyfish
 
-SF_CENSUS_PATH = Path(__file__).parent.parent / "raw-data/census/sf_census_tracts_2020.csv"
-CALI_TRACTS_SHP = Path(__file__).parent.parent / "raw-data/census/cali_tracts_shapefiles/tl_2025_06_tract.shp"
+SF_CENSUS_PATH = (
+    Path(__file__).parent.parent / "raw-data/census/sf_census_tracts_2020.csv"
+)
+CALI_TRACTS_SHP = (
+    Path(__file__).parent.parent
+    / "raw-data/census/cali_tracts_shapefiles/tl_2025_06_tract.shp"
+)
 
-POP_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_population_2020_24.csv"
-RENT_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_median_rent_2020_24.csv"
-HH_INC_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
+POP_PATH = (
+    Path(__file__).parent.parent / "raw-data/census/acs_sf_population_2020_24.csv"
+)
+RENT_PATH = (
+    Path(__file__).parent.parent / "raw-data/census/acs_sf_median_rent_2020_24.csv"
+)
+HH_INC_PATH = (
+    Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
+)
 RACE_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_race_2020_24.csv"
 
 SF_ACS_JOIN = Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
 SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
-MERGED_SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+MERGED_SF_TRACTS_SHP = (
+    Path(__file__).parent.parent
+    / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+)
 
 POP_ID = "AUO6E001"
 RENT_ID = "AUWGE001"
@@ -40,7 +54,7 @@ class encampment(NamedTuple):
     latitude: float
     longitude: float
     neighborhood: str
-   
+
 
 class encampment_report(NamedTuple):
     caseid: int
@@ -53,15 +67,17 @@ class encampment_report(NamedTuple):
     status_notes: str
     report_ids: str
 
+
 def rate(score):
     if score >= 0.95:
         return "high"
     if score < 0.95 and score >= 0.80:
         return "medium"
-    return "low"   
+    return "low"
 
 
 RAW_DATA_DIR = Path(__file__).parent.parent / "raw-data"
+
 
 ## Clean 311 data
 def clean_311():
@@ -91,11 +107,12 @@ def clean_311():
                 float(row.get("Longitude")),
                 row.get("Neighborhood"),
                 row.get("Status Notes").lower(),
-                []
+                [],
             )
             output_report.append(tuple_out)
 
     return output_report
+
 
 ### Clean encampment data ###
 def clean_encampment():
@@ -112,47 +129,59 @@ def clean_encampment():
     assert sheet_obj.cell(row=2, column=3).value == "Tents"
     assert sheet_obj.cell(row=2, column=4).value == "Structures"
     assert sheet_obj.cell(row=2, column=5).value == "Passenger Vehicles"
-    assert sheet_obj.cell(row=2, column=6).value == 'Other Vehicles'
-    assert sheet_obj.cell(row=2, column=8).value == 'Neighborhood'
-    assert sheet_obj.cell(row=2, column=10).value == 'Latitude'
-    assert sheet_obj.cell(row=2, column=11).value == 'Longitude'
+    assert sheet_obj.cell(row=2, column=6).value == "Other Vehicles"
+    assert sheet_obj.cell(row=2, column=8).value == "Neighborhood"
+    assert sheet_obj.cell(row=2, column=10).value == "Latitude"
+    assert sheet_obj.cell(row=2, column=11).value == "Longitude"
 
     output_encampment = []
-    for i in range(3, sheet_obj.max_row+1):
-
-        sheet_obj.cell(row=3, column=1).value 
+    for i in range(3, sheet_obj.max_row + 1):
+        sheet_obj.cell(row=3, column=1).value
         date_obj = sheet_obj.cell(row=i, column=1).value
         date_string = date_obj.strftime("%m/%d/%Y")
         tents = sheet_obj.cell(row=i, column=3).value
         structure = sheet_obj.cell(row=i, column=4).value
-        vehicles = sheet_obj.cell(row=i, column=5).value + sheet_obj.cell(row=i, column=6).value
+        vehicles = (
+            sheet_obj.cell(row=i, column=5).value
+            + sheet_obj.cell(row=i, column=6).value
+        )
         neighborhood = sheet_obj.cell(row=i, column=8).value
 
         lat = float(sheet_obj.cell(row=i, column=10).value)
         lon = float(sheet_obj.cell(row=i, column=11).value)
-        obj = encampment(tents,
-        structure,
-        vehicles,
-        date_obj.year,
-        date_obj.month,
-        date_string,
-        lat,
-        lon,
-        neighborhood)
+        obj = encampment(
+            tents,
+            structure,
+            vehicles,
+            date_obj.year,
+            date_obj.month,
+            date_string,
+            lat,
+            lon,
+            neighborhood,
+        )
         output_encampment.append(obj)
     return output_encampment
 
 
 #### Merge the two files to filter out 311 reports associatd with marked/observed encampments ####
 
+
 def attached_311_reports(output_encampment, output_report):
 
     associated_encamp = []
 
     for encampment in output_encampment:
-        for report in output_report: 
+        for report in output_report:
             if report.month == encampment.month and report.year == encampment.year:
-                if rate(jellyfish.jaro_winkler_similarity(encampment.neighborhood.lower(), report.neighborhood.lower())) == "high":
+                if (
+                    rate(
+                        jellyfish.jaro_winkler_similarity(
+                            encampment.neighborhood.lower(), report.neighborhood.lower()
+                        )
+                    )
+                    == "high"
+                ):
                     associated_encamp.append((encampment, report))
 
 
@@ -168,10 +197,18 @@ def process_acs_data():
     """
     csv.field_size_limit(sys.maxsize)
 
-    pop_df = pd.read_csv(POP_PATH, usecols=["TL_GEO_ID", POP_ID], dtype={"TL_GEO_ID": "str"})
-    race_df = pd.read_csv(RACE_PATH, usecols=["TL_GEO_ID", WHITE_POP_ID], dtype={"TL_GEO_ID": "str"})
-    rent_df = pd.read_csv(RENT_PATH, usecols=["TL_GEO_ID", RENT_ID], dtype={"TL_GEO_ID": "str"})
-    hh_inc_df = pd.read_csv(HH_INC_PATH, usecols=["TL_GEO_ID", HH_INC_ID], dtype={"TL_GEO_ID": "str"})
+    pop_df = pd.read_csv(
+        POP_PATH, usecols=["TL_GEO_ID", POP_ID], dtype={"TL_GEO_ID": "str"}
+    )
+    race_df = pd.read_csv(
+        RACE_PATH, usecols=["TL_GEO_ID", WHITE_POP_ID], dtype={"TL_GEO_ID": "str"}
+    )
+    rent_df = pd.read_csv(
+        RENT_PATH, usecols=["TL_GEO_ID", RENT_ID], dtype={"TL_GEO_ID": "str"}
+    )
+    hh_inc_df = pd.read_csv(
+        HH_INC_PATH, usecols=["TL_GEO_ID", HH_INC_ID], dtype={"TL_GEO_ID": "str"}
+    )
 
     # Impute negative or zero values in rent and household income dataframes
     # with the mean of their positive values
@@ -187,13 +224,15 @@ def process_acs_data():
     rent_df = rent_df.rename(columns={RENT_ID: "med_rent"})
     hh_inc_df = hh_inc_df.rename(columns={HH_INC_ID: "med_hh_inc"})
 
-    # Merge individual dataframes based on GEO_ID 
-    joined_df = pd.merge(pop_df, race_df, on="TL_GEO_ID", how='left')
-    joined_df = pd.merge(joined_df, rent_df, on="TL_GEO_ID", how='left')
-    joined_df = pd.merge(joined_df, hh_inc_df, on="TL_GEO_ID", how='left')
+    # Merge individual dataframes based on GEO_ID
+    joined_df = pd.merge(pop_df, race_df, on="TL_GEO_ID", how="left")
+    joined_df = pd.merge(joined_df, rent_df, on="TL_GEO_ID", how="left")
+    joined_df = pd.merge(joined_df, hh_inc_df, on="TL_GEO_ID", how="left")
 
     # Add white_pct to df
-    joined_df["white_pct"] = np.where(joined_df["population"] > 0, joined_df["white_pop"] / joined_df["population"], 0)
+    joined_df["white_pct"] = np.where(
+        joined_df["population"] > 0, joined_df["white_pop"] / joined_df["population"], 0
+    )
 
     joined_df.to_csv(SF_ACS_JOIN, index=False)
 

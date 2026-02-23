@@ -5,7 +5,7 @@ from pathlib import Path
 
 def filter_zori():
     """
-    Loads ZORI CSV file and filters for SF zip codes and the years 2020-2024. 
+    Loads ZORI CSV file and filters for SF zip codes and the years 2020-2024.
 
     Returns: sf_data_df (Pandas dataframe)
     """
@@ -28,6 +28,7 @@ def filter_zori():
 
     return filtered_df
 
+
 def impute_zori_data(df):
     """
     Imputes data to fill missing values and outputs a CSV file.
@@ -44,19 +45,18 @@ def impute_zori_data(df):
 
 def reformat_zori_data():
     zips = set()
-    with open("clean-data/imputed_zori.csv") as f_in, open("clean-data/processed_zori.csv", "w", newline="") as f_out:
+    with (
+        open("clean-data/imputed_zori.csv") as f_in,
+        open("clean-data/processed_zori.csv", "w", newline="") as f_out,
+    ):
         reader = csv.DictReader(f_in)
-        writer = csv.DictWriter(f_out, fieldnames=['zip', 'month', 'rent'])
+        writer = csv.DictWriter(f_out, fieldnames=["zip", "month", "rent"])
         month_cols = reader.fieldnames[1:]
         for row in reader:
-            zip = row['zip']
+            zip = row["zip"]
             zips.add(str(zip))
             for month in month_cols:
-                writer.writerow({
-                    'zip': zip,
-                    'month': month,
-                    'rent': row[month]
-                })
+                writer.writerow({"zip": zip, "month": month, "rent": row[month]})
     return list(zips)
 
 
@@ -83,6 +83,7 @@ def reformat_crosswalks(zips):
             output_file_name = f"clean-data/crosswalks-csv/{file_path.stem}.csv"
             filtered_df.to_csv(output_file_name, index=None, header=True)
 
+
 # def weight_to_census_tract():
 #     with open("clean-data/processed_zori.csv") as f:
 #         reader = csv.DictReader(f)
@@ -91,10 +92,8 @@ def reformat_crosswalks(zips):
 #             for row in reader:
 
 
-
 if __name__ == "__main__":
     filtered_df = filter_zori()
     impute_zori_data(filtered_df)
     zips = reformat_zori_data()
     reformat_crosswalks(zips)
-
