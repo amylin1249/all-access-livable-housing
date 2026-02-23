@@ -2,7 +2,6 @@ import csv
 import sys
 import pandas as pd
 import geopandas as gpd
-from pathlib import Path
 
 
 SF_CENSUS_PATH = "raw-data/census/sf_census_tracts_2020.csv"

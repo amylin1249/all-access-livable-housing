@@ -1,15 +1,56 @@
 import httpx
+import csv
+import os
 import time
 
-REQUEST_DELAY = 1
-EXPORT_URL_TEMPLATE = (
-    "https://data.sfgov.org/api/archival.csv?id=w4sk-nq57&version=VERSION&method=export"
-)
-API_URL = "https://data.sfgov.org/api/publishing/v1/revision/w4sk-nq57/changes?cursor="
+
+def get_evictions_data() -> list[tuple]:
+    """
+    Provides coordinates and dates of evictions in San Francisco
+    
+    Returns:
+        List of tuples (lat, lon, YYYY-MM)
+    """
+    url = "https://data.sfgov.org/resource/5cei-gny5.json"
+    params = {"$limit": 50000}
+
+    resp = httpx.get(url, params=params)
+    datas = resp.json()
+
+    eviction_list = []
+
+    for data in datas:
+        location = data.get("client_location")
+        date_raw = data.get("file_date")
+
+        if location and date_raw:
+            #  check if in the data
+            lat = location.get("latitude")
+            lon = location.get("longitude")
+
+            if lat and lon:
+                # save as tuple
+                record = (float(lat), float(lon), date_raw[:7])
+                eviction_list.append(record)
+
+    return eviction_list
+
+
+def save_evictions_to_csv(data_list, filename="clean-data/evictions_api_data.csv"):
+    """
+    Save data from evictions API as a csv file
+    """
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+    with open(filename, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["lat", "lon", "year_month"])
+        writer.writerows(data_list)
 
 
 def get_shelter_data():
     """
+    [Currently not in use -- keeping it here for the time being]
     Get monthly counts of people on the shelter waitlist, and the number of days
     to which we have data access.
 
@@ -19,6 +60,12 @@ def get_shelter_data():
         days_per_month: Total number of days to which we have data access for a
                         given month
     """
+    REQUEST_DELAY = 1
+    EXPORT_URL_TEMPLATE = "https://data.sfgov.org/api/archival.csv?id=w4sk-nq57&version=VERSION&method=export"
+    API_URL = (
+        "https://data.sfgov.org/api/publishing/v1/revision/w4sk-nq57/changes?cursor="
+    )
+
     export_url = EXPORT_URL_TEMPLATE
     next_page_url = API_URL
 
@@ -64,4 +111,6 @@ def get_shelter_data():
 
 
 if __name__ == "__main__":
-    get_shelter_data()
+    result = get_evictions_data()
+    if result:
+        save_evictions_to_csv(result)
