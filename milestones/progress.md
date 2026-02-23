@@ -6,11 +6,14 @@
 
 ### Data Source #1: DataSF Open Data Portal
 #### Data Source #1.1: 311 Cases
-(Lily) work in progress
+(Lily) cleaned and standardized the 311 cases into named tuples. 
+(Lily) preliminarily matched 311 cases to encampment tuples by neighborhood and date. 
 
 #### Data Source #1.2: Quarterly count of tents, structures, and lived-in vehicles
 (Amy) email with bryan.v.wong@sfgov.org on 02/09/2026 - trying to get access to underlying dataset for map, rebumped on 02/15/2026
 (Amy) tried to webscrape map directly, can go Network --> largest querydata file, but access issues to direct url
+(Lily) downloaded the Historical Tent Counts excel file data
+(Lily) wrote cleaning code to standardize the encampment data into named tuples and prepped data for 311 data match.
 
 #### Data Source #1.3: HSH Shelter Waitlist
 (Amy) email with HSHSunshine@sfgov.org on 02/09/2026 - trying to get access to archives past July 5, 2024
@@ -34,8 +37,12 @@ request formally submitted 02/10/2026 - follow-up from department required by 02
 ### Data Source #3: Zillow Observed Renter Index (ZORI)
 (Haeji) download done --  downloaded ZORI zip-level data
 (Haeji) wrote code to filter and clean -- isolated 23 San Francisco ZIP codes and filtered time series for the 2020-2024 period
-(Haeji) wrote code to reshape and match -- reshaped wide-format data into long-format (melted) to support time-series analysis
-(Haeji) completed data architecture -- developed `zori_filter.py` to auto-generate both a cleaned CSV file and a `rent_dict` {month: (zip, rent)} for seamless merging with homeless datasets.
+(Amy) imputed data to fill missing/odd values and reshaped file for use
+
+### Data Source #3: HUD Crosswalks
+(Amy) downloaded HUD crosswalk data
+(Amy) wrote code to convert from XLSX, filter by relevant zip codes, and output desired columns to csv
+
 
 ## Data Reconciliation Plan
 

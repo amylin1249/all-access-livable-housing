@@ -8,7 +8,7 @@ from pathlib import Path
 def get_evictions_data() -> list[tuple]:
     """
     Provides coordinates and dates of evictions in San Francisco
-    
+
     Returns:
         List of tuples (lat, lon, YYYY-MM)
     """

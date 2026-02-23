@@ -13,7 +13,10 @@ from shapely import geometry
 from shapely.ops import transform
 
 
-MERGED_SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+MERGED_SF_TRACTS_SHP = (
+    Path(__file__).parent.parent
+    / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+)
 
 
 def visualize_sf_tracts():
