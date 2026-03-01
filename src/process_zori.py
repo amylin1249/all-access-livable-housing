@@ -1,13 +1,13 @@
 import pandas as pd
 import csv
 from pathlib import Path
+from datetime import datetime
 
-
+### COMBINE FIRST AND SECOND FUNCTIONS
 def filter_zori():
     """
-    Loads ZORI CSV file and filters for SF zip codes and the years 2020-2024.
-
-    Returns: sf_data_df (Pandas dataframe)
+    Loads ZORI CSV file, filters for SF zip codes and the years 2020-2024 and 
+    imputes to fill missing data.
     """
     # load data
     df = pd.read_csv("raw-data/zori_by_zip.csv")
@@ -26,17 +26,9 @@ def filter_zori():
     # change regionname to zip
     filtered_df = filtered_df.rename(columns={"RegionName": "zip"})
 
-    return filtered_df
-
-
-def impute_zori_data(df):
-    """
-    Imputes data to fill missing values and outputs a CSV file.
-
-    Inputs: df (Pandas dataframe)
-    """
-    zip_col = df["zip"]
-    data = df.drop(columns=["zip"])
+    # Imputes data to fill missing values and outputs a CSV file.
+    zip_col = filtered_df["zip"]
+    data = filtered_df.drop(columns=["zip"])
     data = data.interpolate(axis=1)
     data = data.fillna(data.mean())
     imputed_df = pd.concat([zip_col, data], axis=1)
@@ -44,10 +36,13 @@ def impute_zori_data(df):
 
 
 def reformat_zori_data():
+    """
+    Reformats Zori CSV into tidy format.
+    """
     zips = set()
     with (
         open("clean-data/imputed_zori.csv") as f_in,
-        open("clean-data/processed_zori.csv", "w", newline="") as f_out,
+        open("clean-data/tidy_zori.csv", "w", newline="") as f_out,
     ):
         reader = csv.DictReader(f_in)
         writer = csv.DictWriter(f_out, fieldnames=["zip", "month", "rent"])
@@ -61,6 +56,7 @@ def reformat_zori_data():
 
 
 def reformat_crosswalks(zips):
+    list_of_dfs = []
     for file_path in Path("raw-data/crosswalks-xlsx").iterdir():
         if not file_path.name.startswith("~$"):
             df = pd.read_excel(file_path, engine="openpyxl")
@@ -79,9 +75,14 @@ def reformat_crosswalks(zips):
                 if "res_ratio" in column.lower():
                     res_ratio_col = column
                     break
+            datetime_str = file_path.stem[-6:]
+            datetime_object = datetime.strptime(datetime_str, "%m%Y")
             filtered_df = sf_df.loc[:, [zip_col, tract_col, res_ratio_col]]
-            output_file_name = f"clean-data/crosswalks-csv/{file_path.stem}.csv"
-            filtered_df.to_csv(output_file_name, index=None, header=True)
+            filtered_df["date"] = datetime_object
+            filtered_df.rename(columns={"ZIP": "zip", "TRACT": "tract", "RES_RATIO": "res_ratio"}, inplace=True)
+            list_of_dfs.append(filtered_df)
+        aggregated_df = pd.concat(list_of_dfs, ignore_index=True)
+        aggregated_df.to_csv('clean-data/crosswalks.csv', index=None, header=True)
 
 
 # def weight_to_census_tract():
@@ -93,7 +94,6 @@ def reformat_crosswalks(zips):
 
 
 if __name__ == "__main__":
-    filtered_df = filter_zori()
-    impute_zori_data(filtered_df)
+    filter_zori()
     zips = reformat_zori_data()
     reformat_crosswalks(zips)
