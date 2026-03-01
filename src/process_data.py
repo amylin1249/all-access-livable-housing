@@ -66,8 +66,6 @@ class EncampmentReport(NamedTuple):
     lat: float
     lon: float
     neighborhood: str
-    status_notes: str
-    report_ids: str
 
 
 def rate(score):
@@ -108,8 +106,6 @@ def clean_311():
                 float(row.get("Latitude")),
                 float(row.get("Longitude")),
                 row.get("Neighborhood"),
-                row.get("Status Notes").lower(),
-                [],
             )
             output_report.append(tuple_out)
 

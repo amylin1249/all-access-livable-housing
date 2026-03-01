@@ -15,6 +15,8 @@ MERGED_SF_TRACTS_SHP = (
 SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv"
 
 SF_EVICTIONS_TRACTS = Path(__file__).parent.parent / "clean-data/evictions_api_data_tracts.csv"
+ENCAMPMENT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_tracts.csv"
+ENCAMPMENT_REPORT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_report_tracts.csv"
 
 
 class Tract(NamedTuple):
@@ -256,15 +258,15 @@ def quadtree_spatial_join(
             join_dict[location.id] = tract_id
         
         ### TEMPORARY FIX WHILE DEBUGGING
-        if location.id not in join_dict:
-            for tract in tracts:
-                if tract.polygon.contains(location_point):
-                    join_dict[location.id] = tract.id
+        # if location.id not in join_dict:
+        #     for tract in tracts:
+        #         if tract.polygon.contains(location_point):
+        #             join_dict[location.id] = tract.id
 
     return join_dict
 
 
-def add_tract_id_csv(source_file: Path, dest_file: Path):
+def add_evictions_tracts_csv(source_file: Path, dest_file: Path):
     """
     Add docstring
     """
@@ -286,6 +288,32 @@ def add_tract_id_csv(source_file: Path, dest_file: Path):
             writer.writerow(row)
 
 
+def add_encampments_tracts_csv(data: list[tuple], dest_file: Path, match_tracts: dict):
+    """
+    ADD DOCSTRING
+    """
+    headers = data[0]._fields + ("geoid",)
+
+    with open(dest_file, "w") as dest_file: 
+        writer = csv.DictWriter(dest_file, fieldnames=headers)
+        writer.writeheader()
+
+        for row in data:
+            row_dict = row._asdict()
+            row_dict["geoid"] = match_tracts[row.id]
+            writer.writerow(row_dict)
+
+
 if __name__ == "__main__":
-    add_tract_id_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS)
+    tracts_shp = load_shapefiles(MERGED_SF_TRACTS_SHP)
+    # add_evictions_tracts_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS)
     # print(quadtree_spatial_join(load_evictions_csv(SF_EVICTIONS), load_shapefiles(MERGED_SF_TRACTS_SHP)))
+    # print(quadtree_spatial_join(clean_311(), load_shapefiles(MERGED_SF_TRACTS_SHP)))
+    # print(quadtree_spatial_join(clean_encampment(), load_shapefiles(MERGED_SF_TRACTS_SHP)))
+    
+    # clean_311 = clean_311()
+    # add_encampments_tracts_csv(clean_311, ENCAMPMENT_REPORT_TRACTS, quadtree_spatial_join(clean_311, tracts_shp)))
+    
+    clean_encampment = clean_encampment()
+    add_encampments_tracts_csv(clean_encampment, ENCAMPMENT_TRACTS, quadtree_spatial_join(clean_encampment, tracts_shp))
+
