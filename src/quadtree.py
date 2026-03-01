@@ -1,7 +1,10 @@
-from typing import NamedTuple
+from typing import NamedTuple, Union
 from shapely.geometry import Polygon, box, Point
 from pathlib import Path
+from process_data import Encampment, EncampmentReport, clean_311, clean_encampment
 import shapefile
+import csv
+import pandas as pd
 
 
 MERGED_SF_TRACTS_SHP = (
@@ -9,14 +12,9 @@ MERGED_SF_TRACTS_SHP = (
     / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
 )
 
+SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv"
 
-class Location(NamedTuple):
-    id: int
-    latitude: float
-    longitude: float
-
-
-### TBD on attributes
+SF_EVICTIONS_TRACTS = Path(__file__).parent.parent / "clean-data/evictions_api_data_tracts.csv"
 
 
 class Tract(NamedTuple):
@@ -37,7 +35,7 @@ def load_shapefiles(path: Path) -> list[Tract]:
         for shape_rec in sf.shapeRecords():
             tracts.append(
                 Tract(
-                    id=shape_rec.record["TRACTCE"],
+                    id=shape_rec.record["GEOID"],
                     pop=shape_rec.record["population"],
                     med_rent=shape_rec.record["med_rent"],
                     med_hh_inc=shape_rec.record["med_hh_inc"],
@@ -62,6 +60,12 @@ class BBox(NamedTuple):
     min_y: float
     max_x: float
     max_y: float
+
+
+class Location(NamedTuple):
+    id: int
+    lat: float
+    lon: float
 
 
 # Maximum depth of a quadtree.
@@ -202,8 +206,26 @@ class Quadtree:
         return matching_polygons
 
 
+def load_evictions_csv(path: Path) -> list[Location]:
+    """
+    Given a CSV containing eviction locations data, return a list of Location objects.
+    """
+    evictions = []
+    with open(path) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            evictions.append(
+                Location(
+                    id=row["id"],
+                    lat=row["lat"],
+                    lon=row["lon"],
+                )
+            )
+    return evictions
+
+
 def quadtree_spatial_join(
-    locations: list[Location],
+    locations: list[Union[Location, Encampment, EncampmentReport]],
     tracts: list[Tract],
 ) -> dict:
     """
@@ -213,8 +235,8 @@ def quadtree_spatial_join(
     Returns:
         A dictionary of location.id as keys and tract.id as values.
     """
-    sf_bbox = BBox(-123.108184, 37.708182, -122.357071, 37.833227)
-    # Westernmost: Farallon 37.770864, -123.108184
+    sf_bbox = BBox(-122.517724, 37.708182, -122.357071, 37.833227)
+    # Westernmost (not incl. Farallon): 37.780436, -122.517724
     # Easternmost: Bayview Hunters Point 37.728650, -122.357071
     # Northernmost: Treasure Island 37.833227, -122.372522
     # Southernmost: 37.708182, -122.485839
@@ -222,21 +244,48 @@ def quadtree_spatial_join(
     capacity = 10
     quadtree = Quadtree(sf_bbox, capacity)
 
-    # join_lst = []
     join_dict = {}
 
     for tract in tracts:
         quadtree.add_polygon(tract.id, tract.polygon)
 
     for location in locations:
-        location_point = Point(location.longitude, location.latitude)
+        location_point = Point(location.lon, location.lat)
 
         for tract_id in quadtree.match(location_point):
-            # join_lst.append((location.id, tract_id))
             join_dict[location.id] = tract_id
+        
+        ### TEMPORARY FIX WHILE DEBUGGING
+        if location.id not in join_dict:
+            for tract in tracts:
+                if tract.polygon.contains(location_point):
+                    join_dict[location.id] = tract.id
 
     return join_dict
 
-# if __name__ == "__main__":
-#     quadtree_spatial_join(locations, load_shapefiles(MERGED_SF_TRACTS_SHP))
-# NOTE: We need to standardize format for the locations
+
+def add_tract_id_csv(source_file: Path, dest_file: Path):
+    """
+    Add docstring
+    """
+    match_tracts = quadtree_spatial_join(load_evictions_csv(SF_EVICTIONS), load_shapefiles(MERGED_SF_TRACTS_SHP))
+
+    with open(source_file, "r") as source_file, open(dest_file, "w") as dest_file: 
+        reader = csv.DictReader(source_file)
+
+        # 
+        headers = reader.fieldnames
+        writer_headers = tuple(headers + ["geoid"])
+
+        writer = csv.DictWriter(dest_file, fieldnames=writer_headers)
+        writer.writeheader()
+
+        # Iterate over each row in source file, add tract geoid, and write it to destination file
+        for row in reader:
+            row["geoid"] = match_tracts[row["id"]]
+            writer.writerow(row)
+
+
+if __name__ == "__main__":
+    add_tract_id_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS)
+    # print(quadtree_spatial_join(load_evictions_csv(SF_EVICTIONS), load_shapefiles(MERGED_SF_TRACTS_SHP)))

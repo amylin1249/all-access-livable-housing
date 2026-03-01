@@ -43,7 +43,7 @@ WHITE_POP_ID = "AUO7E002"
 EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
 
 
-class encampment(NamedTuple):
+class Encampment(NamedTuple):
     ### unique  encampmemnt id per quarter
     id: int
     tents: int
@@ -58,7 +58,7 @@ class encampment(NamedTuple):
     neighborhood: str
 
 
-class encampment_report(NamedTuple):
+class EncampmentReport(NamedTuple):
     id: int
     year: int
     month: int
@@ -100,7 +100,7 @@ def clean_311():
             date_year = datetime_object.year
             date_month = datetime_object.month
 
-            tuple_out = encampment_report(
+            tuple_out = EncampmentReport(
                 row.get("CaseID"),
                 date_year,
                 date_month,
@@ -151,7 +151,7 @@ def clean_encampment():
 
         lat = float(sheet_obj.cell(row=i, column=10).value)
         lon = float(sheet_obj.cell(row=i, column=11).value)
-        obj = encampment(i, tents,
+        obj = Encampment(i, tents,
         structure,
         vehicles,
         date_obj.year,
