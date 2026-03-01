@@ -45,13 +45,16 @@ def reformat_zori_data():
         open("clean-data/tidy_zori.csv", "w", newline="") as f_out,
     ):
         reader = csv.DictReader(f_in)
-        writer = csv.DictWriter(f_out, fieldnames=["zip", "month", "rent"])
+        writer = csv.DictWriter(f_out, fieldnames=["zip", "date", "rent"])
+        writer.writeheader()
         month_cols = reader.fieldnames[1:]
         for row in reader:
             zip = row["zip"]
             zips.add(str(zip))
             for month in month_cols:
-                writer.writerow({"zip": zip, "month": month, "rent": row[month]})
+                datetime_object = datetime.strptime(month, "%Y-%m-%d")
+                date = str(datetime_object.year) + "-" + str(datetime_object.month)
+                writer.writerow({"zip": zip, "date": date, "rent": row[month]})
     return list(zips)
 
 
@@ -77,23 +80,73 @@ def reformat_crosswalks(zips):
                     break
             datetime_str = file_path.stem[-6:]
             datetime_object = datetime.strptime(datetime_str, "%m%Y")
+            date = str(datetime_object.year) + "-" + str(datetime_object.month)
             filtered_df = sf_df.loc[:, [zip_col, tract_col, res_ratio_col]]
-            filtered_df["date"] = datetime_object
+            filtered_df["date"] = date
             filtered_df.rename(columns={"ZIP": "zip", "TRACT": "tract", "RES_RATIO": "res_ratio"}, inplace=True)
             list_of_dfs.append(filtered_df)
-        aggregated_df = pd.concat(list_of_dfs, ignore_index=True)
+        aggregated_df = pd.concat(list_of_dfs)
         aggregated_df.to_csv('clean-data/crosswalks.csv', index=None, header=True)
 
 
-# def weight_to_census_tract():
-#     with open("clean-data/processed_zori.csv") as f:
-#         reader = csv.DictReader(f)
-#         for file_path in Path("clean-data/crosswalks-csv").iterdir():
-#             df = pd.read_csv(file_path)
-#             for row in reader:
+def generate_crosswalks_dict():
+    crosswalks_dict = {}
+    with open("clean-data/crosswalks.csv") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row["date"] not in crosswalks_dict:
+                crosswalks_dict[row["date"]] = {}
+            if row["zip"] not in crosswalks_dict[row["date"]]:
+                crosswalks_dict[row["date"]][row["zip"]] = []
+            crosswalks_dict[row["date"]][row["zip"]].append((row["tract"], row["res_ratio"]))
+    
+    for year in range(2020,2025):
+        for month in range(1,13):
+            current_date = str(year) + "-" + str(month)
+            if current_date not in crosswalks_dict:
+                if month <= 3:
+                    crosswalks_dict[current_date] = crosswalks_dict[str(year) + "-" + str(3)]
+                elif month <= 6:
+                    crosswalks_dict[current_date] = crosswalks_dict[str(year) + "-" + str(6)]
+                elif month <= 9:
+                    crosswalks_dict[current_date] = crosswalks_dict[str(year) + "-" + str(9)]
+                else:
+                    crosswalks_dict[current_date] = crosswalks_dict[str(year) + "-" + str(12)]
+    return crosswalks_dict
+
+
+def generate_rent_by_zip_dict():
+    rent_by_zip = {}
+
+    with open("clean-data/tidy_zori.csv") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row["date"] not in rent_by_zip:
+                rent_by_zip[row["date"]] = {}
+            if row["zip"] not in rent_by_zip[row["date"]]:
+                rent_by_zip[row["date"]][row["zip"]] = row["rent"]  
+
+    return rent_by_zip
+
+
+def weight_to_census_tract(crosswalks_dict, rent_by_zip):
+    weighted_dict = {}
+    for date in crosswalks_dict:
+        for zip in crosswalks_dict[date]:
+            for tract, weight in crosswalks_dict[date][zip]:
+                if date not in weighted_dict:
+                    weighted_dict[date] = {}
+                if tract not in weighted_dict[date]:
+                    weighted_dict[date][tract] = 0
+                weighted_dict[date][tract] += float(rent_by_zip[date][zip]) * float(weight)
+    return weighted_dict
 
 
 if __name__ == "__main__":
-    filter_zori()
-    zips = reformat_zori_data()
-    reformat_crosswalks(zips)
+    # filter_zori()
+    # zips = reformat_zori_data()
+    # reformat_crosswalks(zips)
+    crosswalks_dict = generate_crosswalks_dict()
+    rent_by_zip = generate_rent_by_zip_dict()
+    weighted_dict = weight_to_census_tract(crosswalks_dict, rent_by_zip)
+    print(len(sorted(weighted_dict.keys())))
