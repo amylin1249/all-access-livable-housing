@@ -26,15 +26,26 @@ def get_evictions_data() -> list[tuple]:
         date_raw = data.get("file_date")
 
         if location and date_raw:
-            #  check if in the data
-            lat = location.get("latitude")
-            lon = location.get("longitude")
 
-            if lat and lon:
+            date_obj = datetime.strptime(date_raw, "%Y-%m-%dT%H:%M:%S.%f")
+            year = date_obj.year
+
+            #filter years(2020-2024)
+            if 2020<= year <=2024:
+
+            #  check if in the data
+                lat = location.get("latitude")
+                lon = location.get("longitude")
+
+                if lat and lon:
                 # save as tuple
-                date_obj = datetime.strptime(date_raw, "%Y-%m-%dT%H:%M:%S.%f")
-                date = date_obj.strftime("%Y-%m")
-                record = (int(current_id),float(lat), float(lon), date)
+                    date = date_obj.strftime("%Y-%m")
+                    record = {
+                        "id" : int(current_id),
+                        "lat": float(lat), 
+                        "lon":float(lon), 
+                        "year_mon" : date
+                    }
                 eviction_list.append(record)
                 current_id += 1
 
@@ -46,11 +57,11 @@ def save_evictions_to_csv(data_list, filename="clean-data/evictions_api_data.csv
     Save data from evictions API as a csv file
     """
     os.makedirs(os.path.dirname(Path(__file__).parent.parent / filename), exist_ok=True)
-
+    fieldnames = ["id", "lat", "lon", "year_mon"]
     with open(filename, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(["id","lat", "lon", "year_month"])
-        writer.writerows(data_list)
+        csv_writer = csv.DictWriter(f, fieldnames = fieldnames)
+        csv_writer.writeheader()
+        csv_writer.writerows(data_list)
 
 
 def get_shelter_data():
