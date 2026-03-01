@@ -27,6 +27,7 @@ HH_INC_PATH = (
     Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
 )
 RACE_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_race_2020_24.csv"
+RENTER_UNITS_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_housing_units_2020_24.csv"
 
 SF_ACS_JOIN = Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
 SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
@@ -39,6 +40,7 @@ POP_ID = "AUO6E001"
 RENT_ID = "AUWGE001"
 HH_INC_ID = "AURUE001"
 WHITE_POP_ID = "AUO7E002"
+RENTER_UNITS_ID = "AUUEE003"
 
 EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
 
@@ -205,6 +207,9 @@ def process_acs_data():
     hh_inc_df = pd.read_csv(
         HH_INC_PATH, usecols=["TL_GEO_ID", HH_INC_ID], dtype={"TL_GEO_ID": "str"}
     )
+    renter_df = pd.read_csv(
+        RENTER_UNITS_PATH, usecols=["TL_GEO_ID", RENTER_UNITS_ID], dtype={"TL_GEO_ID": "str"}
+    )
 
     # Impute negative or zero values in rent and household income dataframes
     # with the mean of their positive values
@@ -219,11 +224,13 @@ def process_acs_data():
     race_df = race_df.rename(columns={WHITE_POP_ID: "white_pop"})
     rent_df = rent_df.rename(columns={RENT_ID: "med_rent"})
     hh_inc_df = hh_inc_df.rename(columns={HH_INC_ID: "med_hh_inc"})
+    renter_df = renter_df.rename(columns={RENTER_UNITS_ID: "rent_units"})
 
     # Merge individual dataframes based on GEO_ID
     joined_df = pd.merge(pop_df, race_df, on="TL_GEO_ID", how="left")
     joined_df = pd.merge(joined_df, rent_df, on="TL_GEO_ID", how="left")
     joined_df = pd.merge(joined_df, hh_inc_df, on="TL_GEO_ID", how="left")
+    joined_df = pd.merge(joined_df, renter_df, on="TL_GEO_ID", how="left")
 
     # Add white_pct to df
     joined_df["white_pct"] = np.where(
