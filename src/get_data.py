@@ -3,6 +3,7 @@ import csv
 import os
 import time
 from pathlib import Path
+from datetime import datetime
 
 
 def get_evictions_data() -> list[tuple]:
@@ -10,7 +11,7 @@ def get_evictions_data() -> list[tuple]:
     Provides coordinates and dates of evictions in San Francisco
 
     Returns:
-        List of tuples (lat, lon, YYYY-MM)
+        List of tuples (id, lat, lon, YYYY-MM)
     """
     url = "https://data.sfgov.org/resource/5cei-gny5.json"
     params = {"$limit": 50000}
@@ -31,7 +32,9 @@ def get_evictions_data() -> list[tuple]:
 
             if lat and lon:
                 # save as tuple
-                record = (int(current_id),float(lat), float(lon), date_raw[:7])
+                date_obj = datetime.strptime(date_raw, "%Y-%m-%dT%H:%M:%S.%f")
+                date = date_obj.strftime("%Y-%m")
+                record = (int(current_id),float(lat), float(lon), date)
                 eviction_list.append(record)
                 current_id += 1
 
@@ -46,7 +49,7 @@ def save_evictions_to_csv(data_list, filename="clean-data/evictions_api_data.csv
 
     with open(filename, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["ID","lat", "lon", "year_month"])
+        writer.writerow(["id","lat", "lon", "year_month"])
         writer.writerows(data_list)
 
 
