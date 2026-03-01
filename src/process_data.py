@@ -44,6 +44,8 @@ EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
 
 
 class encampment(NamedTuple):
+    ### unique  encampmemnt id per quarter
+    id: int
     tents: int
     structures: int
     vehicles: int
@@ -51,18 +53,18 @@ class encampment(NamedTuple):
     year: int
     month: int
     date_time: datetime
-    latitude: float
-    longitude: float
+    lat: float
+    lon: float
     neighborhood: str
 
 
 class encampment_report(NamedTuple):
-    caseid: int
+    id: int
     year: int
     month: int
     date_time: datetime
-    latitude: float
-    longitude: float
+    lat: float
+    lon: float
     neighborhood: str
     status_notes: str
     report_ids: str
@@ -116,7 +118,7 @@ def clean_311():
 
 ### Clean encampment data ###
 def clean_encampment():
-    file_input = DATA_DIR / "Historical Tent Counts.xlsx"
+    file_input = RAW_DATA_DIR / "Historical Tent Counts.xlsx"
     wb = load_workbook(file_input)
     sheet_obj = wb.active
 
@@ -149,17 +151,15 @@ def clean_encampment():
 
         lat = float(sheet_obj.cell(row=i, column=10).value)
         lon = float(sheet_obj.cell(row=i, column=11).value)
-        obj = encampment(
-            tents,
-            structure,
-            vehicles,
-            date_obj.year,
-            date_obj.month,
-            date_string,
-            lat,
-            lon,
-            neighborhood,
-        )
+        obj = encampment(i, tents,
+        structure,
+        vehicles,
+        date_obj.year,
+        date_obj.month,
+        date_string,
+        lat,
+        lon,
+        neighborhood)
         output_encampment.append(obj)
     return output_encampment
 
