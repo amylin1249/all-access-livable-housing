@@ -15,9 +15,16 @@ def test_api_conversion():
     sample = results[0]
     assert len(sample) == 4
     
-    assert isinstance(sample[0], int)
-    assert isinstance(sample[1], float)
-    assert isinstance(sample[2], float)
-    assert isinstance(sample[3], str)
+    assert isinstance(sample["id"], int)
+    assert isinstance(sample["lat"], float)
+    assert isinstance(sample["lon"], float)
+    assert isinstance(sample["year_mon"], str)
+
+def test_api_year_in_range():
+    results = get_evictions_data()
+    for date in results:
+        year = int(date["year_mon"][:4])
+        assert 2020 <= year <= 2024
 
 
+#def test_quadtree_
