@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 from datetime import datetime
 
+REQUEST_DELAY = 0.1
 
 def get_evictions_data() -> list[tuple]:
     """
@@ -14,6 +15,8 @@ def get_evictions_data() -> list[tuple]:
         List of tuples (id, lat, lon, YYYY-MM)
     """
     url = "https://data.sfgov.org/resource/5cei-gny5.json"
+    
+    time.sleep(REQUEST_DELAY)
     params = {"$limit": 50000}
 
     resp = httpx.get(url, params=params)
