@@ -26,7 +26,7 @@ RENT_PATH = (
 )
 
 REPORT_PATH = (
-    Path(__file__).parent.parent / "raw-data"/ "311_cases.csv"
+    Path(__file__).parent.parent / "raw-data"/ "311_Cases_vF.csv"
 )
 ENCAMP_PATH = (
       Path(__file__).parent.parent / "raw-data"/ "Historical Tent Counts.xlsx"
@@ -51,7 +51,7 @@ HH_INC_ID = "AURUE001"
 WHITE_POP_ID = "AUO7E002"
 RENTER_UNITS_ID = "AUUEE003"
 
-EXCLUDE_GEOID = "06075980401"
+EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
 
 
 class Encampment(NamedTuple):
@@ -292,7 +292,7 @@ def get_sf_geoid() -> list[str]:
         reader = csv.DictReader(f)
         for row in reader:
             geoid = row["geoid"]
-            if geoid != EXCLUDE_GEOID:
+            if geoid not in EXCLUDE_GEOIDS:
                 sf_geoid.append(geoid)
 
     return sf_geoid
