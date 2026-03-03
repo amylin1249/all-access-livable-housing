@@ -77,6 +77,7 @@ class EncampmentReport(NamedTuple):
     lat: float
     lon: float
     neighborhood: str
+    
 
 
 def rate(score):
@@ -105,21 +106,30 @@ def clean_311():
             datetime_object = datetime.strptime(datetime_str, "%m/%d/%Y %H:%M:%S")
             date_year = datetime_object.year
             date_month = datetime_object.month
+            if row['Latitude'] == '':
+                lat = 0 
+            else:
+                lat = float(row['Latitude'])
+                            
+            if row['Longitude'] == '':
+                lon = 0
+            else:
+                lon = float(row['Longitude'])
 
             tuple_out = EncampmentReport(
                 row.get("CaseID"),
                 date_year,
                 date_month,
                 datetime_object,
-                float(row.get("Latitude")),
-                float(row.get("Longitude")),
-                row.get("Neighborhood"),
+                lat,
+                lon,
+                row.get("Neighborhood")
             )
-            ### Remove reports with missing geographci information ####
-            tolerance = .01
-            missing_location = math.isclose(tuple_out.lat, 0.0, abs_tol=tolerance) and math.isclose(tuple_out.lon, 0.0, abs_tol=tolerance)
-            if not missing_location:
-                output_report.append(tuple_out)
+            ### Remove reports with missing geographic information ####
+            #tolerance = .01
+            #missing_location = math.isclose(tuple_out.lat, 0.0, abs_tol=tolerance) and math.isclose(tuple_out.lon, 0.0, abs_tol=tolerance)
+            #if not missing_location:
+            output_report.append(tuple_out)
 
     return output_report
 
@@ -203,6 +213,11 @@ def attached_311_reports(output_encampment, output_report):
                             if (distance.distance(point1, point2).miles) < 0.2:
                                 associated_encamp.append((encampment, report))
 
+### Bounding box 
+### neighborhood bound
+# ### For each encampment, create a bounding box for each encampmemnt  
+### use the timeit library 
+### timeit helpful to see which functions are taking the longest
 
 def process_acs_data():
     """
