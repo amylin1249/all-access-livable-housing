@@ -17,7 +17,6 @@ def total_evictions_by_tract(eviction_df):
     return total_evic_per_mon
 
 
-
 def calculate_eviction_rate(eviction_df, acs_df):
     """
     Divide total number of evictions within a tract for a given month 
@@ -38,6 +37,3 @@ def calculate_eviction_rate(eviction_df, acs_df):
     merged['eviction_rate'] = merged['eviction_rate'].fillna(0)
 
     return merged.to_dict(orient='records')
-
-
-
