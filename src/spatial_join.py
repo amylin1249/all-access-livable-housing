@@ -16,12 +16,12 @@ SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv
 
 SF_EVICTIONS_TRACTS = Path(__file__).parent.parent / "clean-data/evictions_api_data_tracts.csv"
 ENCAMPMENT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_tracts.csv"
-ENCAMPMENT_REPORT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_report_tracts.csv"
+ENCAMPMENT_REPORT_TRACTS = Path(__file__).parent.parent / "clean-data/311_tracts.csv"
 
 ### TEMP ISSUE FILES
 SF_EVICTIONS_ISSUES = Path(__file__).parent.parent / "clean-data/evictions_api_issues.csv"
 ENCAMPMENT_ISSUES = Path(__file__).parent.parent / "clean-data/encampment_tracts_issues.csv"
-ENCAMPMENT_REPORT_ISSUES = Path(__file__).parent.parent / "clean-data/encampment_report_tracts_issues.csv"
+ENCAMPMENT_REPORT_ISSUES = Path(__file__).parent.parent / "clean-data/311_tracts_issues.csv"
 
 
 class Tract(NamedTuple):
