@@ -328,7 +328,115 @@ def add_sf_tract_data():
     return sf_acs_data
 
 
+def generate_zori_csv():
+    """
+    Loads ZORI CSV file, filters for SF zip codes and the years 2020-2024, imputes 
+    to fill missing data, and outputs tidy ZORI CSV.
+    
+    Returns:
+        zips: [list] SF zip codes
+    """
+    # load data
+    df = pd.read_csv("raw-data/zori_by_zip.csv")
+
+    # column(City) ==  'San Francisco'
+    sf_zips = df[df["City"] == "San Francisco"].copy()
+
+    # filter month-year(2020-2024)
+    date_cols = [
+        col
+        for col in sf_zips.columns
+        if any(yr in col for yr in ["2020", "2021", "2022", "2023", "2024"])
+    ]
+
+    filtered_df = sf_zips[["RegionName"] + date_cols]
+    # change regionname to zip
+    filtered_df = filtered_df.rename(columns={"RegionName": "zip"})
+
+    # Imputes data to fill missing values
+    zip_col = filtered_df["zip"]
+    data = filtered_df.drop(columns=["zip"])
+    data = data.interpolate(axis=1)
+    data = data.fillna(data.mean())
+    imputed_df = pd.concat([zip_col, data], axis=1)
+
+    # Reformats Zori CSV into tidy format
+    tidy_rows = []
+    date_cols = imputed_df.drop(columns=["zip"]).columns
+    for _, row in imputed_df.iterrows():
+        # Avoid conversion to float by converting to string
+        zip_code = str(int(row["zip"]))
+        for date in date_cols:
+            datetime_object = datetime.strptime(date, "%Y-%m-%d")
+            formatted_date = f"{datetime_object.year}-{datetime_object.month:02}"
+            tidy_rows.append({"zip": zip_code, "date": formatted_date, "rent": row[date]})
+
+    # Writes tidy CSV
+    with open("clean-data/tidy_zori.csv", "w", newline="") as f_out:
+        writer = csv.DictWriter(f_out, fieldnames=["zip", "date", "rent"])
+        writer.writeheader()
+        writer.writerows(tidy_rows)
+
+
+def generate_crosswalks_csv():
+    """
+    Loads crosswalks XLSX files, filters for SF zips and tracts, selects necessary 
+    columns (zip, tract, res_ratio), extracts date column from filenames, and 
+    outputs into single CSV.
+    """
+    zori_df = pd.read_csv("clean-data/tidy_zori.csv")
+    acs_df = pd.read_csv("clean-data/census_acs_join.csv")
+    
+    zips_num = set(zori_df["zip"])
+    zips = {str(zip) for zip in zips_num}
+    tracts_num = set(acs_df["TL_GEO_ID"])
+    short_tracts = {str(tract) for tract in tracts_num}
+    tracts = {tract.zfill(11) for tract in short_tracts}
+
+    list_of_dfs = []
+    for file_path in Path("raw-data/crosswalks-xlsx").iterdir():
+        if not file_path.name.startswith("~$"):
+            df = pd.read_excel(file_path, engine="openpyxl")
+            zip_col = None
+            # Pull zip, tract, and res_ratio columns for SF zips/tracts
+            for column in df.columns:
+                if "zip" in column.lower():
+                    zip_col = column
+                    break
+            df[zip_col] = df[zip_col].astype(str)            
+            for column in df.columns:
+                if "tract" in column.lower():
+                    tract_col = column
+                    break
+            df[tract_col] = df[tract_col].astype(str)
+            df[tract_col] = df[tract_col].str.zfill(11)
+            for column in df.columns:
+                if "res_ratio" in column.lower():
+                    res_ratio_col = column
+                    break
+            # Add date column based on filename
+            datetime_str = file_path.stem[-6:]
+            datetime_object = datetime.strptime(datetime_str, "%m%Y")
+            date = f"{datetime_object.year}-{datetime_object.month:02}"
+            filtered_df = df.loc[:, [zip_col, tract_col, res_ratio_col]]
+            filtered_df["date"] = date
+            filtered_df.rename(
+                columns={"ZIP": "zip", "TRACT": "tract", "RES_RATIO": "res_ratio"}, inplace=True
+            )
+            # Filter to SF zips
+            sf_zips_df = filtered_df[filtered_df["zip"].isin(zips)]
+            # Filter to SF tracts
+            sf_df = sf_zips_df[sf_zips_df["tract"].isin(tracts)]
+            list_of_dfs.append(sf_df)
+    
+    # Aggregate and output to CSV
+    aggregated_df = pd.concat(list_of_dfs)
+    aggregated_df.to_csv("clean-data/crosswalks.csv", index=None, header=True)
+
+
 if __name__ == "__main__":
     process_acs_data()
     create_sf_shapefiles()
     add_sf_tract_data()
+    generate_zori_csv()
+    generate_crosswalks_csv()
