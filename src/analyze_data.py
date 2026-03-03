@@ -116,6 +116,7 @@ def weight_to_census_tract(crosswalks, rent_by_zip):
 
 
 if __name__ == "__main__":
-    rent_by_zip = generate_rent_by_zip_dict
-    crosswalks = generate_crosswalks_dict
+    rent_by_zip = generate_rent_by_zip_dict()
+    crosswalks = generate_crosswalks_dict()
     rent_by_tract = weight_to_census_tract(crosswalks, rent_by_zip)
+    print(rent_by_tract)
