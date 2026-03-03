@@ -8,6 +8,7 @@ from pathlib import Path
 from openpyxl import load_workbook
 from datetime import datetime
 import jellyfish
+import math
 
 SF_CENSUS_PATH = (
     Path(__file__).parent.parent / "raw-data/census/sf_census_tracts_2020.csv"
@@ -23,6 +24,14 @@ POP_PATH = (
 RENT_PATH = (
     Path(__file__).parent.parent / "raw-data/census/acs_sf_median_rent_2020_24.csv"
 )
+
+REPORT_PATH = (
+    Path(__file__).parent.parent / "raw-data"/ "311_cases.csv"
+)
+ENCAMP_PATH = (
+      Path(__file__).parent.parent / "raw-data"/ "Historical Tent Counts.xlsx"
+)
+
 HH_INC_PATH = (
     Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
 )
@@ -78,13 +87,10 @@ def rate(score):
     return "low"
 
 
-RAW_DATA_DIR = Path(__file__).parent.parent / "raw-data"
-
-
 ## Clean 311 data
 def clean_311():
 
-    file_input = RAW_DATA_DIR / "311_cases.csv"
+    file_input = REPORT_PATH
 
     with open(file_input, newline="") as csvfile:
         """
@@ -109,14 +115,18 @@ def clean_311():
                 float(row.get("Longitude")),
                 row.get("Neighborhood"),
             )
-            output_report.append(tuple_out)
+            ### Remove reports with missing geographci information ####
+            tolerance = .01
+            missing_location = math.isclose(tuple_out.lat, 0.0, abs_tol=tolerance) and math.isclose(tuple_out.lon, 0.0, abs_tol=tolerance)
+            if not missing_location:
+                output_report.append(tuple_out)
 
     return output_report
 
 
 ### Clean encampment data ###
 def clean_encampment():
-    file_input = RAW_DATA_DIR / "Historical Tent Counts.xlsx"
+    file_input = ENCAMP_PATH
     wb = load_workbook(file_input)
     sheet_obj = wb.active
 
@@ -168,19 +178,30 @@ def clean_encampment():
 def attached_311_reports(output_encampment, output_report):
 
     associated_encamp = []
+    year_2021 = [encamp for encamp in output_encampment if encamp.year == 2021]
+    report_2021 = [report for report in output_report if report.year == 2021]
+    month_dec_2020 = [report for report in output_report if report.year == 2020 and report.month == 12]
+    month_jan_2022 = [report for report in output_report if report.year == 2022 and report.month == 1]
+    report_2021.extend(month_dec_2020)
+    report_2021.extend(month_jan_2022)
 
-    for encampment in output_encampment:
-        for report in output_report:
-            if report.month == encampment.month and report.year == encampment.year:
-                if (
-                    rate(
-                        jellyfish.jaro_winkler_similarity(
-                            encampment.neighborhood.lower(), report.neighborhood.lower()
+    for encampment in year_2021:
+
+            for report in report_2021:
+                format_pattern = '%m/%d/%Y'
+                diff =  datetime.strptime(encampment.date_time,format_pattern) - report.date_time
+                if abs(diff.days) <= 15:
+                    point1 = (encampment.lat, encampment.lon)
+                    point2 = (report.lat, report.lon)
+                    if (
+                        rate(
+                            jellyfish.jaro_winkler_similarity(
+                                encampment.neighborhood.lower(), report.neighborhood.lower()
+                            )
                         )
-                    )
-                    == "high"
-                ):
-                    associated_encamp.append((encampment, report))
+                        == "high"):
+                            if (distance.distance(point1, point2).miles) < 0.2:
+                                associated_encamp.append((encampment, report))
 
 
 def process_acs_data():
