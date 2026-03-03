@@ -1,9 +1,5 @@
 # Project: All Access Livable Housing
 
-## Note: Milestone 3
-For Milestone 3, please refer to the milestone3.md document for updates. (This section will be removed later)
-
-
 ## Members
 
 - Haeji Ahn <ahaeji925@uchicago.edu>
@@ -47,7 +43,7 @@ Overall, our project will have a strong focus on spatial analysis and mapping, v
 
 ### Data Source #2: Census Data
 #### Data Source #2.1: ACS data on rental costs and demographic data
-- https://data2.nhgis.org/main (2020-24 ACS 5-year data for population, median rent, median household income, and racial composition by tract)
+- https://data2.nhgis.org/main (2020-24 ACS 5-year data for population, median rent, median household income, racial composition, and number of renter households by tract)
 
 #### Data Source #2.2: Listing and geographic boundaries of census tracts in SF
 - https://data.sfgov.org/Geographic-Locations-and-Boundaries/Census-2020-Tracts-for-San-Francisco/tmph-tgz9/about_data (to obtain SF census tract IDs)

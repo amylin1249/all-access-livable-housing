@@ -18,6 +18,11 @@ SF_EVICTIONS_TRACTS = Path(__file__).parent.parent / "clean-data/evictions_api_d
 ENCAMPMENT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_tracts.csv"
 ENCAMPMENT_REPORT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_report_tracts.csv"
 
+### TEMP ISSUE FILES
+SF_EVICTIONS_ISSUES = Path(__file__).parent.parent / "clean-data/evictions_api_issues.csv"
+ENCAMPMENT_ISSUES = Path(__file__).parent.parent / "clean-data/encampment_tracts_issues.csv"
+ENCAMPMENT_REPORT_ISSUES = Path(__file__).parent.parent / "clean-data/encampment_report_tracts_issues.csv"
+
 
 class Tract(NamedTuple):
     id: str
@@ -257,7 +262,7 @@ def quadtree_spatial_join(
         for tract_id in quadtree.match(location_point):
             join_dict[location.id] = tract_id
         
-        ### TEMPORARY FIX WHILE DEBUGGING
+        ### TRYING TO TEMPORARILY FIX WHILE DEBUGGING (but not working - seems like the point just doesn't fall in any polygon)
         # if location.id not in join_dict:
         #     for tract in tracts:
         #         if tract.polygon.contains(location_point):
@@ -266,10 +271,13 @@ def quadtree_spatial_join(
     return join_dict
 
 
-def add_evictions_tracts_csv(source_file: Path, dest_file: Path):
+### NOTE: The last parameter is a temporary parameter to analyze how many ID's are not in the file
+def add_evictions_tracts_csv(source_file: Path, dest_file: Path, missing_key_file: Path):
     """
     Add docstring
     """
+    missing_keys = [] ### TO REMOVE ONCE FIXED
+
     match_tracts = quadtree_spatial_join(load_evictions_csv(SF_EVICTIONS), load_shapefiles(MERGED_SF_TRACTS_SHP))
 
     with open(source_file, "r") as source_file, open(dest_file, "w") as dest_file: 
@@ -284,14 +292,25 @@ def add_evictions_tracts_csv(source_file: Path, dest_file: Path):
 
         # Iterate over each row in source file, add tract geoid, and write it to destination file
         for row in reader:
-            row["geoid"] = match_tracts[row["id"]]
-            writer.writerow(row)
+            ### TO REMOVE THIS "IF" STATEMENT ONCE FIXED
+            if row["id"] not in match_tracts:
+                missing_keys.append((row["id"], row["lat"], row["lon"]))
+            else:
+                row["geoid"] = match_tracts[row["id"]]
+                writer.writerow(row)
+
+    ### TO REMOVE ONCE FIXED
+    with open(missing_key_file, "w") as issue_file:
+        writer = csv.writer(issue_file)
+        writer.writerows(missing_keys)
 
 
-def add_encampments_tracts_csv(data: list[tuple], dest_file: Path, match_tracts: dict):
+def add_encampments_tracts_csv(data: list[tuple], dest_file: Path, match_tracts: dict, missing_key_file: Path):
     """
     ADD DOCSTRING
     """
+    missing_keys = [] ### TO REMOVE ONCE FIXED
+
     headers = data[0]._fields + ("geoid",)
 
     with open(dest_file, "w") as dest_file: 
@@ -299,21 +318,30 @@ def add_encampments_tracts_csv(data: list[tuple], dest_file: Path, match_tracts:
         writer.writeheader()
 
         for row in data:
-            row_dict = row._asdict()
-            row_dict["geoid"] = match_tracts[row.id]
-            writer.writerow(row_dict)
+            if row.id not in match_tracts:
+                missing_keys.append((row.id, row.lat, row.lon))
+            else:
+                row_dict = row._asdict()
+                row_dict["geoid"] = match_tracts[row.id]
+                writer.writerow(row_dict)
+
+    ### TO REMOVE ONCE FIXED
+    with open(missing_key_file, "w") as issue_file:
+        writer = csv.writer(issue_file)
+        writer.writerows(missing_keys)
 
 
 if __name__ == "__main__":
     tracts_shp = load_shapefiles(MERGED_SF_TRACTS_SHP)
-    # add_evictions_tracts_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS)
+
+    # add_evictions_tracts_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS, SF_EVICTIONS_ISSUES)
     # print(quadtree_spatial_join(load_evictions_csv(SF_EVICTIONS), load_shapefiles(MERGED_SF_TRACTS_SHP)))
     # print(quadtree_spatial_join(clean_311(), load_shapefiles(MERGED_SF_TRACTS_SHP)))
     # print(quadtree_spatial_join(clean_encampment(), load_shapefiles(MERGED_SF_TRACTS_SHP)))
     
-    # clean_311 = clean_311()
-    # add_encampments_tracts_csv(clean_311, ENCAMPMENT_REPORT_TRACTS, quadtree_spatial_join(clean_311, tracts_shp)))
+    clean_311 = clean_311()
+    add_encampments_tracts_csv(clean_311, ENCAMPMENT_REPORT_TRACTS, quadtree_spatial_join(clean_311, tracts_shp), ENCAMPMENT_REPORT_ISSUES)
     
     clean_encampment = clean_encampment()
-    add_encampments_tracts_csv(clean_encampment, ENCAMPMENT_TRACTS, quadtree_spatial_join(clean_encampment, tracts_shp))
+    add_encampments_tracts_csv(clean_encampment, ENCAMPMENT_TRACTS, quadtree_spatial_join(clean_encampment, tracts_shp), ENCAMPMENT_ISSUES)
 
