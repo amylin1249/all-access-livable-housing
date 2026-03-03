@@ -20,4 +20,7 @@ dependencies = [
     "openpyxl>=3.1.5",
     "jellyfish>=1.2.1",
     "altair>=6.0.0",
+    "dash>=4.0.0",
+    "dash-ag-grid>=33.3.3",
+    "plotly-express>=0.4.1",
 ]
