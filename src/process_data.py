@@ -51,7 +51,7 @@ HH_INC_ID = "AURUE001"
 WHITE_POP_ID = "AUO7E002"
 RENTER_UNITS_ID = "AUUEE003"
 
-EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
+EXCLUDE_GEOID = "06075980401"
 
 
 class Encampment(NamedTuple):
@@ -277,7 +277,7 @@ def get_sf_geoid() -> list[str]:
         reader = csv.DictReader(f)
         for row in reader:
             geoid = row["geoid"]
-            if geoid not in EXCLUDE_GEOIDS:
+            if geoid != EXCLUDE_GEOID:
                 sf_geoid.append(geoid)
 
     return sf_geoid
