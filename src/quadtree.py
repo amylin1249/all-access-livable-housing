@@ -334,11 +334,8 @@ def add_encampments_tracts_csv(data: list[tuple], dest_file: Path, match_tracts:
 if __name__ == "__main__":
     tracts_shp = load_shapefiles(MERGED_SF_TRACTS_SHP)
 
-    # add_evictions_tracts_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS, SF_EVICTIONS_ISSUES)
-    # print(quadtree_spatial_join(load_evictions_csv(SF_EVICTIONS), load_shapefiles(MERGED_SF_TRACTS_SHP)))
-    # print(quadtree_spatial_join(clean_311(), load_shapefiles(MERGED_SF_TRACTS_SHP)))
-    # print(quadtree_spatial_join(clean_encampment(), load_shapefiles(MERGED_SF_TRACTS_SHP)))
-    
+    add_evictions_tracts_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS, SF_EVICTIONS_ISSUES)
+
     clean_311 = clean_311()
     add_encampments_tracts_csv(clean_311, ENCAMPMENT_REPORT_TRACTS, quadtree_spatial_join(clean_311, tracts_shp), ENCAMPMENT_REPORT_ISSUES)
     
