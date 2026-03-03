@@ -126,10 +126,10 @@ def clean_311():
                 row.get("Neighborhood")
             )
             ### Remove reports with missing geographic information ####
-            #tolerance = .01
-            #missing_location = math.isclose(tuple_out.lat, 0.0, abs_tol=tolerance) and math.isclose(tuple_out.lon, 0.0, abs_tol=tolerance)
-            #if not missing_location:
-            output_report.append(tuple_out)
+            tolerance = .01
+            missing_location = math.isclose(tuple_out.lat, 0.0, abs_tol=tolerance) and math.isclose(tuple_out.lon, 0.0, abs_tol=tolerance)
+            if not missing_location:
+                output_report.append(tuple_out)
 
     return output_report
 
