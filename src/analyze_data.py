@@ -39,8 +39,11 @@ def calculate_eviction_rate(eviction_df, acs_df):
         acs_df[["TL_GEO_ID", "rent_units"]],
         left_on="geoid",
         right_on="TL_GEO_ID",
-        how="left",
+        how="right",
     )
+    # without evict -> fill in 0
+    merged["total_evictions"] = merged["total_evictions"].fillna(0)
+    merged["geoid"] = merged["TL_GEO_ID"]
     merged["eviction_rate"] = merged["total_evictions"] / merged["rent_units"]
     merged["eviction_rate"] = merged["eviction_rate"].fillna(0)
 
@@ -194,9 +197,6 @@ def generate_tidy_csv():
         right_on=["year_mon", "geoid"],
         how="left",
     )
-
-    # Fill missing eviction rate values with 0's
-    tidy_df["eviction_rate"] = tidy_df["eviction_rate"].fillna(0)
 
     # Remove unnecessary columns
     tidy_df = tidy_df.drop(columns=["year_mon", "geoid"])
