@@ -26,10 +26,10 @@ RENT_PATH = (
 )
 
 REPORT_PATH = (
-    Path(__file__).parent.parent / "raw-data"/ "311_cases.csv"
+    Path(__file__).parent.parent / "raw-data/311_cases.csv"
 )
 ENCAMP_PATH = (
-      Path(__file__).parent.parent / "raw-data"/ "encampments_counts.xlsx"
+      Path(__file__).parent.parent / "raw-data/encampment_counts.xlsx"
 )
 
 HH_INC_PATH = (

@@ -5,14 +5,20 @@ from datetime import datetime
 
 eviction_df = pd.read_csv("clean-data/evictions_api_data_tracts.csv")
 acs_df = pd.read_csv("clean-data/census_acs_join.csv")
+ENCAMPMENT_DF = pd.read_csv("clean-data/encampment_tracts.csv")
+ENCAMPMENT_REPORT_DF = pd.read_csv("clean-data/311_tracts.csv")
+
+TENTS_EST = 1.1
+STRUCTURES_EST = 1.1
+VEHICLES_EST = 2.1
+
 
 def total_evictions_by_tract(eviction_df):
     """
     Combine current evictions data with census tracts 
     to get total number of evictions within a tract for a given month
     """
-    
-    eviction_df["geoid"] = eviction_df['geoid'].astype(str).str.zfill(11)
+    eviction_df["geoid"] = eviction_df["geoid"].astype(str).str.zfill(11)
     group_by_month = eviction_df.groupby(["geoid", "year_mon"])
     total_evic_per_mon = group_by_month.size().reset_index(name="total_evictions")
 
@@ -26,11 +32,11 @@ def calculate_eviction_rate(eviction_df, acs_df):
     return eviction_mon / rent_units
     """
     agg_eviction_df = total_evictions_by_tract(eviction_df)
-    acs_df["TL_GEO_ID"] = acs_df['TL_GEO_ID'].astype(str).str.zfill(11)
+    acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str).str.zfill(11)
 
     merged = pd.merge(
         agg_eviction_df, 
-        acs_df[['TL_GEO_ID', 'rent_units']], 
+        acs_df[["TL_GEO_ID", "rent_units"]], 
         left_on='geoid', 
         right_on='TL_GEO_ID', 
         how='left'
@@ -115,6 +121,27 @@ def weight_to_census_tract(crosswalks, rent_by_zip):
     return rent_by_tract
 
 
+def encampments_by_tract(df):
+    """
+    Add docstring
+    """
+    df["geoid"] = df["geoid"].astype(str).str.zfill(11)
+    df["date"] = df["year"].astype(str).str.cat(df["month"].astype(str).str.zfill(2), sep="-")
+    ### I think this column "date" should be added under clean_encampment() in process_data.py instead?
+
+    df.groupby(["geoid", "date"], as_index=False).agg(
+    {
+        "tents": "sum",
+        "structures": "sum",
+        "vehicles": "sum",
+    }
+    )
+
+    df = df[["geoid", "date", "tents", "structures", "vehicles"]]
+
+    return df
+
+
 def generate_tidy_csv(rent_by_tract):
     data = []
     for date, tract_rent in rent_by_tract.items():
@@ -125,7 +152,20 @@ def generate_tidy_csv(rent_by_tract):
             dict["median_rent"] = median_rent
             data.append(dict)
     df = pd.DataFrame.from_dict(data)
-    df.to_csv('clean-data/consolidated_data.csv', index = False)
+
+    ### ADD IN CODE FOR EVICTIONS DATA
+
+
+    # Merge encampments data with rent data
+    encampments_df = encampments_by_tract(ENCAMPMENT_DF)
+    encampments_df = encampments_df.rename(columns={"geoid": "tract"})
+    merged_df = pd.merge(df, encampments_df, on=["date", "tract"], how="left")
+    merged_df = merged_df.fillna(0)
+
+    # Calculate weighted estimate of homelessness based on encampment types (rounded)
+    merged_df["estimate"] = (merged_df["tents"] * TENTS_EST + merged_df["structures"] * STRUCTURES_EST + merged_df["vehicles"] * VEHICLES_EST).round(0)
+
+    merged_df.to_csv("clean-data/consolidated_data.csv", index = False)
 
 
 if __name__ == "__main__":
