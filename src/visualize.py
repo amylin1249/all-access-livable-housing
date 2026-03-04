@@ -5,6 +5,7 @@ import webbrowser
 import pandas as pd
 import geopandas as gpd
 import altair as alt
+from altair_saver import save
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -18,7 +19,7 @@ MERGED_SF_TRACTS_SHP = (
     / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
 )
 
-SF_EVICTIONS_TRACTS = Path(__file__).parent.parent / "clean-data/evictions_api_data_tracts.csv"
+CONSOLIDATED = Path(__file__).parent.parent / "clean-data/consolidated_data.csv"
 
 
 # def visualize_sf_tracts():
@@ -103,61 +104,60 @@ def create_tract_map(source_file: Path, start_date: str, end_date: str):
     ### TBD ON WHETHER THIS SHOULD BE INSIDE OR OUTSIDE FUNCTION
 
     filtered_df = (
-        df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
-        .groupby("geoid")
-        .agg(metric_mean=("homelessness", "mean"))
+        df
+        [(df["date"] >= start_date) & (df["date"] <= end_date)]
+        .groupby("tract")
+        .agg(metric=(col_name, agg))
+        .reset_index()
     )
+
 
     chart = (
         alt.Chart(sf_tracts)
         .mark_geoshape()
-        .encode(color=alt.Color("metric_mean:Q"))
+        .encode(color=alt.Color("metric:Q"))
         .transform_lookup(
             lookup="GEOID",
-            from_=alt.LookupData(filtered_df, ("geoid"), ["metric_mean"]),
+            from_=alt.LookupData(filtered_df, ("tract"), ["metric"]),
         )
         .project(type="albersUsa")
         .properties(
-            title=f"Average unsheltered homelessness in SF tracts ({start_date} to {end_date})"
+            title=f"Unsheltered homelessness in SF tracts ({start_date} to {end_date})"
         )
     )
 
     return chart
 
 
-def create_scatterplot():
+def create_scatterplot(source_file: Path, x_var: str, x_agg: str, y_var: str, y_agg: str):
     """
     Docstring
     """
     sns.set_theme(style="whitegrid")
 
     # Load dataset
-    dataset = pd.read_csv(
-        Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
-    )  ### To update string with the dataset name
-
-    # Filter dataset to remove tracts with population of 0
-    filtered = dataset[dataset["population"] > 0]
+    df = pd.read_csv(source_file)
+    filtered_df = df.groupby("tract").agg(x_axis=(x_var, x_agg), y_axis=(y_var, y_agg)).reset_index()
 
     # Draw a scatter plot while assigning point colors and sizes to different
     # variables in the dataset
     f, ax = plt.subplots(figsize=(6.5, 6.5))
     sns.despine(f, left=True, bottom=True)
     sns.scatterplot(
-        x="med_hh_inc",
-        y="med_rent",  ### To update these to the right metrics once dataset finalized
-        hue="white_pct",
-        size="population",  ### To update these to the right metrics once dataset finalized
+        x="x_axis",
+        y="y_axis",
+        # hue="white_pct",
+        # size="population",  ### To update these to the right metrics once dataset finalized
         palette="ch:r=-.2,d=.3_r",
         sizes=(1, 100),
         linewidth=0,
-        data=filtered,
+        data=filtered_df,
         ax=ax,
     )
-    plt.xlabel("Median annual household income ($)", fontsize=12)
-    plt.ylabel("Median monthly rent ($)", fontsize=12)
+    plt.xlabel("Median monthly rent ($)", fontsize=12)
+    plt.ylabel("Average homelessness counts", fontsize=12)
     plt.title(
-        "Median rent vs. Median household income by tract",
+        "Average homelessness counts vs. Median rent by tract",
         fontsize=14,
         fontweight="bold",
     )
@@ -167,20 +167,20 @@ def create_scatterplot():
 TO_PROJ_EPSG = "EPSG:4326"  # WGS 84 global projection
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: uv run python visualize.py path/to/shapefile.shp")
-        sys.exit(1)
+    # if len(sys.argv) != 2:
+    #     print("Usage: uv run python visualize.py path/to/shapefile.shp")
+    #     sys.exit(1)
 
-    filepath = Path(__file__).parent.parent / sys.argv[1]
+    # filepath = Path(__file__).parent.parent / sys.argv[1]
 
-    shapefile_data = load_shapefile(filepath)
-    prj_file = str(filepath).replace("shp", "prj")
-    from_epsg = get_epsg_from_file(prj_file)
-    data = reproject_geometries(shapefile_data, from_epsg, TO_PROJ_EPSG)
+    # shapefile_data = load_shapefile(filepath)
+    # prj_file = str(filepath).replace("shp", "prj")
+    # from_epsg = get_epsg_from_file(prj_file)
+    # data = reproject_geometries(shapefile_data, from_epsg, TO_PROJ_EPSG)
 
-    quick_map(data)
+    # quick_map(data)
     # uv run python visualize.py clean-data/merged_sf_shapefiles/merged_sf_tracts.shp
 
     # visualize_sf_tracts()
-    # create_tract_map(file path, "2020-01", "2024-12")
-    # create_scatterplot()
+    # create_tract_map(CONSOLIDATED, "2020-01", "2024-12", "estimate", "sum")
+    create_scatterplot(CONSOLIDATED, "median_rent", "mean", "estimate", "mean")

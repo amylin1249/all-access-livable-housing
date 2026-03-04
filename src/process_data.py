@@ -26,10 +26,10 @@ RENT_PATH = (
 )
 
 REPORT_PATH = (
-    Path(__file__).parent.parent / "raw-data"/ "311_cases.csv"
+    Path(__file__).parent.parent / "raw-data/311_cases.csv"
 )
 ENCAMP_PATH = (
-      Path(__file__).parent.parent / "raw-data"/ "encampments_counts.xlsx"
+      Path(__file__).parent.parent / "raw-data/encampment_counts.xlsx"
 )
 
 HH_INC_PATH = (
@@ -70,14 +70,76 @@ class Encampment(NamedTuple):
 
 
 class EncampmentReport(NamedTuple):
-    id: int
     year: int
     month: int
-    date_time: datetime
+    address: str
     lat: float
     lon: float
-    neighborhood: str
     
+def clean_parenthesis(name):
+    """
+    This function takes a name and removes any parenthesized portion.
+
+    Returns:
+        A string with parenthesized portion removed.
+    """
+   
+    name = name.replace("(", "*(")
+    name = name.replace(")", ")*")
+
+    split_name = name.split("*")
+    output_list = []
+    
+    for word in split_name:
+        if word == "":
+            continue
+        elif word[0] != "(" and word[-1] != ")":
+            output_list.append(word.strip())
+    return ' '.join(output_list)
+
+STOPWORDS = [
+    "st", "street", "av", "avenue", "ave", "av", "blvd", "boulevard", "rd", "road", "ln", "lane", "dr", "drive",
+    "ct", "court", "pkwy", "parkway", "dr", "drive", "ter", "terrace", "cir", "circle", "pl", "place", "stwy",
+    "a",
+    "an",
+    "and",
+    "&",
+    "are",
+    "as",
+    "at",
+    "be",
+    "by",
+    "for",
+    "from",
+    "has",
+    "he",
+    "in",
+    "is",
+    "it",
+    "its",
+    "of",
+    "on",
+    "that",
+    "the",
+    "to",
+    "was",
+    "were",
+    "will",
+    "with",
+    "park",
+    "parks", "intersection"]
+
+PUNCTUATION = ".,?-#/()[]" 
+
+def clean_address(address):
+    address = address.lower()
+    address = address.replace("i poi", "")
+    address = clean_parenthesis(address)
+    text_data = address.split(" ")
+    cleaned_list = [word.strip(PUNCTUATION) for word in text_data]
+    cleaned_list = [word for word in cleaned_list if word != ""]
+    cleaned_list = [word for word in cleaned_list if word not in STOPWORDS]
+    return " ".join(cleaned_list)
 
 
 def rate(score):
@@ -89,6 +151,7 @@ def rate(score):
 
 
 ## Clean 311 data
+
 def clean_311():
 
     file_input = REPORT_PATH
@@ -97,6 +160,7 @@ def clean_311():
         """
         Given a CSV containing 311, return a list of Encampment report objects.
         """
+        lat_lon_dict = {}
         output_report = []
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -116,22 +180,40 @@ def clean_311():
             else:
                 lon = float(row['Longitude'])
 
+            address = clean_address(row.get("Address"))
             tuple_out = EncampmentReport(
-                row.get("CaseID"),
                 date_year,
                 date_month,
-                datetime_object,
-                lat,
-                lon,
-                row.get("Neighborhood")
+                address,
+                None,
+                None
             )
-            ### Remove reports with missing geographic information ####
-            tolerance = .01
-            missing_location = math.isclose(tuple_out.lat, 0.0, abs_tol=tolerance) and math.isclose(tuple_out.lon, 0.0, abs_tol=tolerance)
-            if not missing_location:
-                output_report.append(tuple_out)
+            key = tuple_out
+            if key not in lat_lon_dict:
+                lat_lon_dict[key] = []
+                lat_lon_dict[key].append((lat, lon))
 
-    return output_report
+            output_report.append(tuple_out)
+
+    return output_report, lat_lon_dict
+
+def attach_lat_lon(output_report, lat_lon_dict):
+    unique_list = set(output_report)
+    output = []
+    for tuple_report in list(unique_list): 
+        lat_lon = lat_lon_dict[tuple_report]
+
+        lat = sum(loc[0] for loc in lat_lon if loc[0]!= 0 ) / len(lat_lon)
+        lon = sum(loc[1] for loc in lat_lon if loc[1]!=0) / len(lat_lon)
+    
+        tuple_out = EncampmentReport(
+                tuple_report.year,
+                tuple_report.month,
+                tuple_report.address,
+                lat,
+                lon
+            )
+        output.append(tuple_out)
 
 
 ### Clean encampment data ###
