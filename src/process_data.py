@@ -324,28 +324,6 @@ def process_acs_data():
     joined_df.to_csv(SF_ACS_JOIN, index=False)
 
 
-def get_sf_geoid() -> list[str]:
-    """
-    Extract the list of SF census tract GeoIDs based on the list of 2020 census
-    tracts from DataSF Open Data Portal.
-
-    Returns:
-        List of SF census tract GeoIDs
-    """
-    sf_geoid = []
-
-    csv.field_size_limit(sys.maxsize)
-
-    with open(SF_CENSUS_PATH) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            geoid = row["geoid"]
-            if geoid != EXCLUDE_GEOIDS:
-                sf_geoid.append(geoid)
-
-    return sf_geoid
-
-
 def create_sf_shapefiles():
     """
     Filter California census tract shapefiles and create SF census tract
