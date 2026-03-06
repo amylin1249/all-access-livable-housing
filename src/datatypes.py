@@ -27,8 +27,8 @@ CALI_TRACTS_SHP = (
 
 
 # Paths to raw encampment counts XLSX and 311 cases CSV
-REPORT_PATH = Path(__file__).parent.parent / "raw-data/311_cases.csv"
 ENCAMP_PATH = Path(__file__).parent.parent / "raw-data/encampment_counts.xlsx"
+REPORT_PATH = Path(__file__).parent.parent / "raw-data/311_cases.csv"
 
 
 # Paths to clean evictions, encampment counts, and 311 cases CSV files

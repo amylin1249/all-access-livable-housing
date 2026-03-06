@@ -16,18 +16,6 @@ from datatypes import (
 )
 
 
-### TEMP ISSUE FILES - TO BE REMOVED ONCE ENCAMPMENT ISSUE COUNTS ARE IN
-SF_EVICTIONS_ISSUES = (
-    Path(__file__).parent.parent / "clean-data/evictions_api_issues.csv"
-)
-ENCAMPMENT_ISSUES = (
-    Path(__file__).parent.parent / "clean-data/encampment_tracts_issues.csv"
-)
-ENCAMPMENT_REPORT_ISSUES = (
-    Path(__file__).parent.parent / "clean-data/311_tracts_issues.csv"
-)
-
-
 class Tract(NamedTuple):
     id: str
     pop: int

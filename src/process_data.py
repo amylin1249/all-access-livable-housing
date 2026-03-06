@@ -6,13 +6,17 @@ import geopandas as gpd
 from pathlib import Path
 from datetime import datetime
 from datatypes import (
-    SF_CENSUS_PATH,
-    CALI_TRACTS_SHP,
     POP_PATH,
     RENT_PATH,
     HH_INC_PATH,
     RACE_PATH,
     RENTER_UNITS_PATH,
+    SF_CENSUS_PATH,
+    CALI_TRACTS_SHP,
+    ENCAMP_PATH,
+    REPORT_PATH,
+    CLEAN_ENCAMP,
+    CLEAN_311,
     SF_ACS_JOIN,
     SF_TRACTS_SHP,
     MERGED_SF_TRACTS_SHP,
@@ -24,43 +28,7 @@ from datatypes import (
 )
 
 
-
-
-EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
-
-class Encampment(NamedTuple):
-    ### unique  encampmemnt id per quarter
-    id: int
-    tents: int
-    structures: int
-    vehicles: int
-
-    year: int
-    month: int
-    date_time: datetime
-    lat: float
-    lon: float
-    neighborhood: str
-
-
-class EncampmentReport(NamedTuple):
-    id: int
-    year: int
-    month: int
-    address: str
-    lat: float
-    lon: float
-  
-
-
-def rate(score):
-    if score >= 0.95:
-        return "high"
-    if score < 0.95 and score >= 0.80:
-        return "medium"
-    return "low"
-
-### LILY CLEANING PROCESS ###
+EXCLUDE_GEOID = "06075980401"
 
 STOPWORDS = [
     "st",
@@ -169,7 +137,7 @@ def generate_311_csv():
     ADD DOCSTRING
     """
     # Load raw data
-    df = pd.read_csv("raw-data/311_cases.csv")
+    df = pd.read_csv(REPORT_PATH)
 
     # Keep only necessary columns
     df = df[["Opened", "Address", "Latitude", "Longitude"]]
@@ -207,7 +175,7 @@ def generate_311_csv():
     # Reorder columns for readability
     df = df.reindex(columns=["id", "date", "lat", "lon"])
 
-    df.to_csv("clean-data/clean_311_data.csv", index=False)
+    df.to_csv(CLEAN_311, index=False)
 
 
 def generate_encampments_csv():
@@ -215,7 +183,7 @@ def generate_encampments_csv():
     ADD DOCSTRING
     """
     # Top row (row 0) is not a real header row
-    df = pd.read_excel("raw-data/encampment_counts.xlsx", header=1)
+    df = pd.read_excel(ENCAMP_PATH, header=1)
 
     # Keep only necessary columns
     df = df[
@@ -264,7 +232,7 @@ def generate_encampments_csv():
         columns=["id", "date", "tents", "structures", "vehicles", "lat", "lon"]
     )
 
-    df.to_csv("clean-data/clean_encampments_data.csv", index=False)
+    df.to_csv(CLEAN_ENCAMP, index=False)
 
 
 def get_sf_geoid() -> list[str]:
@@ -343,9 +311,7 @@ def process_acs_data():
     )
 
     # Add calculation of percentage of white population per tract as a new column
-    joined_df["white_pct"] = np.where(
-        joined_df["population"] > 0, joined_df["white_pop"] / joined_df["population"], 0
-    )
+    joined_df["white_pct"] = joined_df["white_pop"] / joined_df["population"]
 
     # Filter tract IDs only for those in the list of filtered SF census tracts
     joined_df = joined_df[joined_df["TL_GEO_ID"].isin(get_sf_geoid())]
@@ -507,7 +473,7 @@ def generate_crosswalks_csv():
 
 if __name__ == "__main__":
     process_acs_data()
-    create_sf_shapefiles()
-    add_sf_tract_data()
-    generate_zori_csv()
-    generate_crosswalks_csv()
+    # create_sf_shapefiles()
+    # add_sf_tract_data()
+    # generate_zori_csv()
+    # generate_crosswalks_csv()
