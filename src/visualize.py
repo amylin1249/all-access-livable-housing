@@ -95,7 +95,7 @@ CONSOLIDATED = Path(__file__).parent.parent / "clean-data/consolidated_data.csv"
 #     return CRS.from_wkt(prj_text).to_epsg()
 
 
-def create_tract_map(source_file: Path, start_date: str, end_date: str):
+def create_tract_map(source_file: Path, start_date: str, end_date: str, col_name: str, agg: str):
     """
     Add docstring
     """
