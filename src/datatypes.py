@@ -16,9 +16,7 @@ RENTER_UNITS_PATH = (
 )
 
 
-REPORT_PATH = Path(__file__).parent.parent / "raw-data/311_cases.csv"
-ENCAMP_PATH = Path(__file__).parent.parent / "raw-data/encampment_counts.xlsx"
-
+# Paths to raw SF census tracts CSV file and California tracts shapefiles
 SF_CENSUS_PATH = (
     Path(__file__).parent.parent / "raw-data/census/sf_census_tracts_2020.csv"
 )
@@ -27,14 +25,23 @@ CALI_TRACTS_SHP = (
     / "raw-data/census/cali_tracts_shapefiles/tl_2025_06_tract.shp"
 )
 
+
+# Paths to raw encampment counts XLSX and 311 cases CSV
+REPORT_PATH = Path(__file__).parent.parent / "raw-data/311_cases.csv"
+ENCAMP_PATH = Path(__file__).parent.parent / "raw-data/encampment_counts.xlsx"
+
+
+# Paths to clean evictions, encampment counts, and 311 cases CSV files
+SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv"
+
+
+# Paths to clean census CSV file and tract shapefiles
 SF_ACS_JOIN = Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
 SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
 MERGED_SF_TRACTS_SHP = (
     Path(__file__).parent.parent
     / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
 )
-
-SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv"
 
 
 # Paths to CSV files with point data that have been spatially matched with tracts

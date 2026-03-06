@@ -1,12 +1,19 @@
 import pandas as pd
 import csv
-from pathlib import Path
 from datetime import datetime
 
-eviction_df = pd.read_csv("clean-data/evictions_api_data_tracts.csv")
-acs_df = pd.read_csv("clean-data/census_acs_join.csv")
-ENCAMPMENT_DF = pd.read_csv("clean-data/encampment_tracts.csv")
-ENCAMPMENT_REPORT_DF = pd.read_csv("clean-data/311_tracts.csv")
+from datatypes import (
+    SF_EVICTIONS_TRACTS,
+    SF_ACS_JOIN,
+    ENCAMPMENT_TRACTS,
+    ENCAMPMENT_REPORT_TRACTS,
+    CONSOLIDATED
+)
+
+eviction_df = pd.read_csv(SF_EVICTIONS_TRACTS)
+acs_df = pd.read_csv(SF_ACS_JOIN)
+ENCAMPMENT_DF = pd.read_csv(ENCAMPMENT_TRACTS)
+ENCAMPMENT_REPORT_DF = pd.read_csv(ENCAMPMENT_REPORT_TRACTS)
 
 TENTS_EST = 1.1
 STRUCTURES_EST = 1.1
@@ -269,7 +276,7 @@ def generate_tidy_csv():
     # # Round eviction rate to percentage with one decimal
     # final_df["eviction_rate"] = (final_df["eviction_rate"] * 100).round(1)
 
-    tidy_df.to_csv("clean-data/consolidated_data.csv", index=False)
+    tidy_df.to_csv(CONSOLIDATED, index=False)
 
 
 if __name__ == "__main__":
