@@ -16,7 +16,7 @@ Coordinates used for SF bounding box:
 Westernmost (not incl. Farallon): 37.780436, -122.517724
 Easternmost: Bayview Hunters Point 37.728650, -122.357071
 Northernmost: Treasure Island 37.833227, -122.372522
-Southernmost: 37.708182, -122.485839
+Southernmost: 37.706900, -122.485839
 
 
 ## Project Structure
