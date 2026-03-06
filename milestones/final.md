@@ -12,6 +12,13 @@
 List the sources of data, any gaps or challenges in the data. Explain how data flows through the project. What else would someone picking this project up for the first time need to understand?
 
 
+Coordinates used for SF bounding box:
+Westernmost (not incl. Farallon): 37.780436, -122.517724
+Easternmost: Bayview Hunters Point 37.728650, -122.357071
+Northernmost: Treasure Island 37.833227, -122.372522
+Southernmost: 37.708182, -122.485839
+
+
 ## Project Structure
 Write a page or so describing the structure of your project. What modules exist? What do they do? A diagram may be helpful here.
 
