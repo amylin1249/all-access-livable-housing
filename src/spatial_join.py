@@ -234,7 +234,7 @@ def quadtree_spatial_join(
         location_point = Point(location.lon, location.lat)
 
         for tract_id in quadtree.match(location_point):
-            join_dict[location.id] = tract_id
+                join_dict[location.id] = tract_id
 
     return join_dict
 
@@ -251,16 +251,18 @@ def load_points_csv(path: Path) -> list[Location]:
         A list of Location objects that represent the points in the dataset.
     """
     locations = []
-    with open(path) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            locations.append(
-                Location(
-                    id=int(row["id"]),
-                    lat=row["lat"],
-                    lon=row["lon"],
-                )
+
+    df = pd.read_csv(path)
+
+    for row in df.itertuples():
+        locations.append(
+            Location(
+                id=row.id, 
+                lat=row.lat,
+                lon=row.lon
             )
+        )
+
     return locations
 
 
@@ -291,6 +293,6 @@ def join_tracts_csv(source_csv: Path, dest_csv: Path):
 
 
 if __name__ == "__main__":
-    # join_tracts_csv(SF_EVICTIONS, JOINED_EVICTIONS_TRACTS)
-    # join_tracts_csv(CLEAN_ENCAMP, JOINED_ENCAMP_TRACTS)
+    join_tracts_csv(SF_EVICTIONS, JOINED_EVICTIONS_TRACTS)
+    join_tracts_csv(CLEAN_ENCAMP, JOINED_ENCAMP_TRACTS)
     join_tracts_csv(CLEAN_311, JOINED_311_TRACTS)

@@ -175,7 +175,7 @@ def generate_311_csv():
     df = df.drop(columns=["address"])
 
     # Drop observations where lat/lon = 0
-    df = df[(df['lat'] != 0) & (df['lon'] != 0)]
+    df = df[(df["lat"] != 0) & (df["lon"] != 0)]
 
     # Reorder columns for readability
     df = df.reindex(columns=["id", "date", "lat", "lon"])
@@ -477,12 +477,12 @@ def add_sf_tract_data():
 
 
 if __name__ == "__main__":
-    generate_zori_csv()
-    generate_crosswalks_csv()
-    generate_311_csv()
+    # generate_zori_csv()
+    # generate_crosswalks_csv()
+    # generate_311_csv()
     generate_encampments_csv()
-    process_acs_data()
-    create_sf_shapefiles()
-    add_sf_tract_data()
+    # process_acs_data()
+    # create_sf_shapefiles()
+    # add_sf_tract_data()
 
 

@@ -11,7 +11,6 @@ dependencies = [
     "ruff>=0.15.0",
     "sodapy>=2.2.0",
     "lxml>=6.0.2",
-    "shapely>=2.1.2",
     "pyshp>=3.0.3",
     "geopandas>=1.1.2",
     "matplotlib>=3.10.8",
@@ -26,6 +25,7 @@ dependencies = [
     "altair-viewer>=0.4.0",
     "altair-saver>=0.5.0",
     "pytest>=9.0.2",
+    "shapely>=2.1.2",
 ]
 
 [dependency-groups]
