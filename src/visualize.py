@@ -12,14 +12,10 @@ from pathlib import Path
 from pyproj import Transformer, CRS
 from shapely import geometry
 from shapely.ops import transform
-
-
-MERGED_SF_TRACTS_SHP = (
-    Path(__file__).parent.parent
-    / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+from datatypes import (
+    MERGED_SF_TRACTS_SHP,
+    CONSOLIDATED
 )
-
-CONSOLIDATED = Path(__file__).parent.parent / "clean-data/consolidated_data.csv"
 
 
 # def visualize_sf_tracts():

@@ -6,21 +6,16 @@ import shapefile
 import csv
 import pandas as pd
 
-
-MERGED_SF_TRACTS_SHP = (
-    Path(__file__).parent.parent
-    / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+from datatypes import (
+    MERGED_SF_TRACTS_SHP,
+    SF_EVICTIONS,
+    SF_EVICTIONS_TRACTS,
+    ENCAMPMENT_TRACTS,
+    ENCAMPMENT_REPORT_TRACTS
 )
 
-SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv"
 
-SF_EVICTIONS_TRACTS = (
-    Path(__file__).parent.parent / "clean-data/evictions_api_data_tracts.csv"
-)
-ENCAMPMENT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_tracts.csv"
-ENCAMPMENT_REPORT_TRACTS = Path(__file__).parent.parent / "clean-data/311_tracts.csv"
-
-### TEMP ISSUE FILES
+### TEMP ISSUE FILES - TO BE REMOVED ONCE ENCAMPMENT ISSUE COUNTS ARE IN
 SF_EVICTIONS_ISSUES = (
     Path(__file__).parent.parent / "clean-data/evictions_api_issues.csv"
 )
