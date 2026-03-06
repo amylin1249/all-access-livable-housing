@@ -323,8 +323,6 @@ def process_acs_data():
     - Tracts will be identified by their GeoID ("TL_GEO_ID")
     - Data to be merged will be found in the column with the unique identifier
     """
-    csv.field_size_limit(sys.maxsize)
-
     # Read in ACS CSV files as dataframes and specify columns of interest
     pop_df = pd.read_csv(
         POP_PATH, usecols=["TL_GEO_ID", POP_ID], dtype={"TL_GEO_ID": "str"}
