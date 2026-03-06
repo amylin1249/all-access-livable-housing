@@ -25,18 +25,16 @@ RENT_PATH = (
     Path(__file__).parent.parent / "raw-data/census/acs_sf_median_rent_2020_24.csv"
 )
 
-REPORT_PATH = (
-    Path(__file__).parent.parent / "raw-data/311_cases.csv"
-)
-ENCAMP_PATH = (
-      Path(__file__).parent.parent / "raw-data/encampment_counts.xlsx"
-)
+REPORT_PATH = Path(__file__).parent.parent / "raw-data/311_cases.csv"
+ENCAMP_PATH = Path(__file__).parent.parent / "raw-data/encampment_counts.xlsx"
 
 HH_INC_PATH = (
     Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
 )
 RACE_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_race_2020_24.csv"
-RENTER_UNITS_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_housing_units_2020_24.csv"
+RENTER_UNITS_PATH = (
+    Path(__file__).parent.parent / "raw-data/census/acs_sf_housing_units_2020_24.csv"
+)
 
 SF_ACS_JOIN = Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
 SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
@@ -75,7 +73,8 @@ class EncampmentReport(NamedTuple):
     address: str
     lat: float
     lon: float
-    
+
+
 def clean_parenthesis(name):
     """
     This function takes a name and removes any parenthesized portion.
@@ -83,23 +82,49 @@ def clean_parenthesis(name):
     Returns:
         A string with parenthesized portion removed.
     """
-   
+
     name = name.replace("(", "*(")
     name = name.replace(")", ")*")
 
     split_name = name.split("*")
     output_list = []
-    
+
     for word in split_name:
         if word == "":
             continue
         elif word[0] != "(" and word[-1] != ")":
             output_list.append(word.strip())
-    return ' '.join(output_list)
+    return " ".join(output_list)
+
 
 STOPWORDS = [
-    "st", "street", "av", "avenue", "ave", "av", "blvd", "boulevard", "rd", "road", "ln", "lane", "dr", "drive",
-    "ct", "court", "pkwy", "parkway", "dr", "drive", "ter", "terrace", "cir", "circle", "pl", "place", "stwy",
+    "st",
+    "street",
+    "av",
+    "avenue",
+    "ave",
+    "av",
+    "blvd",
+    "boulevard",
+    "rd",
+    "road",
+    "ln",
+    "lane",
+    "dr",
+    "drive",
+    "ct",
+    "court",
+    "pkwy",
+    "parkway",
+    "dr",
+    "drive",
+    "ter",
+    "terrace",
+    "cir",
+    "circle",
+    "pl",
+    "place",
+    "stwy",
     "a",
     "an",
     "and",
@@ -127,9 +152,12 @@ STOPWORDS = [
     "will",
     "with",
     "park",
-    "parks", "intersection"]
+    "parks",
+    "intersection",
+]
 
-PUNCTUATION = ".,?-#/()[]" 
+PUNCTUATION = ".,?-#/()[]"
+
 
 def clean_address(address):
     address = address.lower()
@@ -152,6 +180,7 @@ def rate(score):
 
 ## Clean 311 data
 
+
 def clean_311():
 
     file_input = REPORT_PATH
@@ -170,24 +199,18 @@ def clean_311():
             datetime_object = datetime.strptime(datetime_str, "%m/%d/%Y %H:%M:%S")
             date_year = datetime_object.year
             date_month = datetime_object.month
-            if row['Latitude'] == '':
-                lat = 0 
+            if row["Latitude"] == "":
+                lat = 0
             else:
-                lat = float(row['Latitude'])
-                            
-            if row['Longitude'] == '':
+                lat = float(row["Latitude"])
+
+            if row["Longitude"] == "":
                 lon = 0
             else:
-                lon = float(row['Longitude'])
+                lon = float(row["Longitude"])
 
             address = clean_address(row.get("Address"))
-            tuple_out = EncampmentReport(
-                date_year,
-                date_month,
-                address,
-                None,
-                None
-            )
+            tuple_out = EncampmentReport(date_year, date_month, address, None, None)
             key = tuple_out
             if key not in lat_lon_dict:
                 lat_lon_dict[key] = []
@@ -197,22 +220,19 @@ def clean_311():
 
     return output_report, lat_lon_dict
 
+
 def attach_lat_lon(output_report, lat_lon_dict):
     unique_list = set(output_report)
     output = []
-    for tuple_report in list(unique_list): 
+    for tuple_report in list(unique_list):
         lat_lon = lat_lon_dict[tuple_report]
 
-        lat = sum(loc[0] for loc in lat_lon if loc[0]!= 0 ) / len(lat_lon)
-        lon = sum(loc[1] for loc in lat_lon if loc[1]!=0) / len(lat_lon)
-    
+        lat = sum(loc[0] for loc in lat_lon if loc[0] != 0) / len(lat_lon)
+        lon = sum(loc[1] for loc in lat_lon if loc[1] != 0) / len(lat_lon)
+
         tuple_out = EncampmentReport(
-                tuple_report.year,
-                tuple_report.month,
-                tuple_report.address,
-                lat,
-                lon
-            )
+            tuple_report.year, tuple_report.month, tuple_report.address, lat, lon
+        )
         output.append(tuple_out)
 
 
@@ -251,15 +271,18 @@ def clean_encampment():
 
         lat = float(sheet_obj.cell(row=i, column=10).value)
         lon = float(sheet_obj.cell(row=i, column=11).value)
-        obj = Encampment(i, tents,
-        structure,
-        vehicles,
-        date_obj.year,
-        date_obj.month,
-        date_string,
-        lat,
-        lon,
-        neighborhood)
+        obj = Encampment(
+            i,
+            tents,
+            structure,
+            vehicles,
+            date_obj.year,
+            date_obj.month,
+            date_string,
+            lat,
+            lon,
+            neighborhood,
+        )
         output_encampment.append(obj)
     return output_encampment
 
@@ -272,34 +295,43 @@ def attached_311_reports(output_encampment, output_report):
     associated_encamp = []
     year_2021 = [encamp for encamp in output_encampment if encamp.year == 2021]
     report_2021 = [report for report in output_report if report.year == 2021]
-    month_dec_2020 = [report for report in output_report if report.year == 2020 and report.month == 12]
-    month_jan_2022 = [report for report in output_report if report.year == 2022 and report.month == 1]
+    month_dec_2020 = [
+        report for report in output_report if report.year == 2020 and report.month == 12
+    ]
+    month_jan_2022 = [
+        report for report in output_report if report.year == 2022 and report.month == 1
+    ]
     report_2021.extend(month_dec_2020)
     report_2021.extend(month_jan_2022)
 
     for encampment in year_2021:
-
-            for report in report_2021:
-                format_pattern = '%m/%d/%Y'
-                diff =  datetime.strptime(encampment.date_time,format_pattern) - report.date_time
-                if abs(diff.days) <= 15:
-                    point1 = (encampment.lat, encampment.lon)
-                    point2 = (report.lat, report.lon)
-                    if (
-                        rate(
-                            jellyfish.jaro_winkler_similarity(
-                                encampment.neighborhood.lower(), report.neighborhood.lower()
-                            )
+        for report in report_2021:
+            format_pattern = "%m/%d/%Y"
+            diff = (
+                datetime.strptime(encampment.date_time, format_pattern)
+                - report.date_time
+            )
+            if abs(diff.days) <= 15:
+                point1 = (encampment.lat, encampment.lon)
+                point2 = (report.lat, report.lon)
+                if (
+                    rate(
+                        jellyfish.jaro_winkler_similarity(
+                            encampment.neighborhood.lower(), report.neighborhood.lower()
                         )
-                        == "high"):
-                            if (distance.distance(point1, point2).miles) < 0.2:
-                                associated_encamp.append((encampment, report))
+                    )
+                    == "high"
+                ):
+                    if (distance.distance(point1, point2).miles) < 0.2:
+                        associated_encamp.append((encampment, report))
 
-### Bounding box 
+
+### Bounding box
 ### neighborhood bound
-# ### For each encampment, create a bounding box for each encampmemnt  
-### use the timeit library 
+# ### For each encampment, create a bounding box for each encampmemnt
+### use the timeit library
 ### timeit helpful to see which functions are taking the longest
+
 
 def process_acs_data():
     """
@@ -326,7 +358,9 @@ def process_acs_data():
         HH_INC_PATH, usecols=["TL_GEO_ID", HH_INC_ID], dtype={"TL_GEO_ID": "str"}
     )
     renter_df = pd.read_csv(
-        RENTER_UNITS_PATH, usecols=["TL_GEO_ID", RENTER_UNITS_ID], dtype={"TL_GEO_ID": "str"}
+        RENTER_UNITS_PATH,
+        usecols=["TL_GEO_ID", RENTER_UNITS_ID],
+        dtype={"TL_GEO_ID": "str"},
     )
 
     # Impute negative or zero values in rent and household income dataframes
@@ -412,9 +446,9 @@ def add_sf_tract_data():
 
 def generate_zori_csv():
     """
-    Loads ZORI CSV file, filters for SF zip codes and the years 2020-2024, imputes 
+    Loads ZORI CSV file, filters for SF zip codes and the years 2020-2024, imputes
     to fill missing data, and outputs tidy ZORI CSV.
-    
+
     Returns:
         zips: [list] SF zip codes
     """
@@ -451,7 +485,9 @@ def generate_zori_csv():
         for date in date_cols:
             datetime_object = datetime.strptime(date, "%Y-%m-%d")
             formatted_date = f"{datetime_object.year}-{datetime_object.month:02}"
-            tidy_rows.append({"zip": zip_code, "date": formatted_date, "rent": row[date]})
+            tidy_rows.append(
+                {"zip": zip_code, "date": formatted_date, "rent": row[date]}
+            )
 
     # Writes tidy CSV
     with open("clean-data/tidy_zori.csv", "w", newline="") as f_out:
@@ -462,13 +498,13 @@ def generate_zori_csv():
 
 def generate_crosswalks_csv():
     """
-    Loads crosswalks XLSX files, filters for SF zips and tracts, selects necessary 
-    columns (zip, tract, res_ratio), extracts date column from filenames, and 
+    Loads crosswalks XLSX files, filters for SF zips and tracts, selects necessary
+    columns (zip, tract, res_ratio), extracts date column from filenames, and
     outputs into single CSV.
     """
     zori_df = pd.read_csv("clean-data/tidy_zori.csv")
     acs_df = pd.read_csv("clean-data/census_acs_join.csv")
-    
+
     zips_num = set(zori_df["zip"])
     zips = {str(zip) for zip in zips_num}
     tracts_num = set(acs_df["TL_GEO_ID"])
@@ -485,7 +521,7 @@ def generate_crosswalks_csv():
                 if "zip" in column.lower():
                     zip_col = column
                     break
-            df[zip_col] = df[zip_col].astype(str)            
+            df[zip_col] = df[zip_col].astype(str)
             for column in df.columns:
                 if "tract" in column.lower():
                     tract_col = column
@@ -503,14 +539,15 @@ def generate_crosswalks_csv():
             filtered_df = df.loc[:, [zip_col, tract_col, res_ratio_col]]
             filtered_df["date"] = date
             filtered_df.rename(
-                columns={"ZIP": "zip", "TRACT": "tract", "RES_RATIO": "res_ratio"}, inplace=True
+                columns={"ZIP": "zip", "TRACT": "tract", "RES_RATIO": "res_ratio"},
+                inplace=True,
             )
             # Filter to SF zips
             sf_zips_df = filtered_df[filtered_df["zip"].isin(zips)]
             # Filter to SF tracts
             sf_df = sf_zips_df[sf_zips_df["tract"].isin(tracts)]
             list_of_dfs.append(sf_df)
-    
+
     # Aggregate and output to CSV
     aggregated_df = pd.concat(list_of_dfs)
     aggregated_df.to_csv("clean-data/crosswalks.csv", index=None, header=True)

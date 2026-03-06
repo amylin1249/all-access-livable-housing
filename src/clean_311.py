@@ -18,23 +18,49 @@ def clean_parenthesis(name):
     Returns:
         A string with parenthesized portion removed.
     """
-   
+
     name = name.replace("(", "*(")
     name = name.replace(")", ")*")
 
     split_name = name.split("*")
     output_list = []
-    
+
     for word in split_name:
         if word == "":
             continue
         elif word[0] != "(" and word[-1] != ")":
             output_list.append(word.strip())
-    return ' '.join(output_list)
+    return " ".join(output_list)
+
 
 STOPWORDS = [
-    "st", "street", "av", "avenue", "ave", "av", "blvd", "boulevard", "rd", "road", "ln", "lane", "dr", "drive",
-    "ct", "court", "pkwy", "parkway", "dr", "drive", "ter", "terrace", "cir", "circle", "pl", "place", "stwy",
+    "st",
+    "street",
+    "av",
+    "avenue",
+    "ave",
+    "av",
+    "blvd",
+    "boulevard",
+    "rd",
+    "road",
+    "ln",
+    "lane",
+    "dr",
+    "drive",
+    "ct",
+    "court",
+    "pkwy",
+    "parkway",
+    "dr",
+    "drive",
+    "ter",
+    "terrace",
+    "cir",
+    "circle",
+    "pl",
+    "place",
+    "stwy",
     "a",
     "an",
     "and",
@@ -62,9 +88,12 @@ STOPWORDS = [
     "will",
     "with",
     "park",
-    "parks", "intersection"]
+    "parks",
+    "intersection",
+]
 
-PUNCTUATION = ".,?-#/()[]" 
+PUNCTUATION = ".,?-#/()[]"
+
 
 def clean_address(address):
     address = address.lower()
@@ -83,11 +112,10 @@ class EncampmentReport(NamedTuple):
     address: str
     lat: float
     lon: float
-    
 
-REPORT_PATH = (
-    Path(__file__).parent.parent / "raw-data"/ "311_cases.csv"
-)
+
+REPORT_PATH = Path(__file__).parent.parent / "raw-data" / "311_cases.csv"
+
 
 def clean_311():
 
@@ -107,24 +135,18 @@ def clean_311():
             datetime_object = datetime.strptime(datetime_str, "%m/%d/%Y %H:%M:%S")
             date_year = datetime_object.year
             date_month = datetime_object.month
-            if row['Latitude'] == '':
-                lat = 0 
+            if row["Latitude"] == "":
+                lat = 0
             else:
-                lat = float(row['Latitude'])
-                            
-            if row['Longitude'] == '':
+                lat = float(row["Latitude"])
+
+            if row["Longitude"] == "":
                 lon = 0
             else:
-                lon = float(row['Longitude'])
+                lon = float(row["Longitude"])
 
             address = clean_address(row.get("Address"))
-            tuple_out = EncampmentReport(
-                date_year,
-                date_month,
-                address,
-                None,
-                None
-            )
+            tuple_out = EncampmentReport(date_year, date_month, address, None, None)
             key = tuple_out
             if key not in lat_lon_dict:
                 lat_lon_dict[key] = []
@@ -134,22 +156,17 @@ def clean_311():
 
     return output_report, lat_lon_dict
 
+
 def attach_lat_lon(output_report, lat_lon_dict):
     unique_list = set(output_report)
     output = []
-    for tuple_report in list(unique_list): 
+    for tuple_report in list(unique_list):
         lat_lon = lat_lon_dict[tuple_report]
 
-        lat = sum(loc[0] for loc in lat_lon if loc[0]!= 0 ) / len(lat_lon)
-        lon = sum(loc[1] for loc in lat_lon if loc[1]!=0) / len(lat_lon)
-    
-        tuple_out = EncampmentReport(
-                tuple_report.year,
-                tuple_report.month,
-                tuple_report.address,
-                lat,
-                lon
-            )
-        output.append(tuple_out)
-        
+        lat = sum(loc[0] for loc in lat_lon if loc[0] != 0) / len(lat_lon)
+        lon = sum(loc[1] for loc in lat_lon if loc[1] != 0) / len(lat_lon)
 
+        tuple_out = EncampmentReport(
+            tuple_report.year, tuple_report.month, tuple_report.address, lat, lon
+        )
+        output.append(tuple_out)

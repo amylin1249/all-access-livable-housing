@@ -14,14 +14,22 @@ MERGED_SF_TRACTS_SHP = (
 
 SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv"
 
-SF_EVICTIONS_TRACTS = Path(__file__).parent.parent / "clean-data/evictions_api_data_tracts.csv"
+SF_EVICTIONS_TRACTS = (
+    Path(__file__).parent.parent / "clean-data/evictions_api_data_tracts.csv"
+)
 ENCAMPMENT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_tracts.csv"
 ENCAMPMENT_REPORT_TRACTS = Path(__file__).parent.parent / "clean-data/311_tracts.csv"
 
 ### TEMP ISSUE FILES
-SF_EVICTIONS_ISSUES = Path(__file__).parent.parent / "clean-data/evictions_api_issues.csv"
-ENCAMPMENT_ISSUES = Path(__file__).parent.parent / "clean-data/encampment_tracts_issues.csv"
-ENCAMPMENT_REPORT_ISSUES = Path(__file__).parent.parent / "clean-data/311_tracts_issues.csv"
+SF_EVICTIONS_ISSUES = (
+    Path(__file__).parent.parent / "clean-data/evictions_api_issues.csv"
+)
+ENCAMPMENT_ISSUES = (
+    Path(__file__).parent.parent / "clean-data/encampment_tracts_issues.csv"
+)
+ENCAMPMENT_REPORT_ISSUES = (
+    Path(__file__).parent.parent / "clean-data/311_tracts_issues.csv"
+)
 
 
 class Tract(NamedTuple):
@@ -261,7 +269,7 @@ def quadtree_spatial_join(
 
         for tract_id in quadtree.match(location_point):
             join_dict[location.id] = tract_id
-        
+
         ### TRYING TO TEMPORARILY FIX WHILE DEBUGGING (but not working - seems like the point just doesn't fall in any polygon)
         # if location.id not in join_dict:
         #     for tract in tracts:
@@ -272,18 +280,22 @@ def quadtree_spatial_join(
 
 
 ### NOTE: The last parameter is a temporary parameter to analyze how many ID's are not in the file
-def add_evictions_tracts_csv(source_file: Path, dest_file: Path, missing_key_file: Path):
+def add_evictions_tracts_csv(
+    source_file: Path, dest_file: Path, missing_key_file: Path
+):
     """
     Add docstring
     """
-    missing_keys = [] ### TO REMOVE ONCE FIXED
+    missing_keys = []  ### TO REMOVE ONCE FIXED
 
-    match_tracts = quadtree_spatial_join(load_evictions_csv(SF_EVICTIONS), load_shapefiles(MERGED_SF_TRACTS_SHP))
+    match_tracts = quadtree_spatial_join(
+        load_evictions_csv(SF_EVICTIONS), load_shapefiles(MERGED_SF_TRACTS_SHP)
+    )
 
-    with open(source_file, "r") as source_file, open(dest_file, "w") as dest_file: 
+    with open(source_file, "r") as source_file, open(dest_file, "w") as dest_file:
         reader = csv.DictReader(source_file)
 
-        # 
+        #
         headers = reader.fieldnames
         writer_headers = tuple(headers + ["geoid"])
 
@@ -305,15 +317,17 @@ def add_evictions_tracts_csv(source_file: Path, dest_file: Path, missing_key_fil
         writer.writerows(missing_keys)
 
 
-def add_encampments_tracts_csv(data: list[tuple], dest_file: Path, match_tracts: dict, missing_key_file: Path):
+def add_encampments_tracts_csv(
+    data: list[tuple], dest_file: Path, match_tracts: dict, missing_key_file: Path
+):
     """
     ADD DOCSTRING
     """
-    missing_keys = [] ### TO REMOVE ONCE FIXED
+    missing_keys = []  ### TO REMOVE ONCE FIXED
 
     headers = data[0]._fields + ("geoid",)
 
-    with open(dest_file, "w") as dest_file: 
+    with open(dest_file, "w") as dest_file:
         writer = csv.DictWriter(dest_file, fieldnames=headers)
         writer.writeheader()
 
@@ -337,8 +351,17 @@ if __name__ == "__main__":
     add_evictions_tracts_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS, SF_EVICTIONS_ISSUES)
 
     clean_311 = clean_311()
-    add_encampments_tracts_csv(clean_311, ENCAMPMENT_REPORT_TRACTS, quadtree_spatial_join(clean_311, tracts_shp), ENCAMPMENT_REPORT_ISSUES)
-    
-    clean_encampment = clean_encampment()
-    add_encampments_tracts_csv(clean_encampment, ENCAMPMENT_TRACTS, quadtree_spatial_join(clean_encampment, tracts_shp), ENCAMPMENT_ISSUES)
+    add_encampments_tracts_csv(
+        clean_311,
+        ENCAMPMENT_REPORT_TRACTS,
+        quadtree_spatial_join(clean_311, tracts_shp),
+        ENCAMPMENT_REPORT_ISSUES,
+    )
 
+    clean_encampment = clean_encampment()
+    add_encampments_tracts_csv(
+        clean_encampment,
+        ENCAMPMENT_TRACTS,
+        quadtree_spatial_join(clean_encampment, tracts_shp),
+        ENCAMPMENT_ISSUES,
+    )

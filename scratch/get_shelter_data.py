@@ -1,6 +1,7 @@
 import time
 import httpx
 
+
 def get_shelter_data():
     """
     Get monthly counts of people on the shelter waitlist, and the number of days

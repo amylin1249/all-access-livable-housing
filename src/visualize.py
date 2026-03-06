@@ -104,13 +104,11 @@ def create_tract_map(source_file: Path, start_date: str, end_date: str, col_name
     ### TBD ON WHETHER THIS SHOULD BE INSIDE OR OUTSIDE FUNCTION
 
     filtered_df = (
-        df
-        [(df["date"] >= start_date) & (df["date"] <= end_date)]
+        df[(df["date"] >= start_date) & (df["date"] <= end_date)]
         .groupby("tract")
         .agg(metric=(col_name, agg))
         .reset_index()
     )
-
 
     chart = (
         alt.Chart(sf_tracts)
@@ -129,7 +127,9 @@ def create_tract_map(source_file: Path, start_date: str, end_date: str, col_name
     return chart
 
 
-def create_scatterplot(source_file: Path, x_var: str, x_agg: str, y_var: str, y_agg: str):
+def create_scatterplot(
+    source_file: Path, x_var: str, x_agg: str, y_var: str, y_agg: str
+):
     """
     Docstring
     """
@@ -137,7 +137,11 @@ def create_scatterplot(source_file: Path, x_var: str, x_agg: str, y_var: str, y_
 
     # Load dataset
     df = pd.read_csv(source_file)
-    filtered_df = df.groupby("tract").agg(x_axis=(x_var, x_agg), y_axis=(y_var, y_agg)).reset_index()
+    filtered_df = (
+        df.groupby("tract")
+        .agg(x_axis=(x_var, x_agg), y_axis=(y_var, y_agg))
+        .reset_index()
+    )
 
     # Draw a scatter plot while assigning point colors and sizes to different
     # variables in the dataset
