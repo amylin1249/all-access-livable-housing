@@ -48,8 +48,8 @@ def get_evictions_data() -> list[tuple]:
                         "lon": float(lon),
                         "year_mon": date,
                     }
-                evictions_list.append(record)
-                current_id += 1
+                    evictions_list.append(record)
+                    current_id += 1
 
     return evictions_list
 
