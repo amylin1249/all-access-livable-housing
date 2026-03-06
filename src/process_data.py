@@ -26,10 +26,10 @@ RENT_PATH = (
 )
 
 REPORT_PATH = (
-    Path(__file__).parent.parent / "raw-data/311_cases.csv"
+    Path(__file__).parent.parent / "raw-data"/ "311_cases.csv"
 )
 ENCAMP_PATH = (
-      Path(__file__).parent.parent / "raw-data/encampment_counts.xlsx"
+      Path(__file__).parent.parent / "raw-data"/ "encampment_counts.xlsx"
 )
 
 HH_INC_PATH = (
@@ -70,12 +70,13 @@ class Encampment(NamedTuple):
 
 
 class EncampmentReport(NamedTuple):
+    id: int
     year: int
     month: int
     address: str
     lat: float
     lon: float
-    
+  
 def clean_parenthesis(name):
     """
     This function takes a name and removes any parenthesized portion.
@@ -142,6 +143,7 @@ def clean_address(address):
     return " ".join(cleaned_list)
 
 
+
 def rate(score):
     if score >= 0.95:
         return "high"
@@ -151,8 +153,7 @@ def rate(score):
 
 
 ## Clean 311 data
-
-def clean_311():
+def clean_311_part1():
 
     file_input = REPORT_PATH
 
@@ -181,14 +182,15 @@ def clean_311():
                 lon = float(row['Longitude'])
 
             address = clean_address(row.get("Address"))
+            key = (date_year, date_month, address)
             tuple_out = EncampmentReport(
+                key,
                 date_year,
                 date_month,
                 address,
                 None,
                 None
             )
-            key = tuple_out
             if key not in lat_lon_dict:
                 lat_lon_dict[key] = []
                 lat_lon_dict[key].append((lat, lon))
@@ -197,16 +199,18 @@ def clean_311():
 
     return output_report, lat_lon_dict
 
-def attach_lat_lon(output_report, lat_lon_dict):
+def clean_311():
+    output_report, lat_lon_dict = clean_311_part1()
     unique_list = set(output_report)
     output = []
     for tuple_report in list(unique_list): 
-        lat_lon = lat_lon_dict[tuple_report]
+        lat_lon = lat_lon_dict[tuple_report.id]
 
         lat = sum(loc[0] for loc in lat_lon if loc[0]!= 0 ) / len(lat_lon)
         lon = sum(loc[1] for loc in lat_lon if loc[1]!=0) / len(lat_lon)
     
         tuple_out = EncampmentReport(
+                tuple_report.id, 
                 tuple_report.year,
                 tuple_report.month,
                 tuple_report.address,
@@ -214,6 +218,10 @@ def attach_lat_lon(output_report, lat_lon_dict):
                 lon
             )
         output.append(tuple_out)
+    return output
+        
+
+
 
 
 ### Clean encampment data ###
@@ -241,26 +249,27 @@ def clean_encampment():
         sheet_obj.cell(row=3, column=1).value
         date_obj = sheet_obj.cell(row=i, column=1).value
         date_string = date_obj.strftime("%m/%d/%Y")
-        tents = sheet_obj.cell(row=i, column=3).value
-        structure = sheet_obj.cell(row=i, column=4).value
+        tents = float(sheet_obj.cell(row=i, column=3).value)
+        structure = float(sheet_obj.cell(row=i, column=4).value)
         vehicles = (
-            sheet_obj.cell(row=i, column=5).value
-            + sheet_obj.cell(row=i, column=6).value
+            float(sheet_obj.cell(row=i, column=5).value)
+            + float(sheet_obj.cell(row=i, column=6).value)
         )
         neighborhood = sheet_obj.cell(row=i, column=8).value
 
         lat = float(sheet_obj.cell(row=i, column=10).value)
         lon = float(sheet_obj.cell(row=i, column=11).value)
-        obj = Encampment(i, tents,
-        structure,
-        vehicles,
-        date_obj.year,
-        date_obj.month,
-        date_string,
-        lat,
-        lon,
-        neighborhood)
-        output_encampment.append(obj)
+        if date_obj.year >= 2020 and date_obj.year <= 2024:
+            obj = Encampment(i, tents,
+            structure,
+            vehicles,
+            date_obj.year,
+            date_obj.month,
+            date_string,
+            lat,
+            lon,
+            neighborhood)
+            output_encampment.append(obj)
     return output_encampment
 
 
