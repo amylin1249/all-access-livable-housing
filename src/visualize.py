@@ -91,13 +91,17 @@ from datatypes import (
 #     return CRS.from_wkt(prj_text).to_epsg()
 
 
-def create_tract_map(source_file: Path, start_date: str, end_date: str, col_name: str, agg: str):
+def create_tract_map(
+    source_file: Path, start_date: str, end_date: str, col_name: str, agg: str
+):
     """
     Add docstring
     """
     df = pd.read_csv(source_file)
     sf_tracts = gpd.read_file(MERGED_SF_TRACTS_SHP)
     ### TBD ON WHETHER THIS SHOULD BE INSIDE OR OUTSIDE FUNCTION
+
+    df["tract"] = df["tract"].astype(str).str.zfill(11)
 
     filtered_df = (
         df[(df["date"] >= start_date) & (df["date"] <= end_date)]
@@ -109,15 +113,22 @@ def create_tract_map(source_file: Path, start_date: str, end_date: str, col_name
     chart = (
         alt.Chart(sf_tracts)
         .mark_geoshape()
-        .encode(color=alt.Color("metric:Q"))
-        .transform_lookup(
+        .encode(
+            color=alt.Color("metric:Q"),
+            tooltip=[
+                alt.Tooltip("TL_GEO_ID:N", title = "Tract ID"),
+                alt.Tooltip("population:Q", title="Population"), 
+                alt.Tooltip("med_hh_inc:Q", title="Median annual household income"), 
+                alt.Tooltip("white_pct:Q", title="% white population"),
+                alt.Tooltip("metric:Q")
+        ]).transform_lookup(
             lookup="GEOID",
             from_=alt.LookupData(filtered_df, ("tract"), ["metric"]),
         )
         .project(type="albersUsa")
         .properties(
             title=f"Unsheltered homelessness in SF tracts ({start_date} to {end_date})"
-        )
+        ).interactive()
     )
 
     return chart

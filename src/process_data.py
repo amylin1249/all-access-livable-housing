@@ -3,21 +3,20 @@ import sys
 import pandas as pd
 import numpy as np
 import geopandas as gpd
-import jellyfish
-from typing import NamedTuple
 from pathlib import Path
-from openpyxl import load_workbook
 from datetime import datetime
 from datatypes import (
-    SF_CENSUS_PATH,
-    CALI_TRACTS_SHP,
     POP_PATH,
     RENT_PATH,
     HH_INC_PATH,
     RACE_PATH,
     RENTER_UNITS_PATH,
-    REPORT_PATH,
+    SF_CENSUS_PATH,
+    CALI_TRACTS_SHP,
     ENCAMP_PATH,
+    REPORT_PATH,
+    CLEAN_ENCAMP,
+    CLEAN_311,
     SF_ACS_JOIN,
     SF_TRACTS_SHP,
     MERGED_SF_TRACTS_SHP,
@@ -26,11 +25,12 @@ from datatypes import (
     HH_INC_ID,
     WHITE_POP_ID,
     RENTER_UNITS_ID,
+    REPORT_PATH,
+    ENCAMP_PATH
 )
 
 
 EXCLUDE_GEOID = "06075980401"
-
 
 STOPWORDS = [
     "st",
@@ -95,12 +95,12 @@ STOPWORDS = [
 PUNCTUATION = ".,?-#/()[]"
 
 
-def clean_parenthesis(phrase):
+def clean_parenthesis(phrase: str) -> str:
     """
     This function takes a phrase and removes any parenthesized portion.
 
     Parameters:
-        * phrase: a string representing a phrase
+        phrase: a string representing a phrase
 
     Returns:
         A string representing the phrase with parenthesized portion removed.
@@ -121,6 +121,9 @@ def clean_parenthesis(phrase):
 
 
 def clean_address(address):
+    """
+    ADD DOCSTRING
+    """
     address = address.lower()
     address = address.replace("i poi", "")
     address = clean_parenthesis(address)
@@ -131,9 +134,61 @@ def clean_address(address):
     return " ".join(cleaned_list)
 
 
+def generate_311_csv():
+    """
+    ADD DOCSTRING
+    """
+    # Load raw data
+    df = pd.read_csv(REPORT_PATH)
+
+    # Keep only necessary columns
+    df = df[["Opened", "Address", "Latitude", "Longitude"]]
+
+    # Rename columns for ease of spatial join
+    df = df.rename(
+        columns={
+            "Opened": "date",
+            "Address": "address",
+            "Latitude": "lat",
+            "Longitude": "lon",
+        }
+    )
+
+    # Convert date to standardized format: YYYY-MM
+    df["date"] = pd.to_datetime(df["date"])
+    df["date"] = df["date"].dt.strftime("%Y-%m")
+
+    # Filter for years of interest: 2020-2024
+    df = df[df["date"].between("2020-01-01", "2024-12-31")]
+
+    # Add id column
+    df["id"] = range(1, len(df) + 1)
+
+    # Clean addresses
+    df["address"] = df["address"].apply(clean_address)
+
+    # De-dupe by cleaned address and month (keep only one row per cleaned
+    # address per month)
+    df = df.drop_duplicates(subset=["address", "date"], keep="first")
+
+    # Drop address as it's no longer needed after this point
+    df = df.drop(columns=["address"])
+
+    # Drop observations where lat/lon = 0
+    df = df[(df['lat'] != 0) & (df['lon'] != 0)]
+
+    # Reorder columns for readability
+    df = df.reindex(columns=["id", "date", "lat", "lon"])
+
+    df.to_csv(CLEAN_311, index=False)
+
+
 def generate_encampments_csv():
+    """
+    ADD DOCSTRING
+    """
     # Top row (row 0) is not a real header row
-    df = pd.read_excel("raw-data/encampment_counts.xlsx", header=1)
+    df = pd.read_excel(ENCAMP_PATH, header=1)
 
     # Keep only necessary columns
     df = df[
@@ -182,57 +237,29 @@ def generate_encampments_csv():
         columns=["id", "date", "tents", "structures", "vehicles", "lat", "lon"]
     )
 
-    df.to_csv("clean-data/clean_encampments_data.csv", index=False)
+    df.to_csv(CLEAN_ENCAMP, index=False)
 
 
-def generate_311_csv():
-    # Load raw data
-    df = pd.read_csv("raw-data/311_cases.csv")
+def get_sf_geoid() -> list[str]:
+    """
+    Extract the list of SF census tract GeoIDs based on the list of 2020 census
+    tracts from DataSF Open Data Portal, removing any tracts to be excluded.
 
-    # Keep only necessary columns
-    df = df[["Opened", "Address", "Latitude", "Longitude"]]
+    Returns:
+        List of filtered SF census tract GeoIDs.
+    """
+    sf_geoid = []
 
-    # Rename columns for ease of spatial join
-    df = df.rename(
-        columns={
-            "Opened": "date",
-            "Address": "address",
-            "Latitude": "lat",
-            "Longitude": "lon",
-        }
-    )
+    csv.field_size_limit(sys.maxsize)
 
-    # Convert date to standardized format: YYYY-MM
-    df["date"] = pd.to_datetime(df["date"])
-    df["date"] = df["date"].dt.strftime("%Y-%m")
+    with open(SF_CENSUS_PATH) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            geoid = row["geoid"]
+            if geoid != EXCLUDE_GEOID:
+                sf_geoid.append(geoid)
 
-    # Filter for years of interest: 2020-2024
-    df = df[df["date"].between("2020-01-01", "2024-12-31")]
-
-    # Add id column
-    df["id"] = range(1, len(df) + 1)
-
-    # Clean addresses
-    df["address"] = df["address"].apply(clean_address)
-
-    # De-dupe by cleaned address and month (keep only one row per cleaned
-    # address per month)
-    df = df.drop_duplicates(subset=["address", "date"], keep="first")
-
-    # Drop address as it's no longer needed after this point
-    df = df.drop(columns=["address"])
-
-    # Reorder columns for readability
-    df = df.reindex(columns=["id", "date", "lat", "lon"])
-
-    df.to_csv("clean-data/clean_311_data.csv", index=False)
-
-
-### Bounding box
-### neighborhood bound
-# ### For each encampment, create a bounding box for each encampmemnt
-### use the timeit library
-### timeit helpful to see which functions are taking the longest
+    return sf_geoid
 
 
 def process_acs_data():
@@ -264,13 +291,13 @@ def process_acs_data():
         dtype={"TL_GEO_ID": "str"},
     )
 
-    # Impute negative or zero values (i.e., missing) in rent and household income
+    # Impute negative values (i.e., missing) in rent and household income
     # dataframes with the mean of their positive values
     mean_rent = round(rent_df.loc[rent_df[RENT_ID] > 0, RENT_ID].mean())
-    rent_df.loc[rent_df[RENT_ID] <= 0, RENT_ID] = mean_rent
+    rent_df.loc[rent_df[RENT_ID] < 0, RENT_ID] = mean_rent
 
     mean_hh_inc = round(hh_inc_df.loc[hh_inc_df[HH_INC_ID] > 0, HH_INC_ID].mean())
-    hh_inc_df.loc[hh_inc_df[HH_INC_ID] <= 0, HH_INC_ID] = mean_hh_inc
+    hh_inc_df.loc[hh_inc_df[HH_INC_ID] < 0, HH_INC_ID] = mean_hh_inc
 
     # Merge individual dataframes based on GEO_ID
     joined_df = pop_df
@@ -278,40 +305,23 @@ def process_acs_data():
         joined_df = pd.merge(joined_df, df, on="TL_GEO_ID", how="left")
 
     # Rename population, race, rent, income, and renter units column names
-    joined_df = joined_df.rename(columns={POP_ID: "population",
-                                          WHITE_POP_ID: "white_pop",
-                                          RENT_ID: "med_rent",
-                                          HH_INC_ID: "med_hh_inc",
-                                          RENTER_UNITS_ID: "rent_units"})
-
-    # Add calculation of percentage of white population per tract as a new column
-    joined_df["white_pct"] = np.where(
-        joined_df["population"] > 0, joined_df["white_pop"] / joined_df["population"], 0
+    joined_df = joined_df.rename(
+        columns={
+            POP_ID: "population",
+            WHITE_POP_ID: "white_pop",
+            RENT_ID: "med_rent",
+            HH_INC_ID: "med_hh_inc",
+            RENTER_UNITS_ID: "rent_units",
+        }
     )
 
+    # Add calculation of percentage of white population per tract as a new column
+    joined_df["white_pct"] = joined_df["white_pop"] / joined_df["population"]
+
+    # Filter tract IDs only for those in the list of filtered SF census tracts
+    joined_df = joined_df[joined_df["TL_GEO_ID"].isin(get_sf_geoid())]
+
     joined_df.to_csv(SF_ACS_JOIN, index=False)
-
-
-def get_sf_geoid() -> list[str]:
-    """
-    Extract the list of SF census tract GeoIDs based on the list of 2020 census
-    tracts from DataSF Open Data Portal.
-
-    Returns:
-        List of SF census tract GeoIDs
-    """
-    sf_geoid = []
-
-    csv.field_size_limit(sys.maxsize)
-
-    with open(SF_CENSUS_PATH) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            geoid = row["geoid"]
-            if geoid != EXCLUDE_GEOID:
-                sf_geoid.append(geoid)
-
-    return sf_geoid
 
 
 def create_sf_shapefiles():
@@ -467,9 +477,7 @@ def generate_crosswalks_csv():
 
 
 if __name__ == "__main__":
-    generate_encampments_csv()
-    generate_311_csv()
-    # process_acs_data()
+    process_acs_data()
     # create_sf_shapefiles()
     # add_sf_tract_data()
     # generate_zori_csv()

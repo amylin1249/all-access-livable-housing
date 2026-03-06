@@ -107,9 +107,9 @@ def clean_address(address):
 
 
 class EncampmentReport(NamedTuple):
+    id: int
     year: int
     month: int
-    address: str
     lat: float
     lon: float
 
@@ -146,8 +146,20 @@ def clean_311():
                 lon = float(row["Longitude"])
 
             address = clean_address(row.get("Address"))
+<<<<<<< HEAD
+            key = (date_year, date_month, address)
+            tuple_out = EncampmentReport(
+                key,
+                date_year,
+                date_month,
+                address,
+                None,
+                None
+            )
+=======
             tuple_out = EncampmentReport(date_year, date_month, address, None, None)
             key = tuple_out
+>>>>>>> 275d4340ec3216b02c8e8205ae411738e7205105
             if key not in lat_lon_dict:
                 lat_lon_dict[key] = []
                 lat_lon_dict[key].append((lat, lon))
@@ -160,11 +172,31 @@ def clean_311():
 def attach_lat_lon(output_report, lat_lon_dict):
     unique_list = set(output_report)
     output = []
+<<<<<<< HEAD
+    for tuple_report in list(unique_list): 
+        key = (tuple_report.year, tuple_report.month, tuple_report.address)
+        lat_lon = lat_lon_dict[tuple_report]
+
+        lat = sum(loc[0] for loc in lat_lon if loc[0]!= 0 ) / len(lat_lon)
+        lon = sum(loc[1] for loc in lat_lon if loc[1]!=0) / len(lat_lon)
+    
+        tuple_out = EncampmentReport(
+                key, 
+                tuple_report.year,
+                tuple_report.month,
+                tuple_report.address,
+                lat,
+                lon
+            )
+        output.append(tuple_out)
+        
+=======
     for tuple_report in list(unique_list):
         lat_lon = lat_lon_dict[tuple_report]
 
         lat = sum(loc[0] for loc in lat_lon if loc[0] != 0) / len(lat_lon)
         lon = sum(loc[1] for loc in lat_lon if loc[1] != 0) / len(lat_lon)
+>>>>>>> 275d4340ec3216b02c8e8205ae411738e7205105
 
         tuple_out = EncampmentReport(
             tuple_report.year, tuple_report.month, tuple_report.address, lat, lon
