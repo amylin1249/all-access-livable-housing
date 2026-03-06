@@ -1,4 +1,4 @@
-from typing import NamedTuple, Union
+from typing import NamedTuple
 from shapely.geometry import Polygon, box, Point
 from pathlib import Path
 from process_data import Encampment, EncampmentReport, clean_311, clean_encampment
@@ -6,22 +6,25 @@ import shapefile
 import csv
 import pandas as pd
 
-
-MERGED_SF_TRACTS_SHP = (
-    Path(__file__).parent.parent
-    / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+from datatypes import (
+    MERGED_SF_TRACTS_SHP,
+    SF_EVICTIONS,
+    SF_EVICTIONS_TRACTS,
+    ENCAMPMENT_TRACTS,
+    ENCAMPMENT_REPORT_TRACTS,
 )
 
-SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv"
 
-SF_EVICTIONS_TRACTS = Path(__file__).parent.parent / "clean-data/evictions_api_data_tracts.csv"
-ENCAMPMENT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_tracts.csv"
-ENCAMPMENT_REPORT_TRACTS = Path(__file__).parent.parent / "clean-data/311_tracts.csv"
-
-### TEMP ISSUE FILES
-SF_EVICTIONS_ISSUES = Path(__file__).parent.parent / "clean-data/evictions_api_issues.csv"
-ENCAMPMENT_ISSUES = Path(__file__).parent.parent / "clean-data/encampment_tracts_issues.csv"
-ENCAMPMENT_REPORT_ISSUES = Path(__file__).parent.parent / "clean-data/311_tracts_issues.csv"
+### TEMP ISSUE FILES - TO BE REMOVED ONCE ENCAMPMENT ISSUE COUNTS ARE IN
+SF_EVICTIONS_ISSUES = (
+    Path(__file__).parent.parent / "clean-data/evictions_api_issues.csv"
+)
+ENCAMPMENT_ISSUES = (
+    Path(__file__).parent.parent / "clean-data/encampment_tracts_issues.csv"
+)
+ENCAMPMENT_REPORT_ISSUES = (
+    Path(__file__).parent.parent / "clean-data/311_tracts_issues.csv"
+)
 
 
 class Tract(NamedTuple):
@@ -176,8 +179,8 @@ class Quadtree:
         for child in children:
             for id, polygon in self.polygons.items():
                 child.add_polygon(id, polygon)
-            self.children.append(child)
 
+        self.children = children
         self.polygons = {}
 
     def match(self, point: Point) -> set[str]:
@@ -187,7 +190,7 @@ class Quadtree:
 
         Parameters:
             point: a Point object that is checked for whether it falls within
-            the polygons
+                   the polygons
 
         Returns:
             A set of strings of ids of polygons within which the point falls.
@@ -213,40 +216,22 @@ class Quadtree:
         return matching_polygons
 
 
-def load_evictions_csv(path: Path) -> list[Location]:
-    """
-    Given a CSV containing eviction locations data, return a list of Location objects.
-    """
-    evictions = []
-    with open(path) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            evictions.append(
-                Location(
-                    id=row["id"],
-                    lat=row["lat"],
-                    lon=row["lon"],
-                )
-            )
-    return evictions
-
-
 def quadtree_spatial_join(
-    locations: list[Union[Location, Encampment, EncampmentReport]],
+    locations: list[Location],
     tracts: list[Tract],
 ) -> dict:
     """
-    Given a list of Location and Tract NamedTuples, compute a spatial join
-    between the Location point and the Tract polygon using Quadtree class.
+    Given a list of Location NamedTuples, compute a spatial join between the
+    Location point and the Tract polygon using Quadtree class.
+
+    Parameters:
+        locations: a list of Location objects to be matched to tracts
+        tracts: a list of Tract objects that the locations will be matched to
 
     Returns:
         A dictionary of location.id as keys and tract.id as values.
     """
     sf_bbox = BBox(-122.517724, 37.708182, -122.357071, 37.833227)
-    # Westernmost (not incl. Farallon): 37.780436, -122.517724
-    # Easternmost: Bayview Hunters Point 37.728650, -122.357071
-    # Northernmost: Treasure Island 37.833227, -122.372522
-    # Southernmost: 37.708182, -122.485839
 
     capacity = 10
     quadtree = Quadtree(sf_bbox, capacity)
@@ -261,59 +246,73 @@ def quadtree_spatial_join(
 
         for tract_id in quadtree.match(location_point):
             join_dict[location.id] = tract_id
-        
-        ### TRYING TO TEMPORARILY FIX WHILE DEBUGGING (but not working - seems like the point just doesn't fall in any polygon)
-        # if location.id not in join_dict:
-        #     for tract in tracts:
-        #         if tract.polygon.contains(location_point):
-        #             join_dict[location.id] = tract.id
 
     return join_dict
 
 
-### NOTE: The last parameter is a temporary parameter to analyze how many ID's are not in the file
-def add_evictions_tracts_csv(source_file: Path, dest_file: Path, missing_key_file: Path):
+def load_points_csv(path: Path) -> list[Location]:
     """
-    Add docstring
+    Given a CSV containing point data (i.e., coordinates), return a list of
+    Location objects.
+
+    Parameter:
+        path: Path to CSV containing point data that will be converted
+
+    Returns:
+        A list of Location objects that represent the points in the dataset.
     """
-    missing_keys = [] ### TO REMOVE ONCE FIXED
-
-    match_tracts = quadtree_spatial_join(load_evictions_csv(SF_EVICTIONS), load_shapefiles(MERGED_SF_TRACTS_SHP))
-
-    with open(source_file, "r") as source_file, open(dest_file, "w") as dest_file: 
-        reader = csv.DictReader(source_file)
-
-        # 
-        headers = reader.fieldnames
-        writer_headers = tuple(headers + ["geoid"])
-
-        writer = csv.DictWriter(dest_file, fieldnames=writer_headers)
-        writer.writeheader()
-
-        # Iterate over each row in source file, add tract geoid, and write it to destination file
+    locations = []
+    with open(path) as f:
+        reader = csv.DictReader(f)
         for row in reader:
-            ### TO REMOVE THIS "IF" STATEMENT ONCE FIXED
-            if row["id"] not in match_tracts:
-                missing_keys.append((row["id"], row["lat"], row["lon"]))
-            else:
-                row["geoid"] = match_tracts[row["id"]]
-                writer.writerow(row)
-
-    ### TO REMOVE ONCE FIXED
-    with open(missing_key_file, "w") as issue_file:
-        writer = csv.writer(issue_file)
-        writer.writerows(missing_keys)
+            locations.append(
+                Location(
+                    id=int(row["id"]),
+                    lat=row["lat"],
+                    lon=row["lon"],
+                )
+            )
+    return locations
 
 
-def add_encampments_tracts_csv(data: list[tuple], dest_file: Path, match_tracts: dict, missing_key_file: Path):
+def join_tracts_csv(source_csv: Path, dest_csv: Path):
+    """
+    Create a new CSV containing all data from the source CSV, with a new column
+    indicating the tract to which each point is matched.
+
+    Parameters:
+        source_csv: Path to CSV that contains point data and relevant fields
+        dest_csv: Path to CSV that will contain data from source_CSV and the matched tract IDs
+    """
+    match_tracts = quadtree_spatial_join(
+        load_points_csv(source_csv), load_shapefiles(MERGED_SF_TRACTS_SHP)
+    )
+
+    matched_df = (
+        pd.DataFrame.from_dict(match_tracts, orient="index", columns=["geoid"])
+        .reset_index()
+        .rename(columns={"index": "id"})
+    )
+    source_df = pd.read_csv(source_csv)
+
+    # Right merge to exclude unmatched points from being included in merged dataframe
+    merged_df = pd.merge(source_df, matched_df, on="id", how="right")
+
+    merged_df.to_csv(dest_csv, index=False)
+
+
+### THIS FUNCTION WILL BE REMOVED ONCE ENCAMPMENTS AND REPORTS CSVS ARE CREATED (can all use add_tracts_csv)
+def add_encampments_tracts_csv(
+    data: list[tuple], dest_file: Path, match_tracts: dict, missing_key_file: Path
+):
     """
     ADD DOCSTRING
     """
-    missing_keys = [] ### TO REMOVE ONCE FIXED
+    missing_keys = []  ### TO REMOVE ONCE FIXED
 
     headers = data[0]._fields + ("geoid",)
 
-    with open(dest_file, "w") as dest_file: 
+    with open(dest_file, "w") as dest_file:
         writer = csv.DictWriter(dest_file, fieldnames=headers)
         writer.writeheader()
 
@@ -332,13 +331,23 @@ def add_encampments_tracts_csv(data: list[tuple], dest_file: Path, match_tracts:
 
 
 if __name__ == "__main__":
-    tracts_shp = load_shapefiles(MERGED_SF_TRACTS_SHP)
+    join_tracts_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS)
 
-    add_evictions_tracts_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS, SF_EVICTIONS_ISSUES)
+    ### THESE WILL BE REMOVED ONCE ENCAMPMENTS AND REPORTS CSVS ARE CREATED
+    # tracts_shp = load_shapefiles(MERGED_SF_TRACTS_SHP)
 
-    clean_311 = clean_311()
-    add_encampments_tracts_csv(clean_311, ENCAMPMENT_REPORT_TRACTS, quadtree_spatial_join(clean_311, tracts_shp), ENCAMPMENT_REPORT_ISSUES)
-    
-    clean_encampment = clean_encampment()
-    add_encampments_tracts_csv(clean_encampment, ENCAMPMENT_TRACTS, quadtree_spatial_join(clean_encampment, tracts_shp), ENCAMPMENT_ISSUES)
+    # clean_311 = clean_311()
+    # add_encampments_tracts_csv(
+    #     clean_311,
+    #     ENCAMPMENT_REPORT_TRACTS,
+    #     quadtree_spatial_join(clean_311, tracts_shp),
+    #     ENCAMPMENT_REPORT_ISSUES,
+    # )
 
+    # clean_encampment = clean_encampment()
+    # add_encampments_tracts_csv(
+    #     clean_encampment,
+    #     ENCAMPMENT_TRACTS,
+    #     quadtree_spatial_join(clean_encampment, tracts_shp),
+    #     ENCAMPMENT_ISSUES,
+    # )

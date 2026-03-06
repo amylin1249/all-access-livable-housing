@@ -15,15 +15,13 @@ app = Dash()
 df = pd.read_csv(MASTER_DATA)
 
 
-
 # App layout
 app.layout = [
     html.Div(children="Project All Access Livable Housing"),
     dag.AgGrid(
-        rowData=df.to_dict("records"),
-        columnDefs=[{"field": i} for i in df.columns]
+        rowData=df.to_dict("records"), columnDefs=[{"field": i} for i in df.columns]
     ),
-    dcc.Graph(figure=px.histogram(df, x='continent', y='lifeExp', histfunc='avg'))
+    dcc.Graph(figure=px.histogram(df, x="continent", y="lifeExp", histfunc="avg")),
 ]
 
 
@@ -42,6 +40,5 @@ app.layout = [
 #     ])
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

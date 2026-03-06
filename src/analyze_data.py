@@ -1,12 +1,19 @@
 import pandas as pd
 import csv
-from pathlib import Path
 from datetime import datetime
 
-eviction_df = pd.read_csv("clean-data/evictions_api_data_tracts.csv")
-acs_df = pd.read_csv("clean-data/census_acs_join.csv")
-ENCAMPMENT_DF = pd.read_csv("clean-data/encampment_tracts.csv")
-ENCAMPMENT_REPORT_DF = pd.read_csv("clean-data/311_tracts.csv")
+from datatypes import (
+    SF_EVICTIONS_TRACTS,
+    SF_ACS_JOIN,
+    ENCAMPMENT_TRACTS,
+    ENCAMPMENT_REPORT_TRACTS,
+    CONSOLIDATED
+)
+
+eviction_df = pd.read_csv(SF_EVICTIONS_TRACTS)
+acs_df = pd.read_csv(SF_ACS_JOIN)
+ENCAMPMENT_DF = pd.read_csv(ENCAMPMENT_TRACTS)
+ENCAMPMENT_REPORT_DF = pd.read_csv(ENCAMPMENT_REPORT_TRACTS)
 
 TENTS_EST = 1.1
 STRUCTURES_EST = 1.1
@@ -41,13 +48,17 @@ def calculate_eviction_rate(eviction_df, acs_df):
         right_on="TL_GEO_ID",
         how="left",
     )
+    # without evict -> fill in 0
+    merged["geoid"] = merged["TL_GEO_ID"]
     merged["eviction_rate"] = merged["total_evictions"] / merged["rent_units"]
-    merged["eviction_rate"] = merged["eviction_rate"].fillna(0)
-
     return merged.to_dict(orient="records")
 
 
 def generate_rent_by_zip_dict():
+    """
+    Returns: rent_by_zip: [dict] monthly median rent for each SF zip code
+    """
+
     rent_by_zip = {}
 
     with open("clean-data/tidy_zori.csv") as f:
@@ -63,7 +74,7 @@ def generate_rent_by_zip_dict():
 
 def generate_crosswalks_dict():
     """
-    crosswalks: [dict] monthly crosswalk data per SF zip code, with
+    Returns: crosswalks: [dict] monthly crosswalk data per SF zip code, with
         (tract, res_ratio)
     """
     # Generate dictionary with crosswalks data
@@ -78,7 +89,6 @@ def generate_crosswalks_dict():
             crosswalks[row["date"]][row["zip"]].append((row["tract"], row["res_ratio"]))
 
     # Fill in missing months (e.g., March 2020 --> Jan 2020, Feb 2020, and March 2020)
-    ### TECHNICALLY COULD INTERPOLATE? BUT SEEMS UNNECESSARY
     for year in range(2020, 2025):
         for month in range(1, 13):
             current_date = f"{year}-{month:02}"
@@ -96,6 +106,10 @@ def generate_crosswalks_dict():
 
 
 def weight_to_census_tract(crosswalks, rent_by_zip):
+    """
+    Inputs:
+    Returns: [dict]
+    """
     rent_by_tract = {}
     # Denominator
     weight_sums = {}
@@ -155,10 +169,15 @@ def get_311_calls_by_tract(df):
     return df.groupby(["geoid", "date"]).size().reset_index(name="311_calls")
 
 
-def generate_tidy_csv(rent_by_tract):
+def generate_tidy_csv():
     """
     Add docstring
     """
+    # Convert monthly median rent per SF census tract dictionary into rows of tidy CSV
+    rent_by_zip = generate_rent_by_zip_dict()
+    crosswalks = generate_crosswalks_dict()
+    rent_by_tract = weight_to_census_tract(crosswalks, rent_by_zip)
+
     data = []
     for date, tract_rent in rent_by_tract.items():
         for tract, median_rent in tract_rent.items():
@@ -168,49 +187,99 @@ def generate_tidy_csv(rent_by_tract):
             dict["median_rent"] = median_rent
             data.append(dict)
 
-    final_df = pd.DataFrame(data)
+    tidy_df = pd.DataFrame(data)
 
     # Merge eviction data
     eviction_records = calculate_eviction_rate(eviction_df, acs_df)
     df_evic_list = pd.DataFrame(eviction_records)
 
-    final_df = pd.merge(
-        final_df,
+    tidy_df = pd.merge(
+        tidy_df,
         df_evic_list[["year_mon", "geoid", "eviction_rate"]],
         left_on=["date", "tract"],
         right_on=["year_mon", "geoid"],
         how="left",
     )
 
-    final_df["eviction_rate"] = final_df["eviction_rate"].fillna(0)
-    final_df = final_df.drop(columns=["year_mon", "geoid"])
+    # Remove unnecessary columns
+    tidy_df = tidy_df.drop(columns=["year_mon", "geoid"])
+
+    # Fill census tracts with no evictions as eviction rate = 0
+    tidy_df["eviction_rate"] = tidy_df["eviction_rate"].fillna(0)
 
     # Merge 311 call data
     encampment_reports_df = get_311_calls_by_tract(ENCAMPMENT_REPORT_DF)
     encampment_reports_df = encampment_reports_df.rename(columns={"geoid": "tract"})
 
-    final_df = pd.merge(final_df, encampment_reports_df, on=["date", "tract"], how="left")
+    tidy_df = pd.merge(tidy_df, encampment_reports_df, on=["date", "tract"], how="left")
 
-    # Merge encampments data
+    # Fill missing 311 calls with 0's
+    tidy_df["311_calls"] = tidy_df["311_calls"].fillna(0)
+
+    # Grab encampments data
     encampments_df = get_encampments_by_tract(ENCAMPMENT_DF)
     encampments_df = encampments_df.rename(columns={"geoid": "tract"})
 
-    final_df = pd.merge(final_df, encampments_df, on=["date", "tract"], how="left")
-    final_df = final_df.fillna(0)
+    # Interpolate encampments data to go from quarterly to monthly
+    encampments_df["date"] = pd.to_datetime(encampments_df["date"])
+    encampments_df = encampments_df.sort_values(["tract", "date"])
 
-    # Calculate weighted estimate of homelessness based on encampment types (rounded)
-    final_df["estimate"] = (
-        final_df["tents"] * TENTS_EST
-        + final_df["structures"] * STRUCTURES_EST
-        + final_df["vehicles"] * VEHICLES_EST
-    ).round(0)
+    interpolated_list = []
 
-    final_df.to_csv("clean-data/consolidated_data.csv", index=False)
+    for tract, tract_group in encampments_df.groupby("tract"):
+        tract_group = tract_group.set_index("date", drop=False)
+
+        # Add missing months to prepare for quarterly --> monthly interpolation
+        all_months = pd.date_range(
+            start=tract_group.index.min(), end=tract_group.index.max(), freq="MS"
+        )
+        tract_group = tract_group.reindex(all_months)
+
+        tract_group["tract"] = tract
+
+        # Convert to floats to prepare for interpolation
+        encampment_cols = ["tents", "structures", "vehicles"]
+        tract_group[encampment_cols] = tract_group[encampment_cols].astype(float)
+
+        # Linear interpolation for all encampments (tents, structures, and vehicles)
+        tract_group[encampment_cols] = tract_group[encampment_cols].interpolate(
+            method="linear"
+        )
+
+        tract_group["date"] = tract_group.index
+        tract_group = tract_group.reset_index(drop=True)
+
+        interpolated_list.append(tract_group)
+
+    encampments_df = pd.concat(interpolated_list, ignore_index=True)
+
+    # Convert date back to string for proper merge
+    encampments_df["date"] = encampments_df["date"].dt.strftime("%Y-%m")
+
+    # Merge encampments data
+    tidy_df = pd.merge(tidy_df, encampments_df, on=["date", "tract"], how="left")
+
+    # Fill missing encampments with 0's
+    tidy_df[["tents", "structures", "vehicles"]] = tidy_df[
+        ["tents", "structures", "vehicles"]
+    ].fillna(0)
+
+    # Calculate weighted estimate of homelessness based on encampment types
+    tidy_df["estimate"] = (
+        tidy_df["tents"] * TENTS_EST
+        + tidy_df["structures"] * STRUCTURES_EST
+        + tidy_df["vehicles"] * VEHICLES_EST
+    )
+    # .round(0)
+
+    # # Round median rent to whole numbers
+    # final_df["median_rent"] = final_df["median_rent"].round(0).astype(int)
+
+    # # Round eviction rate to percentage with one decimal
+    # final_df["eviction_rate"] = (final_df["eviction_rate"] * 100).round(1)
+
+    tidy_df.to_csv(CONSOLIDATED, index=False)
 
 
 if __name__ == "__main__":
-    rent_by_zip = generate_rent_by_zip_dict()
-    crosswalks = generate_crosswalks_dict()
-    rent_by_tract = weight_to_census_tract(crosswalks, rent_by_zip)
-
-    generate_tidy_csv(rent_by_tract)
+    generate_tidy_csv()
