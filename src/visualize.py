@@ -139,6 +139,11 @@ def create_tract_map(
             from_=alt.LookupData(filtered_df, ("tract"), ["metric"]),
         )
         .project(type="albersUsa")
+        .properties(
+            width='container',      
+            height='container',
+            autosize=alt.AutoSizeParams(type='fit', contains='padding')
+        )
         .interactive()
     )
 
