@@ -28,6 +28,7 @@ dependencies = [
     "dash-vega-components>=0.11.0",
     "shapely>=2.1.2",
     "streamlit>=1.19.0",
+    "just>=0.8.165",
 ]
 
 [dependency-groups]
