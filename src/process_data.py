@@ -1,11 +1,10 @@
 import csv
 import sys
 import pandas as pd
-import numpy as np
 import geopandas as gpd
 from pathlib import Path
 from datetime import datetime
-from datatypes import (
+from .datatypes import (
     RAW_SF_TRACTS,
     RAW_ACS_POP,
     RAW_ACS_RENT,

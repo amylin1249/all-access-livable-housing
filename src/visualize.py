@@ -10,7 +10,7 @@ from shapely.ops import transform
 from dash import Dash, html
 import dash_vega_components as dvc
 
-from datatypes import (
+from .datatypes import (
     MERGED_SF_TRACTS_SHP,
     MERGED
 )

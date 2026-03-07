@@ -4,7 +4,7 @@ from pathlib import Path
 import time
 from datetime import datetime
 
-from datatypes import CLEAN_EVICTIONS
+from .datatypes import CLEAN_EVICTIONS
 
 EVICTIONS_URL = "https://data.sfgov.org/resource/5cei-gny5.json"
 REQUEST_DELAY = 1

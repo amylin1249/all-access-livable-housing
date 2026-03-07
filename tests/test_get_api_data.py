@@ -1,5 +1,6 @@
 import pytest
-from src.get_data import get_evictions_data
+from datetime import datetime
+from src.get_api_data import get_evictions_data
 
 @pytest.fixture(scope="module")
 def eviction_results():

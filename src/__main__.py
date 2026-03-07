@@ -1,40 +1,53 @@
+from .get_api_data import get_evictions_data, save_evictions_to_csv
+from .process_data import process_acs_data, create_sf_shapefiles, add_sf_tract_data, generate_311_csv, generate_encampments_csv, generate_zillow_csv, generate_crosswalks_csv
+from .spatial_join import join_tracts_csv
+from .analyze_data import generate_tidy_csv
+from .dashboard import app
+
+from .datatypes import (
+    CLEAN_EVICTIONS,
+    CLEAN_ENCAMP,
+    CLEAN_311,
+    JOINED_EVICTIONS_TRACTS,
+    JOINED_ENCAMP_TRACTS,
+    JOINED_311_TRACTS,
+)
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--sample", type=int, help="number of elements to sample")
-    parser.add_argument(
-        "--quadtree", action="store_true", help="Use quadtree spatial index"
-    )
-    args = parser.parse_args()
+    # # Run functions from get_api_data module to retrieve data from the relevant API
+    # result = get_evictions_data()
+    # if result:
+    #     save_evictions_to_csv(result)
+    # print("Pulled data from relevant API")
 
-    facilities = load_frs_csv(Path("data/il_frs.csv"))
-    tracts = load_shapefiles(Path("data/il_tracts"))
+    # # Run functions from process_data module to generate intermediate data files from raw data
+    # process_acs_data()
+    # create_sf_shapefiles()
+    # add_sf_tract_data()
+    # generate_311_csv()
+    # generate_encampments_csv()
+    # generate_zillow_csv()
+    # generate_crosswalks_csv()
+    # print("Generated all intermediate clean data files required for further analysis")
 
-    if args.sample >= len(facilities):
-        print(f"Loaded {len(facilities)}, using all records")
-    else:
-        print(f"Loaded {len(facilities)}, sampling {args.sample}")
+    # # Run functions from spatial_join module to match location points to their respective tracts
+    # join_tracts_csv(CLEAN_EVICTIONS, JOINED_EVICTIONS_TRACTS)
+    # join_tracts_csv(CLEAN_ENCAMP, JOINED_ENCAMP_TRACTS)
+    # join_tracts_csv(CLEAN_311, JOINED_311_TRACTS)
+    # print("Matched all point data to tracts for those that fall within a matching SF tract")
 
-    facilities = facilities[: args.sample]
+    # # Run function from analyze module to generate a consolidated data file with key metrics for visualization
+    # generate_tidy_csv()
+    # print("Generated a consolidated CSV to be used in visualization")
 
-    if args.quadtree:
-        spatial_join = quadtree_spatial_join
-    else:
-        spatial_join = basic_spatial_join
-
-    start_time = time.time()
-    results = spatial_join(facilities, tracts)
-    elapsed = time.time() - start_time
-
-    print(f"Found {len(results)} matches in {elapsed:.2f} seconds")
-
-    with open("matches.csv", "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(("frs_id", "tract_id"))
-        writer.writerows(results)
+    # Run dashboard with interactive visualizations
+    print("Copy the link below from Dash and paste it into your web browser to view our interactive visualizations.")
+    app.run(debug=True, use_reloader=False)
 
 
 if __name__ == "__main__":
-    print("Hello from project-all-access-livable-housing!")
+    print("Hello from Project All Access Livable Housing!")
+    print("Our application is now starting.")
     main()
+    print("Our application has finished running.")

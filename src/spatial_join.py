@@ -8,7 +8,7 @@ import pandas as pd
 # Functions below have been adapted from CAPP122 Winter 2026 PA4, with modifications
 # and additions to customize to our dataset.
 
-from datatypes import (
+from .datatypes import (
     MERGED_SF_TRACTS_SHP,
     CLEAN_EVICTIONS,
     CLEAN_ENCAMP,

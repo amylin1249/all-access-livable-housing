@@ -1,7 +1,7 @@
 import pandas as pd
 import csv
 
-from datatypes import (
+from .datatypes import (
     CLEAN_ZILLOW,
     CLEAN_CROSSWALKS,
     JOINED_EVICTIONS_TRACTS,

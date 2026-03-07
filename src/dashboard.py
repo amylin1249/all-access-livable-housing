@@ -1,6 +1,6 @@
 from pathlib import Path
 from dash import Dash, html, dcc, Input, Output, dash
-from visualize import create_tract_map, create_scatterplot
+from .visualize import create_tract_map, create_scatterplot
 import dash_ag_grid as dag
 import pandas as pd
 import plotly.express as px
@@ -24,7 +24,7 @@ import matplotlib
 matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 
-from datatypes import (
+from .datatypes import (
     MERGED_SF_TRACTS_SHP,
     MERGED
 )
