@@ -11,14 +11,14 @@ from src.datatypes import (
     JOINED_EVICTIONS_TRACTS,
     JOINED_ENCAMP_TRACTS,
     JOINED_311_TRACTS,
-)    
+)
 
 # Tests below have been adapted from CAPP122 Winter 2026 PA4 (instructor James
 # Turk), with modifications and additional tests to customize to our dataset.
 
 POLYGON_OUTSIDE = box(-122.45, 37.6, -122.43, 37.65)
 POLYGON_NW = box(-122.48, 37.77, -122.46, 37.79)
-POLYGON_NE = box(-122.34, 37.76, -122.31, 37.78) 
+POLYGON_NE = box(-122.34, 37.76, -122.31, 37.78)
 POLYGON_SW = box(-122.45, 37.72, -122.42, 37.74)
 POLYGON_SE = box(-122.37, 37.71, -122.34, 37.73)
 
@@ -43,9 +43,30 @@ def locations():
 @pytest.fixture
 def tracts():
     return [
-        Tract(id="T-X", pop=3000, med_rent=2800, med_hh_inc=100000, white_pct=0.3, polygon=box(-122.43, 37.76, -122.39, 37.79)),  # northern box
-        Tract(id="T-Y", pop=3000, med_rent=2500, med_hh_inc=90000, white_pct=0.7, polygon=box(-122.43, 37.71, -122.39, 37.74)),  # southern box
-        Tract(id="T-Z", pop=3000, med_rent=3000, med_hh_inc=110000, white_pct=0.8, polygon=box(-122.5, 35.2, -122.4, 35.8)),  # far away
+        Tract(
+            id="T-X",
+            pop=3000,
+            med_rent=2800,
+            med_hh_inc=100000,
+            white_pct=0.3,
+            polygon=box(-122.43, 37.76, -122.39, 37.79),
+        ),  # northern box
+        Tract(
+            id="T-Y",
+            pop=3000,
+            med_rent=2500,
+            med_hh_inc=90000,
+            white_pct=0.7,
+            polygon=box(-122.43, 37.71, -122.39, 37.74),
+        ),  # southern box
+        Tract(
+            id="T-Z",
+            pop=3000,
+            med_rent=3000,
+            med_hh_inc=110000,
+            white_pct=0.8,
+            polygon=box(-122.5, 35.2, -122.4, 35.8),
+        ),  # far away
     ]
 
 
@@ -161,7 +182,7 @@ def test_quadtree_match_point_outside_bbox(empty):
 
 def test_quadtree_join(locations, tracts):
     results = quadtree_spatial_join(locations, tracts)
-    expected = {1: 'T-X', 3: 'T-Y'}
+    expected = {1: "T-X", 3: "T-Y"}
     # Location 1 is within T-X
     # Location 2 is not within any tract
     # Location 3 is within T-Y
