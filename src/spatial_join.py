@@ -2,8 +2,11 @@ from typing import NamedTuple
 from shapely.geometry import Polygon, box, Point
 from pathlib import Path
 import shapefile
-import csv
 import pandas as pd
+
+
+# Functions below have been adapted from CAPP122 Winter 2026 PA4, with modifications
+# and additions to customize to our dataset.
 
 from datatypes import (
     MERGED_SF_TRACTS_SHP,

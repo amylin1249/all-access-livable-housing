@@ -301,13 +301,13 @@ def generate_311_csv():
     df = df.drop_duplicates(subset=["address", "date"], keep="first")
 
     # Drop address as it's no longer needed after this point
-    #df = df.drop(columns=["address"])
+    df = df.drop(columns=["address"])
 
     # Drop observations where lat/lon = 0
     df = df[(df["lat"] != 0) & (df["lon"] != 0)]
 
     # Reorder columns for readability
-    df = df.reindex(columns=["id", "date", "address", "lat", "lon"])
+    df = df.reindex(columns=["id", "date", "lat", "lon"])
 
     df.to_csv(CLEAN_311, index=False)
 
