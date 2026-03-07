@@ -7,7 +7,7 @@ from datatypes import (
     SF_ACS_JOIN,
     JOINED_ENCAMP_TRACTS,
     JOINED_311_TRACTS,
-    MERGED
+    MERGED,
 )
 
 eviction_df = pd.read_csv(JOINED_EVICTIONS_TRACTS)

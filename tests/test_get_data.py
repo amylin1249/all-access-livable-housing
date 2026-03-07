@@ -24,6 +24,3 @@ def test_api_year_in_range():
     for date in results:
         year = int(date["year_mon"][:4])
         assert 2020 <= year <= 2024
-
-
-

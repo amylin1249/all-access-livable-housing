@@ -234,7 +234,7 @@ def quadtree_spatial_join(
         location_point = Point(location.lon, location.lat)
 
         for tract_id in quadtree.match(location_point):
-                join_dict[location.id] = tract_id
+            join_dict[location.id] = tract_id
 
     return join_dict
 
@@ -255,13 +255,7 @@ def load_points_csv(path: Path) -> list[Location]:
     df = pd.read_csv(path)
 
     for row in df.itertuples():
-        locations.append(
-            Location(
-                id=row.id, 
-                lat=row.lat,
-                lon=row.lon
-            )
-        )
+        locations.append(Location(id=row.id, lat=row.lat, lon=row.lon))
 
     return locations
 

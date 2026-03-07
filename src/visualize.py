@@ -12,10 +12,7 @@ from pathlib import Path
 from pyproj import Transformer, CRS
 from shapely import geometry
 from shapely.ops import transform
-from datatypes import (
-    MERGED_SF_TRACTS_SHP,
-    CONSOLIDATED
-)
+from datatypes import MERGED_SF_TRACTS_SHP, CONSOLIDATED
 
 
 # def visualize_sf_tracts():
@@ -116,19 +113,22 @@ def create_tract_map(
         .encode(
             color=alt.Color("metric:Q"),
             tooltip=[
-                alt.Tooltip("TL_GEO_ID:N", title = "Tract ID"),
-                alt.Tooltip("population:Q", title="Population"), 
-                alt.Tooltip("med_hh_inc:Q", title="Median annual household income"), 
+                alt.Tooltip("TL_GEO_ID:N", title="Tract ID"),
+                alt.Tooltip("population:Q", title="Population"),
+                alt.Tooltip("med_hh_inc:Q", title="Median annual household income"),
                 alt.Tooltip("white_pct:Q", title="% white population"),
-                alt.Tooltip("metric:Q")
-        ]).transform_lookup(
+                alt.Tooltip("metric:Q"),
+            ],
+        )
+        .transform_lookup(
             lookup="GEOID",
             from_=alt.LookupData(filtered_df, ("tract"), ["metric"]),
         )
         .project(type="albersUsa")
         .properties(
             title=f"Unsheltered homelessness in SF tracts ({start_date} to {end_date})"
-        ).interactive()
+        )
+        .interactive()
     )
 
     return chart
@@ -194,4 +194,10 @@ if __name__ == "__main__":
 
     # visualize_sf_tracts()
     # create_tract_map(CONSOLIDATED, "2020-01", "2024-12", "estimate", "sum")
-    create_scatterplot(CONSOLIDATED, "estimate", "mean", "median_rent", "mean", )
+    create_scatterplot(
+        CONSOLIDATED,
+        "estimate",
+        "mean",
+        "median_rent",
+        "mean",
+    )

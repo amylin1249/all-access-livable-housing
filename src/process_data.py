@@ -6,29 +6,151 @@ import geopandas as gpd
 from pathlib import Path
 from datetime import datetime
 from datatypes import (
-    RAW_ENCAMP,
-    RAW_311,
+    RAW_SF_TRACTS,
     RAW_ACS_POP,
     RAW_ACS_RENT,
     RAW_ACS_HH_INC,
     RAW_ACS_RACE,
     RAW_ACS_RENTER_UNITS,
-    RAW_SF_TRACTS,
-    CALI_TRACTS_SHP,
-    CLEAN_ENCAMP,
-    CLEAN_311,
-    SF_ACS_JOIN,
-    SF_TRACTS_SHP,
-    MERGED_SF_TRACTS_SHP,
     ACS_POP_ID,
     ACS_RENT_ID,
     ACS_HH_INC_ID,
     ACS_WHITE_POP_ID,
     ACS_RENTER_UNITS_ID,
+    SF_CENSUS_TRACTS,
+    CALI_TRACTS_SHP,
+    SF_TRACTS_SHP,
+    MERGED_SF_TRACTS_SHP,
+    RAW_311,
+    CLEAN_311,
+    RAW_ENCAMP,
+    CLEAN_ENCAMP,
+    RAW_ZILLOW,
+    RAW_CROSSWALKS,
+    CLEAN_ZILLOW,
+    CLEAN_CROSSWALKS,
 )
 
-
 EXCLUDE_GEOID = "06075980401"
+
+
+def get_sf_geoid() -> list[str]:
+    """
+    Extract the list of SF census tract GeoIDs based on the list of 2020 census
+    tracts from DataSF Open Data Portal, removing any tracts to be excluded.
+
+    Returns:
+        List of filtered SF census tract GeoIDs.
+    """
+    sf_geoid = []
+
+    csv.field_size_limit(sys.maxsize)
+
+    with open(RAW_SF_TRACTS) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            geoid = row["geoid"]
+            if geoid != EXCLUDE_GEOID:
+                sf_geoid.append(geoid)
+
+    return sf_geoid
+
+
+def process_acs_data():
+    """
+    Load the data from the ACS files saved, impute negative or zero values in
+    rent and household income, merge them based on GeoID, and save the merged
+    dataframe to a new file.
+
+    In each ACS file:
+    - Tracts will be identified by their GeoID ("TL_GEO_ID")
+    - Data to be merged will be found in the column with the unique identifier
+    """
+    # Read in ACS CSV files as dataframes and specify columns of interest
+    pop_df = pd.read_csv(
+        RAW_ACS_POP, usecols=["TL_GEO_ID", ACS_POP_ID], dtype={"TL_GEO_ID": "str"}
+    )
+    race_df = pd.read_csv(
+        RAW_ACS_RACE,
+        usecols=["TL_GEO_ID", ACS_WHITE_POP_ID],
+        dtype={"TL_GEO_ID": "str"},
+    )
+    rent_df = pd.read_csv(
+        RAW_ACS_RENT, usecols=["TL_GEO_ID", ACS_RENT_ID], dtype={"TL_GEO_ID": "str"}
+    )
+    hh_inc_df = pd.read_csv(
+        RAW_ACS_HH_INC, usecols=["TL_GEO_ID", ACS_HH_INC_ID], dtype={"TL_GEO_ID": "str"}
+    )
+    renter_df = pd.read_csv(
+        RAW_ACS_RENTER_UNITS,
+        usecols=["TL_GEO_ID", ACS_RENTER_UNITS_ID],
+        dtype={"TL_GEO_ID": "str"},
+    )
+
+    # Impute negative values (i.e., missing) in rent and household income
+    # dataframes with the mean of their positive values
+    mean_rent = round(rent_df.loc[rent_df[ACS_RENT_ID] > 0, ACS_RENT_ID].mean())
+    rent_df.loc[rent_df[ACS_RENT_ID] < 0, ACS_RENT_ID] = mean_rent
+
+    mean_hh_inc = round(
+        hh_inc_df.loc[hh_inc_df[ACS_HH_INC_ID] > 0, ACS_HH_INC_ID].mean()
+    )
+    hh_inc_df.loc[hh_inc_df[ACS_HH_INC_ID] < 0, ACS_HH_INC_ID] = mean_hh_inc
+
+    # Merge individual dataframes based on GEO_ID
+    joined_df = pop_df
+    for df in [race_df, rent_df, hh_inc_df, renter_df]:
+        joined_df = pd.merge(joined_df, df, on="TL_GEO_ID", how="left")
+
+    # Rename population, race, rent, income, and renter units column names
+    joined_df = joined_df.rename(
+        columns={
+            ACS_POP_ID: "population",
+            ACS_WHITE_POP_ID: "white_pop",
+            ACS_RENT_ID: "med_rent",
+            ACS_HH_INC_ID: "med_hh_inc",
+            ACS_RENTER_UNITS_ID: "rent_units",
+        }
+    )
+
+    # Add calculation of percentage of white population per tract as a new column
+    joined_df["white_pct"] = joined_df["white_pop"] / joined_df["population"]
+
+    # Filter tract IDs only for those in the list of filtered SF census tracts
+    joined_df = joined_df[joined_df["TL_GEO_ID"].isin(get_sf_geoid())]
+
+    joined_df.to_csv(SF_CENSUS_TRACTS, index=False)
+
+
+def create_sf_shapefiles():
+    """
+    Filter California census tract shapefiles and create SF census tract
+    shapefiles that only include tracts in San Francisco, by matching with the
+    GeoIDs obtained from the San Francisco list of census tracts.
+    """
+    cali_tracts = gpd.read_file(CALI_TRACTS_SHP)
+
+    # Filter California tract IDs only for those that are in SF
+    sf_tracts = cali_tracts[cali_tracts["GEOID"].isin(get_sf_geoid())]
+
+    sf_tracts.to_file(SF_TRACTS_SHP)
+
+
+def add_sf_tract_data():
+    """
+    Add SF ACS data to SF census tract shapefiles as attributes, and save to new
+    SF census tract shapefiles containing the merged attributes.
+    """
+    sf_tracts = gpd.read_file(SF_TRACTS_SHP)
+    sf_acs_data = pd.read_csv(SF_CENSUS_TRACTS, dtype={"TL_GEO_ID": "str"})
+
+    # Align geo_id column name in sf_acs_data with GEOID column name in
+    # sf_tracts shapefile prior to the merge
+    sf_acs_data.rename(columns={"TL_GEO_ID": "GEOID"}, inplace=True)
+
+    updated_sf_tracts = sf_tracts.merge(sf_acs_data, on="GEOID", how="left")
+    updated_sf_tracts.to_file(MERGED_SF_TRACTS_SHP)
+
 
 STOPWORDS = [
     "st",
@@ -238,16 +360,16 @@ def generate_encampments_csv():
     df.to_csv(CLEAN_ENCAMP, index=False)
 
 
-def generate_zori_csv():
+def generate_zillow_csv():
     """
-    Loads ZORI CSV file, filters for SF zip codes and the years 2020-2024, imputes
-    to fill missing data, and outputs tidy ZORI CSV.
+    Loads Zillow CSV file, filters for SF zip codes and the years 2020-2024, imputes
+    to fill missing data, and outputs tidy Zillow CSV.
 
     Returns:
         zips: [list] SF zip codes
     """
     # Load raw data
-    df = pd.read_csv("raw-data/zori_by_zip.csv")
+    df = pd.read_csv(RAW_ZILLOW)
 
     # Filter for San Francisco rows
     sf_zips = df[df["City"] == "San Francisco"].copy()
@@ -278,7 +400,7 @@ def generate_zori_csv():
     tidy_df["zip"] = tidy_df["zip"].astype(int).astype(str)
 
     # Writes tidy CSV
-    tidy_df.to_csv("clean-data/tidy_zori.csv", index=False)
+    tidy_df.to_csv(CLEAN_ZILLOW, index=False)
 
 
 def process_crosswalks_xlsx(file_path, zips, tracts):
@@ -337,150 +459,36 @@ def generate_crosswalks_csv():
     """
     Cleans multiple crosswalks XLSX files and outputs to a single CSV.
     """
-    zori_df = pd.read_csv("clean-data/tidy_zori.csv")
-    acs_df = pd.read_csv("clean-data/census_acs_join.csv")
+    zillow_df = pd.read_csv(CLEAN_ZILLOW)
+    tracts_df = pd.read_csv(SF_CENSUS_TRACTS)
 
-    # Grab SF zips from ZORI data
-    zips_num = set(zori_df["zip"])
+    # Grab SF zips from Zillow data
+    zips_num = set(zillow_df["zip"])
     sf_zips = {str(zip) for zip in zips_num}
 
     # Grab SF tracts from census data
-    tracts_num = set(acs_df["TL_GEO_ID"])
+    tracts_num = set(tracts_df["TL_GEO_ID"])
     short_tracts = {str(tract) for tract in tracts_num}
     sf_tracts = {tract.zfill(11) for tract in short_tracts}
 
     list_of_dfs = []
-    for file_path in Path("raw-data/crosswalks-xlsx").iterdir():
+    for file_path in Path(RAW_CROSSWALKS).iterdir():
         if not file_path.name.startswith("~$"):
             sf_df = process_crosswalks_xlsx(file_path, sf_zips, sf_tracts)
             list_of_dfs.append(sf_df)
 
     # Aggregate and output to CSV
     aggregated_df = pd.concat(list_of_dfs)
-    aggregated_df.to_csv("clean-data/crosswalks.csv", index=None, header=True)
-
-
-def get_sf_geoid() -> list[str]:
-    """
-    Extract the list of SF census tract GeoIDs based on the list of 2020 census
-    tracts from DataSF Open Data Portal, removing any tracts to be excluded.
-
-    Returns:
-        List of filtered SF census tract GeoIDs.
-    """
-    sf_geoid = []
-
-    csv.field_size_limit(sys.maxsize)
-
-    with open(RAW_SF_TRACTS) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            geoid = row["geoid"]
-            if geoid != EXCLUDE_GEOID:
-                sf_geoid.append(geoid)
-
-    return sf_geoid
-
-
-def process_acs_data():
-    """
-    Load the data from the ACS files saved, impute negative or zero values in
-    rent and household income, merge them based on GeoID, and save the merged
-    dataframe to a new file.
-
-    In each ACS file:
-    - Tracts will be identified by their GeoID ("TL_GEO_ID")
-    - Data to be merged will be found in the column with the unique identifier
-    """
-    # Read in ACS CSV files as dataframes and specify columns of interest
-    pop_df = pd.read_csv(
-        RAW_ACS_POP, usecols=["TL_GEO_ID", ACS_POP_ID], dtype={"TL_GEO_ID": "str"}
-    )
-    race_df = pd.read_csv(
-        RAW_ACS_RACE, usecols=["TL_GEO_ID", ACS_WHITE_POP_ID], dtype={"TL_GEO_ID": "str"}
-    )
-    rent_df = pd.read_csv(
-        RAW_ACS_RENT, usecols=["TL_GEO_ID", ACS_RENT_ID], dtype={"TL_GEO_ID": "str"}
-    )
-    hh_inc_df = pd.read_csv(
-        RAW_ACS_HH_INC, usecols=["TL_GEO_ID", ACS_HH_INC_ID], dtype={"TL_GEO_ID": "str"}
-    )
-    renter_df = pd.read_csv(
-        RAW_ACS_RENTER_UNITS,
-        usecols=["TL_GEO_ID", ACS_RENTER_UNITS_ID],
-        dtype={"TL_GEO_ID": "str"},
-    )
-
-    # Impute negative values (i.e., missing) in rent and household income
-    # dataframes with the mean of their positive values
-    mean_rent = round(rent_df.loc[rent_df[ACS_RENT_ID] > 0, ACS_RENT_ID].mean())
-    rent_df.loc[rent_df[ACS_RENT_ID] < 0, ACS_RENT_ID] = mean_rent
-
-    mean_hh_inc = round(hh_inc_df.loc[hh_inc_df[ACS_HH_INC_ID] > 0, ACS_HH_INC_ID].mean())
-    hh_inc_df.loc[hh_inc_df[ACS_HH_INC_ID] < 0, ACS_HH_INC_ID] = mean_hh_inc
-
-    # Merge individual dataframes based on GEO_ID
-    joined_df = pop_df
-    for df in [race_df, rent_df, hh_inc_df, renter_df]:
-        joined_df = pd.merge(joined_df, df, on="TL_GEO_ID", how="left")
-
-    # Rename population, race, rent, income, and renter units column names
-    joined_df = joined_df.rename(
-        columns={
-            ACS_POP_ID: "population",
-            ACS_WHITE_POP_ID: "white_pop",
-            ACS_RENT_ID: "med_rent",
-            ACS_HH_INC_ID: "med_hh_inc",
-            ACS_RENTER_UNITS_ID: "rent_units",
-        }
-    )
-
-    # Add calculation of percentage of white population per tract as a new column
-    joined_df["white_pct"] = joined_df["white_pop"] / joined_df["population"]
-
-    # Filter tract IDs only for those in the list of filtered SF census tracts
-    joined_df = joined_df[joined_df["TL_GEO_ID"].isin(get_sf_geoid())]
-
-    joined_df.to_csv(SF_ACS_JOIN, index=False)
-
-
-def create_sf_shapefiles():
-    """
-    Filter California census tract shapefiles and create SF census tract
-    shapefiles that only include tracts in San Francisco, by matching with the
-    GeoIDs obtained from the San Francisco list of census tracts.
-    """
-    cali_tracts = gpd.read_file(CALI_TRACTS_SHP)
-
-    # Filter California tract IDs only for those that are in SF
-    sf_tracts = cali_tracts[cali_tracts["GEOID"].isin(get_sf_geoid())]
-
-    sf_tracts.to_file(SF_TRACTS_SHP)
-
-
-def add_sf_tract_data():
-    """
-    Add SF ACS data to SF census tract shapefiles as attributes, and save to new
-    SF census tract shapefiles containing the merged attributes.
-    """
-    sf_tracts = gpd.read_file(SF_TRACTS_SHP)
-    sf_acs_data = pd.read_csv(SF_ACS_JOIN, dtype={"TL_GEO_ID": "str"})
-
-    # Align geo_id column name in sf_acs_data with GEOID column name in
-    # sf_tracts shapefile prior to the merge
-    sf_acs_data.rename(columns={"TL_GEO_ID": "GEOID"}, inplace=True)
-
-    updated_sf_tracts = sf_tracts.merge(sf_acs_data, on="GEOID", how="left")
-    updated_sf_tracts.to_file(MERGED_SF_TRACTS_SHP)
+    aggregated_df.to_csv(CLEAN_CROSSWALKS, index=None, header=True)
 
 
 if __name__ == "__main__":
-    # generate_zori_csv()
-    # generate_crosswalks_csv()
-    # generate_311_csv()
+    process_acs_data()
+    create_sf_shapefiles()
+    add_sf_tract_data()
+    generate_311_csv()
     generate_encampments_csv()
-    # process_acs_data()
-    # create_sf_shapefiles()
-    # add_sf_tract_data()
-
-
+    generate_zillow_csv()
+    generate_crosswalks_csv()
+   
+    

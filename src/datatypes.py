@@ -26,19 +26,24 @@ CALI_TRACTS_SHP = (
 )
 
 
-# Paths to raw encampment counts XLSX and 311 cases CSV
+# Paths to raw encampment counts XLSX, 311 cases CSV, and Zillow CSV
 RAW_ENCAMP = Path(__file__).parent.parent / "raw-data/raw_encampments_data.xlsx"
 RAW_311 = Path(__file__).parent.parent / "raw-data/raw_311_data.csv"
+RAW_ZILLOW = Path(__file__).parent.parent / "raw-data/raw_zillow_data.csv"
 
+# Path to raw crosswalks XLSX files folder
+RAW_CROSSWALKS = Path(__file__).parent.parent / "raw-data/raw_crosswalks"
 
-# Paths to clean evictions, encampment counts, and 311 cases CSV files
+# Paths to clean evictions, encampment counts, 311 cases, Zillow, and crosswalks CSV files
 CLEAN_EVICTIONS = Path(__file__).parent.parent / "clean-data/api_evictions_data.csv"
 CLEAN_ENCAMP = Path(__file__).parent.parent / "clean-data/clean_encampments_data.csv"
 CLEAN_311 = Path(__file__).parent.parent / "clean-data/clean_311_data.csv"
+CLEAN_ZILLOW = Path(__file__).parent.parent / "clean-data/clean_311_zillow_data.csv"
+CLEAN_CROSSWALKS = Path(__file__).parent.parent / "clean-data/clean_crosswalks.csv"
 
 
 # Paths to clean census CSV file and tract shapefiles
-SF_ACS_JOIN = Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
+SF_CENSUS_TRACTS = Path(__file__).parent.parent / "clean-data/sf_census_tracts.csv"
 SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
 MERGED_SF_TRACTS_SHP = (
     Path(__file__).parent.parent
@@ -54,7 +59,7 @@ JOINED_ENCAMP_TRACTS = Path(__file__).parent.parent / "clean-data/joined_encampm
 JOINED_311_TRACTS = Path(__file__).parent.parent / "clean-data/joined_311_tracts.csv"
 
 
-# Path to consolidated data file to be used for analysis and visualization
+# Path to consolidated/merged data file to be used for analysis and visualization
 MERGED = Path(__file__).parent.parent / "clean-data/merged_data.csv"
 
 
