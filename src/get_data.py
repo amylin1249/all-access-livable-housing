@@ -4,7 +4,7 @@ import os
 import time
 from datetime import datetime
 
-from datatypes import SF_EVICTIONS
+from datatypes import CLEAN_EVICTIONS
 
 EVICTIONS_URL = "https://data.sfgov.org/resource/5cei-gny5.json"
 REQUEST_DELAY = 1
@@ -58,9 +58,9 @@ def save_evictions_to_csv(evictions_list):
     """
     Save data from evictions API as a CSV file
     """
-    os.makedirs(os.path.dirname(SF_EVICTIONS), exist_ok=True)
+    os.makedirs(os.path.dirname(CLEAN_EVICTIONS), exist_ok=True)
     fieldnames = ["id", "lat", "lon", "year_mon"]
-    with open(SF_EVICTIONS, "w", newline="") as f:
+    with open(CLEAN_EVICTIONS, "w", newline="") as f:
         csv_writer = csv.DictWriter(f, fieldnames=fieldnames)
         csv_writer.writeheader()
         csv_writer.writerows(evictions_list)

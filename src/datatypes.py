@@ -1,24 +1,24 @@
 from pathlib import Path
 
 # Paths to raw ACS CSV files for the relevant metrics
-POP_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/acs_sf_population_2020_24.csv"
+RAW_ACS_POP = (
+    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_population_2020_24.csv"
 )
-RENT_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/acs_sf_median_rent_2020_24.csv"
+RAW_ACS_RENT = (
+    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_median_rent_2020_24.csv"
 )
-HH_INC_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
+RAW_ACS_HH_INC = (
+    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_median_hh_income_2020_24.csv"
 )
-RACE_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_race_2020_24.csv"
-RENTER_UNITS_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/acs_sf_housing_units_2020_24.csv"
+RAW_ACS_RACE = Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_race_2020_24.csv"
+RAW_ACS_RENTER_UNITS = (
+    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_housing_units_2020_24.csv"
 )
 
 
 # Paths to raw SF census tracts CSV file and California tracts shapefiles
-SF_CENSUS_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/sf_census_tracts_2020.csv"
+RAW_SF_TRACTS = (
+    Path(__file__).parent.parent / "raw-data/census/raw_sf_census_tracts_2020.csv"
 )
 CALI_TRACTS_SHP = (
     Path(__file__).parent.parent
@@ -32,7 +32,7 @@ REPORT_PATH = Path(__file__).parent.parent / "raw-data/311_cases.csv"
 
 
 # Paths to clean evictions, encampment counts, and 311 cases CSV files
-SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv"
+CLEAN_EVICTIONS = Path(__file__).parent.parent / "clean-data/api_evictions_data.csv"
 CLEAN_ENCAMP = Path(__file__).parent.parent / "clean-data/clean_encampments_data.csv"
 CLEAN_311 = Path(__file__).parent.parent / "clean-data/clean_311_data.csv"
 

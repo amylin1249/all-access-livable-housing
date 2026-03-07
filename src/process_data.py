@@ -6,12 +6,12 @@ import geopandas as gpd
 from pathlib import Path
 from datetime import datetime
 from datatypes import (
-    POP_PATH,
-    RENT_PATH,
-    HH_INC_PATH,
-    RACE_PATH,
-    RENTER_UNITS_PATH,
-    SF_CENSUS_PATH,
+    RAW_ACS_POP,
+    RAW_ACS_RENT,
+    RAW_ACS_HH_INC,
+    RAW_ACS_RACE,
+    RAW_ACS_RENTER_UNITS,
+    RAW_SF_TRACTS,
     CALI_TRACTS_SHP,
     ENCAMP_PATH,
     REPORT_PATH,
@@ -374,7 +374,7 @@ def get_sf_geoid() -> list[str]:
 
     csv.field_size_limit(sys.maxsize)
 
-    with open(SF_CENSUS_PATH) as f:
+    with open(RAW_SF_TRACTS) as f:
         reader = csv.DictReader(f)
         for row in reader:
             geoid = row["geoid"]
@@ -396,19 +396,19 @@ def process_acs_data():
     """
     # Read in ACS CSV files as dataframes and specify columns of interest
     pop_df = pd.read_csv(
-        POP_PATH, usecols=["TL_GEO_ID", POP_ID], dtype={"TL_GEO_ID": "str"}
+        RAW_ACS_POP, usecols=["TL_GEO_ID", POP_ID], dtype={"TL_GEO_ID": "str"}
     )
     race_df = pd.read_csv(
-        RACE_PATH, usecols=["TL_GEO_ID", WHITE_POP_ID], dtype={"TL_GEO_ID": "str"}
+        RAW_ACS_RACE, usecols=["TL_GEO_ID", WHITE_POP_ID], dtype={"TL_GEO_ID": "str"}
     )
     rent_df = pd.read_csv(
-        RENT_PATH, usecols=["TL_GEO_ID", RENT_ID], dtype={"TL_GEO_ID": "str"}
+        RAW_ACS_RENT, usecols=["TL_GEO_ID", RENT_ID], dtype={"TL_GEO_ID": "str"}
     )
     hh_inc_df = pd.read_csv(
-        HH_INC_PATH, usecols=["TL_GEO_ID", HH_INC_ID], dtype={"TL_GEO_ID": "str"}
+        RAW_ACS_HH_INC, usecols=["TL_GEO_ID", HH_INC_ID], dtype={"TL_GEO_ID": "str"}
     )
     renter_df = pd.read_csv(
-        RENTER_UNITS_PATH,
+        RAW_ACS_RENTER_UNITS,
         usecols=["TL_GEO_ID", RENTER_UNITS_ID],
         dtype={"TL_GEO_ID": "str"},
     )
