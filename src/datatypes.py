@@ -8,11 +8,15 @@ RAW_ACS_RENT = (
     Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_median_rent_2020_24.csv"
 )
 RAW_ACS_HH_INC = (
-    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_median_hh_income_2020_24.csv"
+    Path(__file__).parent.parent
+    / "raw-data/census/raw_acs_sf_median_hh_income_2020_24.csv"
 )
-RAW_ACS_RACE = Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_race_2020_24.csv"
+RAW_ACS_RACE = (
+    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_race_2020_24.csv"
+)
 RAW_ACS_RENTER_UNITS = (
-    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_housing_units_2020_24.csv"
+    Path(__file__).parent.parent
+    / "raw-data/census/raw_acs_sf_housing_units_2020_24.csv"
 )
 
 
@@ -43,9 +47,6 @@ CLEAN_CROSSWALKS = Path(__file__).parent.parent / "clean-data/clean_crosswalks.c
 
 
 # Paths to clean census CSV file and tract shapefiles
-SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/sf_shapefiles"
-MERGED_SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/merged_sf_shapefiles"
-
 SF_CENSUS_TRACTS = Path(__file__).parent.parent / "clean-data/sf_census_tracts.csv"
 SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
 MERGED_SF_TRACTS_SHP = (
@@ -58,7 +59,9 @@ MERGED_SF_TRACTS_SHP = (
 JOINED_EVICTIONS_TRACTS = (
     Path(__file__).parent.parent / "clean-data/joined_evictions_tracts.csv"
 )
-JOINED_ENCAMP_TRACTS = Path(__file__).parent.parent / "clean-data/joined_encampment_tracts.csv"
+JOINED_ENCAMP_TRACTS = (
+    Path(__file__).parent.parent / "clean-data/joined_encampment_tracts.csv"
+)
 JOINED_311_TRACTS = Path(__file__).parent.parent / "clean-data/joined_311_tracts.csv"
 
 

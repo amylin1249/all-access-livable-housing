@@ -1,6 +1,6 @@
 import httpx
 import csv
-import os
+from pathlib import Path 
 import time
 from datetime import datetime
 
@@ -8,6 +8,7 @@ from datatypes import CLEAN_EVICTIONS
 
 EVICTIONS_URL = "https://data.sfgov.org/resource/5cei-gny5.json"
 REQUEST_DELAY = 1
+CLEAN_DATA_DIR = Path(__file__).parent.parent / "clean-data"
 
 
 def get_evictions_data() -> list[tuple]:
@@ -58,7 +59,8 @@ def save_evictions_to_csv(evictions_list):
     """
     Save data from evictions API as a CSV file
     """
-    os.makedirs(os.path.dirname(CLEAN_EVICTIONS), exist_ok=True)
+    if not CLEAN_DATA_DIR.exists():
+        CLEAN_DATA_DIR.mkdir()
     fieldnames = ["id", "lat", "lon", "year_mon"]
     with open(CLEAN_EVICTIONS, "w", newline="") as f:
         csv_writer = csv.DictWriter(f, fieldnames=fieldnames)

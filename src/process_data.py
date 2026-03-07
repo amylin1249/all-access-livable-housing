@@ -19,8 +19,6 @@ from datatypes import (
     ACS_RENTER_UNITS_ID,
     SF_CENSUS_TRACTS,
     CALI_TRACTS_SHP,
-    SF_TRACTS_DIR,
-    MERGED_SF_TRACTS_DIR,
     SF_TRACTS_SHP,
     MERGED_SF_TRACTS_SHP,
     RAW_311,
@@ -35,6 +33,8 @@ from datatypes import (
 
 EXCLUDE_GEOID = "06075980401"
 
+SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/sf_shapefiles"
+MERGED_SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/merged_sf_shapefiles"
 
 def get_sf_geoid() -> list[str]:
     """
@@ -482,7 +482,8 @@ def generate_crosswalks_csv():
 
     list_of_dfs = []
     for file_path in Path(RAW_CROSSWALKS).iterdir():
-        if not file_path.name.startswith("~$"):
+        # Skip over hidden/system/temp files
+        if not file_path.name.startswith(("~$", "_$", ".")):
             sf_df = process_crosswalks_xlsx(file_path, sf_zips, sf_tracts)
             list_of_dfs.append(sf_df)
 
@@ -499,5 +500,3 @@ if __name__ == "__main__":
     generate_encampments_csv()
     generate_zillow_csv()
     generate_crosswalks_csv()
-   
-    

@@ -307,6 +307,15 @@ wheels = [
 ]
 
 [[package]]
+name = "dash-vega-components"
+version = "0.11.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/8f/a3/fd9756872a6fa46d0a8124c46a3f676557f6462233d6d8d994067ff116ff/dash_vega_components-0.11.0.tar.gz", hash = "sha256:13657bb4a93b1679876c8c58ef39914179545b1323b3c94340decf7f19ab7f24", size = 1344128, upload-time = "2024-08-11T06:54:45.784Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d6/c7/bf205de1982c0e61698c9750a1444c701bb71ac0a661c85636f75c1d26e4/dash_vega_components-0.11.0-py3-none-any.whl", hash = "sha256:6ab17cec0918eb3c7c8eea6649301d2fc147ca18fa7f97323b9bad9627749387", size = 1356521, upload-time = "2024-08-11T06:54:43.404Z" },
+]
+
+[[package]]
 name = "decorator"
 version = "5.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1133,6 +1142,7 @@ dependencies = [
     { name = "altair-viewer" },
     { name = "dash" },
     { name = "dash-ag-grid" },
+    { name = "dash-vega-components" },
     { name = "folium" },
     { name = "geopandas" },
     { name = "httpx" },
@@ -1163,6 +1173,7 @@ requires-dist = [
     { name = "altair-viewer", specifier = ">=0.4.0" },
     { name = "dash", specifier = ">=4.0.0" },
     { name = "dash-ag-grid", specifier = ">=33.3.3" },
+    { name = "dash-vega-components", specifier = ">=0.11.0" },
     { name = "folium", specifier = ">=0.20.0" },
     { name = "geopandas", specifier = ">=1.1.2" },
     { name = "httpx", specifier = ">=0.28.1" },
