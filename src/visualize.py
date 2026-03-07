@@ -186,6 +186,87 @@ def create_scatterplot(
     plt.show()
 
 
+def create_reg_chart():
+
+    variables = [
+        "Median Rent (Tract)",
+        "Median Household Income (Tract)",
+        "Percentage White",
+        "Total Tents",
+        "Total Structures",
+        "Total Vehicles"
+    ]
+
+    # Coefficients with varying effect sizes and significance
+    coefficients = [-0.0005, -1.124e-05, 10.5250, 0.9523, 0.6413, -0.0452]
+    std_errors = [0.001, 1.79e-05, 3.500, 0.127, 0.241, 0.027]
+
+    # Calculate 95% confidence intervals
+    ci_lower = [coefficients[i] - 1.96 * std_errors[i] for i in range(0, len(coefficients))]
+    ci_upper = [coefficients[i] + 1.96 * std_errors[i] for i in range(0, len(coefficients))]
+
+    # Determine significance  
+    significant = [(ci_lower[i] > 0 or ci_upper[i] < 0) for i in range(0, len(coefficients))]
+
+    df = pd.DataFrame(
+        {
+            "variable": variables,
+            "coefficient": coefficients,
+            "ci_lower": ci_lower,
+            "ci_upper": ci_upper,
+            "significant": significant,
+        }
+    )
+
+    # Error bars (confidence intervals)
+    error_bars = alt.Chart(df).mark_rule(strokeWidth=3).encode(
+        x="ci_lower:Q",
+        x2="ci_upper:Q",
+        y=alt.Y("variable:N", sort=None),
+        color=alt.condition(
+            alt.datum.significant,
+            alt.value("blue"),
+            alt.value("black"),
+        ),
+    )
+
+    # Points (coefficient estimates)
+    points = (
+        alt.Chart(df)
+        .mark_point(size=300, filled=True)
+        .encode(
+            x="coefficient:Q",
+            y=alt.Y("variable:N", sort='x'),
+            color=alt.condition(
+                alt.datum.significant,
+                alt.value("blue"),  
+                alt.value("black"),   
+            ),
+            tooltip=[
+                alt.Tooltip("variable:N", title="Variable"),
+                alt.Tooltip("coefficient:Q", title="Coefficient", format=".2f"),
+                alt.Tooltip("significant:N", title="Significant"),
+            ],
+        )
+    )
+
+
+    x_zero = alt.Chart(pd.DataFrame({'x':[0]})).mark_rule(color='black', size=2, strokeDash=[4,4]).encode(x='x:Q')
+
+
+    # Combine layers
+    chart = (
+        (x_zero + error_bars + points)
+        .properties(
+            width=1400,
+            height=900,
+            title=alt.Title("Total Encampments Reported Per Tract", fontSize=30),
+        )
+        .configure_axis(labelFontSize=18, titleFontSize=22)
+    )
+    return chart
+
+
 if __name__ == "__main__":
     create_tract_map(MERGED, "2020-01", "2024-12", "estimate")
     # create_scatterplot(
