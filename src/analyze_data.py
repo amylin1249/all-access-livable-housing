@@ -131,7 +131,6 @@ def calculate_eviction_rate():
         right_on="TL_GEO_ID",
         how="left",
     )
-    # without evict -> fill in 0
     merged["geoid"] = merged["TL_GEO_ID"]
     merged["eviction_rate"] = merged["total_evictions"] / merged["rent_units"]
     return merged.to_dict(orient="records")
