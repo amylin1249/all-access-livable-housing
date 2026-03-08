@@ -213,7 +213,12 @@ def create_reg_chart():
 
     return chart.resolve_scale(color="independent")
 
+<<<<<<< HEAD
 def create_homeless_scatterplot(source_file: Path, tract_id: str):
+=======
+
+def create_homeless_scatterplot(tract_id: str):
+>>>>>>> 82d290fd54b64801fd3d178ae27aae5aa428f2d2
     """
     Add docstring
     """
@@ -234,8 +239,13 @@ def create_homeless_scatterplot(source_file: Path, tract_id: str):
     return chart
 
 
+<<<<<<< HEAD
 def create_encampments_scatterplot(source_file: Path, tract_id: str):
     df = pd.read_csv(source_file)
+=======
+def create_encampments_scatterplot(tract_id: str):
+    df = pd.read_csv(MERGED)
+>>>>>>> 82d290fd54b64801fd3d178ae27aae5aa428f2d2
 
     df["tract"] = df["tract"].astype(str).str.zfill(11)
 
@@ -257,7 +267,7 @@ def create_encampments_scatterplot(source_file: Path, tract_id: str):
     return folded_chart
 
 
-def rent_scatterplot(zip_code: str):
+def create_rent_scatterplot(zip_code: str):
     df = pd.read_csv(CLEAN_ZILLOW)
 
     df["zip"] = df["zip"].astype(str).str.zfill(5)
@@ -272,39 +282,6 @@ def rent_scatterplot(zip_code: str):
                 y=alt.Y("rent:Q"),
         )
     )
-
-#     df = df.rename(
-#             columns={
-#                 "tents": "Tents",
-#                 "vehicles": "Vehicles",
-#                 "structures": "Structures",
-#                 "tract": "Tract",
-#                 "date": "Date",
-
-#             }
-#         )
-
-
-#     tract_select = alt.selection_point(
-#             fields=['Tract'],
-#             bind=alt.binding_select(options=list(df['Tract'].unique()), name='Select Tract')
-#         )
-
-
-#     folded_chart = (
-#             alt.Chart(df)
-#             .mark_line()
-#             .transform_fold(
-#                 fold= ['Structures', 'Tents', 'Vehicles'],
-#                 as_=["measurement", "value"],
-#             ) .transform_filter(tract_select)
-#             .encode(
-#                 x=alt.X("Date", type="temporal", timeUnit="yearmonth"),
-#                 y=alt.Y("value", type="quantitative"),
-#                 color=alt.Color("measurement", type="nominal"),
-#             ).add_params(tract_select)
-#         )
-#     folded_chart
 
 
 if __name__ == "__main__":
