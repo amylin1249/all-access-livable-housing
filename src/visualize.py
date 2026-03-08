@@ -199,12 +199,7 @@ def create_reg_chart():
     # )
     return chart.resolve_scale(color="independent")
 
-<<<<<<< HEAD
 def create_homeless_scatterplot(source_file: Path, tract_id: str):
-=======
-
-def homeless_scatterplot(tract_id: str):
->>>>>>> b4f756848a5114f80f8eeae872f9ad4a49541f9c
     """
     Add docstring
     """
@@ -225,20 +220,14 @@ def homeless_scatterplot(tract_id: str):
     return chart
 
 
-<<<<<<< HEAD
 def create_encampments_scatterplot(source_file: Path, tract_id: str):
     df = pd.read_csv(source_file)
-=======
-def encampments_scatterplot(tract_id: str):
-    df = pd.read_csv(MERGED)
->>>>>>> b4f756848a5114f80f8eeae872f9ad4a49541f9c
 
     df["tract"] = df["tract"].astype(str).str.zfill(11)
 
     filtered_df = df[df["tract"] == tract_id]
 
     folded_chart = (
-<<<<<<< HEAD
             alt.Chart(filtered_df)
             .mark_line()
             .transform_fold(
@@ -248,18 +237,6 @@ def encampments_scatterplot(tract_id: str):
                 x=alt.X("date:T"),
                 y=alt.Y("value:Q"),
                 color=alt.Color("measurement:N"),
-=======
-        alt.Chart(filtered_df)
-        .mark_line()
-        .transform_fold(
-            fold=["Structures", "Tents", "Vehicles"],
-            as_=["measurement", "value"],
-        )
-        .encode(
-            x=alt.X("Date:T"),
-            y=alt.Y("value:Q"),
-            color=alt.Color("measurement:N"),
->>>>>>> 3028bb6e564a481d967e84239ffc2c917599cb20
         )
     )
 
@@ -282,9 +259,6 @@ def rent_scatterplot(zip_code: str):
         )
     )
 
-<<<<<<< HEAD
-    return chart
-=======
 #     df = df.rename(
 #             columns={
 #                 "tents": "Tents",
@@ -317,7 +291,6 @@ def rent_scatterplot(zip_code: str):
 #             ).add_params(tract_select)
 #         )
 #     folded_chart
->>>>>>> 3028bb6e564a481d967e84239ffc2c917599cb20
 
 
 if __name__ == "__main__":
