@@ -16,7 +16,7 @@ my_chart = create_tract_map(
     col_name="eviction_rate",
 )
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH])
+app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH],suppress_callback_exceptions=True)
 
 app.layout = html.Div(
     [
@@ -47,13 +47,13 @@ app.layout = html.Div(
         ),
         # [basic number showing]
         html.Div([
-            html.Div([html.B("Total Tracts"), html.Br(), "243"], style={"flex": "1", "textAlign": "center"}),
+            html.Div([html.B("Eviction Rate"), html.Br(), "###"], style={"flex": "1", "textAlign": "center"}),
             html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
-            html.Div([html.B("Avg Rent"), html.Br(), "$2,850"], style={"flex": "1", "textAlign": "center"}),
+            html.Div([html.B("Average Rent"), html.Br(), "####"], style={"flex": "1", "textAlign": "center"}),
             html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
-            html.Div([html.B("Total Encampments"), html.Br(), "1,240"], style={"flex": "1", "textAlign": "center"}),
+            html.Div([html.B("311 Calls"), html.Br(), "###"], style={"flex": "1", "textAlign": "center"}),
             html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
-            html.Div([html.B("Eviction Rate"), html.Br(), "1.2%"], style={"flex": "1", "textAlign": "center"}),
+            html.Div([html.B("Homelessness Estimate"), html.Br(), "###"], style={"flex": "1", "textAlign": "center"}),
         ], style={
             "display": "flex", "alignItems": "center", "padding": "20px", 
             "margin": "20px 40px", "backgroundColor": "#f8f9fa", "borderRadius": "10px", "border": "1px solid #eee"
@@ -71,7 +71,7 @@ app.layout = html.Div(
     ],style={"maxWidth": "1600px", "margin": "0 auto", "boxSizing": "border-box"})
 
 @app.callback(
-    Output('tabs-render-content', 'children'),
+    Output('tabs-content-container', 'children'),
     Input('tabs-content', 'value')
 )
 
@@ -144,7 +144,7 @@ def render_content(tab):
                 ]),
             ], style={"padding": "20px", "backgroundColor": "#f9f9f9", "borderRadius": "10px", "marginBottom": "20px"}),
 
-            # 2. 지도 표시 섹션 (100% 너비 활용)
+            # map
             html.Div([
                 html.H3(id="map-title", style={"textAlign": "center", "color": "#2c3e50", "marginBottom": "15px"}),
                 html.Hr(),
@@ -154,7 +154,7 @@ def render_content(tab):
                     style={"width": "100%", "height": "600px", "borderRadius": "10px"},
                 ),
             ], style={
-                "width": "100%", # 탭 구조이므로 50%보다 100%가 시원합니다.
+                "width": "100%", 
                 "padding": "20px",
                 "border": "1px solid #ddd",
                 "borderRadius": "10px",
@@ -178,7 +178,7 @@ def render_content(tab):
                     style={"width": "100%", "height": "500px"},
                 ),
             ],style={
-                "width": "50%",
+                "width": "100%",
                 "padding": "20px",
                 "marginLeft": "20px",
                 "border": "1px solid #ddd",
@@ -212,7 +212,7 @@ def render_content(tab):
                     id="scatter-metric-dropdown",
                     options=[
                         {"label": "Median Rent", "value": "median_rent"},
-                        {"label": "Time", "value": "start_date"},
+                       # {"label": "Time", "value": "start_date"},
                     ],
                     value="estimate",
                 ),
@@ -242,13 +242,13 @@ def render_content(tab):
                 # left
                 html.Div([
                     html.H4("## vs. ##", style={"textAlign": "center"}),
-                    dvc.Vega(id="extra-scatter-1", spec={}, style={"width": "100%", "height": "400px"}),
+                    dvc.Vega(id="homeless-1", spec={}, style={"width": "100%", "height": "400px"}),
                 ], style={"width": "48%", "padding": "10px", "border": "1px solid #eee", "borderRadius": "10px"}),
                 
                 # right
                 html.Div([
                     html.H4("## vs. ##", style={"textAlign": "center"}),
-                    dvc.Vega(id="extra-scatter-2", spec={}, style={"width": "100%", "height": "400px"}),
+                    dvc.Vega(id="homeless-2", spec={}, style={"width": "100%", "height": "400px"}),
                 ], style={"width": "48%", "padding": "10px", "border": "1px solid #eee", "borderRadius": "10px", "marginLeft": "4%"}),
             ], style={"display": "flex", "flexDirection": "row", "justifyContent": "center"})
         ])
@@ -257,9 +257,7 @@ def render_content(tab):
     [
         Output("sf-map", "spec"),  # update
         Output("map-title", "children"),  # title-map
-        Output("reg-chart", "spec"),  # update
-        Output("regression-title", "children"),
-    ],  # title-regression
+    ], 
     [
         Input("column-dropdown", "value"),  # change in column
         Input("start-year", "value"),  # change in start-date
@@ -268,8 +266,8 @@ def render_content(tab):
         Input("end-month", "value"),
     ],
 )
-def update_dashboard(selected_col, start_year, start_month, end_year, end_month):
 
+def update_map(selected_col, start_year, start_month, end_year, end_month):
     if any(
         v is None for v in [selected_col, start_year, start_month, end_year, end_month]
     ):
@@ -296,15 +294,51 @@ def update_dashboard(selected_col, start_year, start_month, end_year, end_month)
         start_date=start_dt,
         end_date=end_dt,
         col_name=selected_col,
-        agg="mean",
+        #agg="mean",
     )
 
     map_title = f"Average {METRIC_NAMES[selected_col].lower()} in SF tracts ({start_year}-{start_month} to {end_year}-{end_month})"
+    
+    return map_chart.to_dict(), map_title
+
+@app.callback(
+    [
+        Output("reg-chart", "spec"),  # update
+        Output("regression-title", "children"),# title-regression
+    ],  
+    [
+        Input("tabs-content", "value"),  # change in column
+    ],
+)
+
+def update_regression(tab_value):
+
+    if tab_value != 'tab-reg':
+        raise dash.exceptions.PreventUpdate
 
     new_reg = create_reg_chart()
-    reg_title = f"Total Encampments Reported per Tract"
+    reg_title = "Total Encampments Reported per Tract"
 
-    return map_chart.to_dict(), map_title, new_reg.to_dict(), reg_title
+    return new_reg.to_dict(), reg_title
+
+@app.callback(
+    Output("rent-scatter-plot", "spec"),
+    [Input("tabs-content", "value")]
+)
+def update_rent_scatter(tab_value):
+    if tab_value != 'tab-rent':
+        raise dash.exceptions.PreventUpdate
+    return {}
+
+
+@app.callback(
+    Output("homeless-scatter-plot", "spec"),
+    [Input("tabs-content", "value")]
+)
+def update_homeless_scatter(tab_value):
+    if tab_value != 'tab-homeless':
+        raise dash.exceptions.PreventUpdate
+    return {}
 
 
 if __name__ == "__main__":
