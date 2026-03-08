@@ -1,4 +1,3 @@
-import sys
 import argparse
 from .get_api_data import get_evictions_data, save_evictions_to_csv
 from .process_data import (
@@ -26,10 +25,11 @@ from .datatypes import (
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
         "--data", action="store_true", help="Get clean and consolidated data files"
     )
-    parser.add_argument(
+    group.add_argument(
         "--dashboard", action="store_true", help="Access interactive dashboard"
     )
     args = parser.parse_args()
@@ -62,9 +62,9 @@ def main():
             "Matched all point data to tracts for those that fall within a matching SF tract"
         )
 
-        # # Run function from analyze module to generate a consolidated data file with key metrics for visualization
-        # generate_tidy_csv()
-        # print("Generated a consolidated CSV to be used in visualization")
+        # Run function from analyze module to generate a consolidated data file with key metrics for visualization
+        generate_tidy_csv()
+        print("Generated a consolidated CSV to be used in visualization")
 
     # Run dashboard with interactive visualizations
     if args.dashboard:
@@ -77,11 +77,5 @@ def main():
 if __name__ == "__main__":
     print("Hello from Project All Access Livable Housing!")
     print("Our application is now starting.")
-    if len(sys.argv) <= 1:
-        print(
-            "Our application requires an argument. Input 'uv run python -m src -h' for help."
-        )
-        sys.exit(1)
-    else:
-        main()
+    main()
     print("Our application has finished running.")

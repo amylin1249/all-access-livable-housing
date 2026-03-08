@@ -96,7 +96,7 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
         .interactive()
     )
 
-    return chart.resolve_scale(color="independent")
+    return background + chart.resolve_scale(color="independent")
 
 
 def create_reg_chart():
@@ -274,13 +274,4 @@ def create_rent_scatterplot(zip_code: str):
         )
     )
 
-
-if __name__ == "__main__":
-    print(create_tract_map("2020-01", "2024-12", "estimate"))
-    # create_scatterplot(
-    #     MERGED,
-    #     "estimate",
-    #     "mean",
-    #     "median_rent",
-    #     "mean",
-    # )
+    return chart
