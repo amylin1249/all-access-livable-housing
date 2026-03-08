@@ -83,6 +83,7 @@ def create_reg_chart():
         ["Median Rent", "(Tract)"],
         ["Median Household", "Income (Tract)"],
         "Percentage White",
+        
         "Total Tents",
         "Total Structures",
         "Total Vehicles",
@@ -136,17 +137,17 @@ def create_reg_chart():
         alt.Chart(df)
         .mark_point(size=200, filled=True)
         .encode(
-            x="coefficient:Q",
+            x=alt.X("coefficient:Q", axis=alt.Axis(title="Coefficient Value")),
             y=alt.Y(
                 "variable:N",
                 sort="x",
                 axis=alt.Axis(
+                    title=None,
                     labelAlign="right",
                     labelFontSize=10,
                     labelAngle=-30,
                     labelPadding=10,
-                ),
-            ),
+                ),),
             color=alt.condition(
                 alt.datum.significant,
                 alt.value("blue"),
@@ -157,8 +158,7 @@ def create_reg_chart():
                 alt.Tooltip("coefficient:Q", title="Coefficient", format=".3f"),
                 alt.Tooltip("significant:N", title="Significant"),
             ],
-        )
-    )
+        ))
 
     x_zero = (
         alt.Chart(pd.DataFrame({"x": [0]}))
@@ -167,9 +167,15 @@ def create_reg_chart():
     )
 
     # Combine layers
-    chart = (x_zero + error_bars + points).properties(
-        width="container",
-        height=450,
+    chart = (
+        (x_zero + error_bars + points)
+        .properties(
+            width="container",
+            height=450,
+            padding={"left": 10, "right": 10, "top": 20, "bottom": 20},
+            title=alt.Title(['"Regression Analysis: Impact of Tract Features', 'on Total Number of Unique Reports'], fontSize=15),
+        )
+        .configure_axis(labelFontSize=18, titleFontSize=22)
     )
 
     # chart = (

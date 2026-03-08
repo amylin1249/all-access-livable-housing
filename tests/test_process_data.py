@@ -6,6 +6,18 @@ from src.datatypes import RAW_SF_TRACTS, SF_CENSUS_TRACTS
 
 ### Add tests on generate encampments and 311 CSVs
 
+## Tests for Lily to add on encampments and 311 CSVs
+
+## Ensure your cleaned dataset has the expected columns.
+## Verify cleaning removed or handled nulls.
+## Ensure values fall in expected ranges.clean_df["value"].between(0, 100).all()
+## Duplicate Checks
+## Row count checks
+## can test particular values
+
+
+
+
 
 ACS_DF = pd.read_csv(SF_CENSUS_TRACTS)
 ACS_DF["TL_GEO_ID"] = ACS_DF["TL_GEO_ID"].astype(str).str.zfill(11)
