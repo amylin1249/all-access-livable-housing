@@ -3,8 +3,9 @@ import geopandas as gpd
 import altair as alt
 from pathlib import Path
 
+from datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
-from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
+# from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
 
 def create_tract_map(
@@ -191,7 +192,7 @@ def create_reg_chart():
 
 
 if __name__ == "__main__":
-    create_tract_map(MERGED, "2020-01", "2024-12", "estimate")
+    print(create_tract_map(MERGED, "2020-01", "2024-12", "estimate"))
     # create_scatterplot(
     #     MERGED,
     #     "estimate",
@@ -199,3 +200,4 @@ if __name__ == "__main__":
     #     "median_rent",
     #     "mean",
     # )
+
