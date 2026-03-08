@@ -8,7 +8,7 @@ from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
 
 def create_tract_map(
-    source_file: Path, start_date: str, end_date: str, col_name: str, agg: str = "mean"
+    source_file: Path, start_date: str, end_date: str, col_name: str
 ):
     """
     Add docstring
@@ -35,7 +35,7 @@ def create_tract_map(
     filtered_df = (
         df[(df["date"] >= start_dt) & (df["date"] <= end_dt)]
         .groupby("tract")
-        .agg(metric=(col_name, agg))
+        .agg(metric=(col_name, "mean"))
         .reset_index()
     )
 

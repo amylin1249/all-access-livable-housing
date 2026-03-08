@@ -14,7 +14,6 @@ my_chart = create_tract_map(
     start_date="2020-01",
     end_date="2024-12",
     col_name="eviction_rate",
-    agg="mean",
 )
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH])
