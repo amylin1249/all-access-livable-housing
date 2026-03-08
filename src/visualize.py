@@ -188,15 +188,6 @@ def create_reg_chart():
         .configure_axis(labelFontSize=18, titleFontSize=22)
     )
 
-    # chart = (
-    #     (x_zero + error_bars + points)
-    #     .properties(
-    #         width=600,
-    #         height=500,
-    #         title=alt.Title("Total Encampments Reported Per Tract", fontSize=30),
-    #     )
-    #     .configure_axis(labelFontSize=18, titleFontSize=22)
-    # )
     return chart.resolve_scale(color="independent")
 
 def create_homeless_scatterplot(source_file: Path, tract_id: str):
