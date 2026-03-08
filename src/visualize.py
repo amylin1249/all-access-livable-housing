@@ -4,6 +4,7 @@ import altair as alt
 from pathlib import Path
 
 from .datatypes import MERGED_SF_TRACTS_SHP, MERGED, CLEAN_ZILLOW
+from regression_analysis import run_reg
 
 # from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
@@ -111,8 +112,9 @@ def create_reg_chart():
     ]
 
     # Coefficients with varying effect sizes and significance
-    coefficients = [-0.0005, -1.124e-05, 10.5250, 0.9523, 0.6413, -0.0452]
-    std_errors = [0.001, 1.79e-05, 3.500, 0.127, 0.241, 0.027]
+    output = run_reg()
+    coefficients = [output.params['med_rent'], output.params['med_hh_inc'], output.params['white_pct'], output.params['tents'], output.params['structures'], output.params['vehicles']]
+    std_errors = [output.bse['med_rent'], output.bse['med_hh_inc'], output.bse['white_pct'], output.bse['tents'], output.bse['structures'], output.bse['vehicles']]
 
     # Calculate 95% confidence intervals
     ci_lower = [
