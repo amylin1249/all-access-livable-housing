@@ -245,7 +245,8 @@ def generate_tidy_csv():
 
         # Linear interpolation for all encampments (tents, structures, and vehicles)
         tract_group[encampment_cols] = tract_group[encampment_cols].interpolate(
-            method="linear", limit_direction="both"
+            method="linear"
+            #, limit_direction="both"
         )
 
         tract_group["date"] = tract_group.index
@@ -272,13 +273,6 @@ def generate_tidy_csv():
         + tidy_df["structures"] * STRUCTURES_EST
         + tidy_df["vehicles"] * VEHICLES_EST
     )
-    # .round(0)
-
-    # # Round median rent to whole numbers
-    # final_df["median_rent"] = final_df["median_rent"].round(0).astype(int)
-
-    # # Round eviction rate to percentage with one decimal
-    # final_df["eviction_rate"] = (final_df["eviction_rate"] * 100).round(1)
 
     tidy_df.to_csv(MERGED, index=False)
 
