@@ -1,5 +1,13 @@
 from .get_api_data import get_evictions_data, save_evictions_to_csv
-from .process_data import process_acs_data, create_sf_shapefiles, add_sf_tract_data, generate_311_csv, generate_encampments_csv, generate_zillow_csv, generate_crosswalks_csv
+from .process_data import (
+    process_acs_data,
+    create_sf_shapefiles,
+    add_sf_tract_data,
+    generate_311_csv,
+    generate_encampments_csv,
+    generate_zillow_csv,
+    generate_crosswalks_csv,
+)
 from .spatial_join import join_tracts_csv
 from .analyze_data import generate_tidy_csv
 from .dashboard import app
@@ -42,7 +50,9 @@ def main():
     # print("Generated a consolidated CSV to be used in visualization")
 
     # Run dashboard with interactive visualizations
-    print("Copy the link below from Dash and paste it into your web browser to view our interactive visualizations.")
+    print(
+        "Copy the link below from Dash and paste it into your web browser to view our interactive visualizations."
+    )
     app.run(debug=True, use_reloader=False)
 
 

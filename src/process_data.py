@@ -35,6 +35,7 @@ EXCLUDE_GEOID = "06075980401"
 SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/sf_shapefiles"
 MERGED_SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/merged_sf_shapefiles"
 
+
 def get_sf_geoid() -> list[str]:
     """
     Extract the list of SF census tract GeoIDs based on the list of 2020 census
@@ -342,12 +343,12 @@ def generate_encampments_csv():
         }
     )
 
-    # Convert date to standardized format: YYYY-MM
-    df["date"] = pd.to_datetime(df["date"])
-    df["date"] = df["date"].dt.strftime("%Y-%m")
-
     # Filter for years of interest: 2020-2024
+    df["date"] = pd.to_datetime(df["date"])
     df = df[df["date"].between("2020-01-01", "2024-12-31")]
+
+    # Convert date to standardized format: YYYY-MM
+    df["date"] = df["date"].dt.strftime("%Y-%m")
 
     # Aggregate passenger and other vehicles
     df["vehicles"] = df["Passenger Vehicles"].astype(int) + df["Other Vehicles"].astype(

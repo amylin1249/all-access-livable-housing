@@ -4,26 +4,23 @@ import altair as alt
 from pathlib import Path
 
 
-from .datatypes import (
-    MERGED_SF_TRACTS_SHP,
-    MERGED
-)
+from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
 
 def create_tract_map(
-    source_file: Path, start_date: str, end_date: str, col_name: str, agg:str ="mean"
+    source_file: Path, start_date: str, end_date: str, col_name: str, agg: str = "mean"
 ):
     """
     Add docstring
     """
     METRIC_NAMES = {
-    "311_calls": "311 calls",
-    "eviction_rate": "Eviction rate",
-    "median_rent": "Median rent",
-    "tents": "Tents",
-    "structures": "Structures",
-    "vehicles": "Vehicles",
-    "estimate": "Homelessness estimate",
+        "311_calls": "311 calls",
+        "eviction_rate": "Eviction rate",
+        "median_rent": "Median rent",
+        "tents": "Tents",
+        "structures": "Structures",
+        "vehicles": "Vehicles",
+        "estimate": "Homelessness estimate",
     }
 
     df = pd.read_csv(source_file)
@@ -44,39 +41,40 @@ def create_tract_map(
 
     chart = (
         alt.Chart(sf_tracts)
-        .mark_geoshape()
+        .mark_geoshape(stroke="black", strokeWidth=0.5)
         .encode(
-            color=alt.Color("metric:Q", title=METRIC_NAMES[col_name].split(),
-                            legend=alt.Legend(
-                                orient="right", direction="vertical", titleAnchor = "end", labelAlign = "right", titlePadding =10
-    )),
+            color=alt.Color(
+                "metric:Q",
+                title=METRIC_NAMES[col_name],
+                legend=alt.Legend(
+                    orient="right",
+                    direction="vertical",
+                    labelAlign="left",
+                    titlePadding=5,
+                    offset=10,
+                ),
+            ),
             tooltip=[
                 alt.Tooltip("GEOID:N", title="Tract ID"),
                 alt.Tooltip("population:Q", title="Population"),
                 alt.Tooltip("med_hh_inc:Q", title="Median annual household income"),
                 alt.Tooltip("white_pct:Q", title="% white population"),
-                alt.Tooltip("metric:Q", title=f"Monthly average {METRIC_NAMES[col_name].lower()}"),
+                alt.Tooltip(
+                    "metric:Q",
+                    title=f"Monthly average {METRIC_NAMES[col_name].lower()}",
+                ),
             ],
         )
         .transform_lookup(
             lookup="GEOID",
-            from_=alt.LookupData(filtered_df, ("tract"), ["metric"]),
+            from_=alt.LookupData(filtered_df, "tract", ["metric"]),
         )
-        #.project(type="albersUsa")
-        .project(
-            type='mercator', 
-            scale=160000,    
-            center=[-122.433, 37.765]
-        )
-        .properties(
-            width='container',      
-            height=550,
-            autosize=alt.AutoSizeParams(type='fit', contains='padding')
-        )
+        .project(type="mercator", scale=120000, center=[-122.43, 37.77])
+        .properties(width="container", height=550)
+        .configure_view(stroke=None)
         .interactive()
     )
-
-    return chart.resolve_scale(color='independent')
+    return chart.resolve_scale(color="independent")
 
 
 def create_reg_chart():
@@ -87,7 +85,7 @@ def create_reg_chart():
         "Percentage White",
         "Total Tents",
         "Total Structures",
-        "Total Vehicles"
+        "Total Vehicles",
     ]
 
     # Coefficients with varying effect sizes and significance
@@ -95,11 +93,17 @@ def create_reg_chart():
     std_errors = [0.001, 1.79e-05, 3.500, 0.127, 0.241, 0.027]
 
     # Calculate 95% confidence intervals
-    ci_lower = [coefficients[i] - 1.96 * std_errors[i] for i in range(0, len(coefficients))]
-    ci_upper = [coefficients[i] + 1.96 * std_errors[i] for i in range(0, len(coefficients))]
+    ci_lower = [
+        coefficients[i] - 1.96 * std_errors[i] for i in range(0, len(coefficients))
+    ]
+    ci_upper = [
+        coefficients[i] + 1.96 * std_errors[i] for i in range(0, len(coefficients))
+    ]
 
-    # Determine significance  
-    significant = [(ci_lower[i] > 0 or ci_upper[i] < 0) for i in range(0, len(coefficients))]
+    # Determine significance
+    significant = [
+        (ci_lower[i] > 0 or ci_upper[i] < 0) for i in range(0, len(coefficients))
+    ]
 
     df = pd.DataFrame(
         {
@@ -112,15 +116,19 @@ def create_reg_chart():
     )
 
     # Error bars (confidence intervals)
-    error_bars = alt.Chart(df).mark_rule(strokeWidth=3).encode(
-        x="ci_lower:Q",
-        x2="ci_upper:Q",
-        y=alt.Y("variable:N", sort=None),
-        color=alt.condition(
-            alt.datum.significant,
-            alt.value("blue"),
-            alt.value("black"),
-        ),
+    error_bars = (
+        alt.Chart(df)
+        .mark_rule(strokeWidth=3)
+        .encode(
+            x="ci_lower:Q",
+            x2="ci_upper:Q",
+            y=alt.Y("variable:N", sort=None),
+            color=alt.condition(
+                alt.datum.significant,
+                alt.value("blue"),
+                alt.value("black"),
+            ),
+        )
     )
 
     # Points (coefficient estimates)
@@ -128,21 +136,21 @@ def create_reg_chart():
         alt.Chart(df)
         .mark_point(size=200, filled=True)
         .encode(
-            x="coefficient:Q", 
-            y=alt.Y("variable:N", 
-                sort='x',
-                axis = alt.Axis(
+            x="coefficient:Q",
+            y=alt.Y(
+                "variable:N",
+                sort="x",
+                axis=alt.Axis(
                     labelAlign="right",
                     labelFontSize=10,
-                    labelAngle=-30,          
-                    labelPadding=10
-                )
+                    labelAngle=-30,
+                    labelPadding=10,
+                ),
             ),
-
             color=alt.condition(
                 alt.datum.significant,
-                alt.value("blue"),  
-                alt.value("black"),   
+                alt.value("blue"),
+                alt.value("black"),
             ),
             tooltip=[
                 alt.Tooltip("variable:N", title="Variable"),
@@ -152,19 +160,14 @@ def create_reg_chart():
         )
     )
 
-
     x_zero = (
-        alt.Chart(pd.DataFrame({'x':[0]})).mark_rule(
-        color='black',
-        strokeDash=[4,4]
-    ).encode(x='x:Q')
+        alt.Chart(pd.DataFrame({"x": [0]}))
+        .mark_rule(color="black", strokeDash=[4, 4])
+        .encode(x="x:Q")
     )
 
-
     # Combine layers
-    chart = (
-        x_zero + error_bars + points
-    ).properties(
+    chart = (x_zero + error_bars + points).properties(
         width="container",
         height=450,
     )
@@ -178,7 +181,7 @@ def create_reg_chart():
     #     )
     #     .configure_axis(labelFontSize=18, titleFontSize=22)
     # )
-    return chart.resolve_scale(color='independent')
+    return chart.resolve_scale(color="independent")
 
 
 if __name__ == "__main__":

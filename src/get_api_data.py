@@ -1,6 +1,6 @@
 import httpx
 import csv
-from pathlib import Path 
+from pathlib import Path
 import time
 from datetime import datetime
 

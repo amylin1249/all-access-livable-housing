@@ -11,9 +11,9 @@ from .datatypes import (
     MERGED,
 )
 
-TENTS_EST = 1.1
-STRUCTURES_EST = 1.1
-VEHICLES_EST = 2.1
+TENTS_EST = 1.9
+STRUCTURES_EST = 1.7
+VEHICLES_EST = 1.6
 
 
 def generate_rent_by_zip_dict():
@@ -245,7 +245,7 @@ def generate_tidy_csv():
 
         # Linear interpolation for all encampments (tents, structures, and vehicles)
         tract_group[encampment_cols] = tract_group[encampment_cols].interpolate(
-            method="linear"
+            method="linear", limit_direction="both"
         )
 
         tract_group["date"] = tract_group.index

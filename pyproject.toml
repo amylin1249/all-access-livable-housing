@@ -29,6 +29,7 @@ dependencies = [
     "shapely>=2.1.2",
     "streamlit>=1.19.0",
     "just>=0.8.165",
+    "dash-bootstrap-components>=2.0.4",
 ]
 
 [dependency-groups]
