@@ -42,6 +42,7 @@ def main():
             save_evictions_to_csv(result)
         print("Pulled data from relevant API")
 
+<<<<<<< HEAD
         # # Run functions from process_data module to generate intermediate data files from raw data
         # process_acs_data()
         # create_sf_shapefiles()
@@ -57,6 +58,27 @@ def main():
         # join_tracts_csv(CLEAN_ENCAMP, JOINED_ENCAMP_TRACTS)
         # join_tracts_csv(CLEAN_311, JOINED_311_TRACTS)
         # print("Matched all point data to tracts for those that fall within a matching SF tract")
+=======
+        # Run functions from process_data module to generate intermediate data files from raw data
+        process_acs_data()
+        create_sf_shapefiles()
+        add_sf_tract_data()
+        generate_311_csv()
+        generate_encampments_csv()
+        generate_zillow_csv()
+        generate_crosswalks_csv()
+        print(
+            "Generated all intermediate clean data files required for further analysis"
+        )
+
+        # Run functions from spatial_join module to match location points to their respective tracts
+        join_tracts_csv(CLEAN_EVICTIONS, JOINED_EVICTIONS_TRACTS)
+        join_tracts_csv(CLEAN_ENCAMP, JOINED_ENCAMP_TRACTS)
+        join_tracts_csv(CLEAN_311, JOINED_311_TRACTS)
+        print(
+            "Matched all point data to tracts for those that fall within a matching SF tract"
+        )
+>>>>>>> 5a1e344c265b3f76afc10fdb5a04794d2734725d
 
         # # Run function from analyze module to generate a consolidated data file with key metrics for visualization
         # generate_tidy_csv()
@@ -74,7 +96,9 @@ if __name__ == "__main__":
     print("Hello from Project All Access Livable Housing!")
     print("Our application is now starting.")
     if len(sys.argv) <= 1:
-        print("Our application requires an argument. Input 'uv run python -m src -h' for help.")
+        print(
+            "Our application requires an argument. Input 'uv run python -m src -h' for help."
+        )
         sys.exit(1)
     else:
         main()

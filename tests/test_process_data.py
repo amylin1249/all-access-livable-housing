@@ -16,9 +16,6 @@ from src.datatypes import RAW_SF_TRACTS, SF_CENSUS_TRACTS
 ## can test particular values
 
 
-
-
-
 ACS_DF = pd.read_csv(SF_CENSUS_TRACTS)
 ACS_DF["TL_GEO_ID"] = ACS_DF["TL_GEO_ID"].astype(str).str.zfill(11)
 

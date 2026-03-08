@@ -3,7 +3,7 @@ import geopandas as gpd
 import altair as alt
 from pathlib import Path
 
-from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
+from .datatypes import MERGED_SF_TRACTS_SHP, MERGED, CLEAN_ZILLOW
 
 # from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
@@ -109,7 +109,6 @@ def create_reg_chart():
         ["Median Rent", "(Tract)"],
         ["Median Household", "Income (Tract)"],
         "Percentage White",
-        
         "Total Tents",
         "Total Structures",
         "Total Vehicles",
@@ -173,7 +172,8 @@ def create_reg_chart():
                     labelFontSize=10,
                     labelAngle=-30,
                     labelPadding=10,
-                ),),
+                ),
+            ),
             color=alt.condition(
                 alt.datum.significant,
                 alt.value("blue"),
@@ -181,10 +181,15 @@ def create_reg_chart():
             ),
             tooltip=[
                 alt.Tooltip("variable:N", title="Variable"),
-                alt.Tooltip("coefficient:Q", title="Coefficient (Unique 311 Reports)", format=".3f"),
+                alt.Tooltip(
+                    "coefficient:Q",
+                    title="Coefficient (Unique 311 Reports)",
+                    format=".3f",
+                ),
                 alt.Tooltip("significant:N", title="Significant"),
             ],
-        ))
+        )
+    )
 
     x_zero = (
         alt.Chart(pd.DataFrame({"x": [0]}))
@@ -199,77 +204,85 @@ def create_reg_chart():
             width="container",
             height=450,
             padding={"left": 10, "right": 10, "top": 20, "bottom": 20},
-            title=alt.Title(['Regression Analysis: Impact of Tract Features', 'on Total Number of Unique Reports'], fontSize=15),
+            title=alt.Title(
+                [
+                    "Regression Analysis: Impact of Tract Features",
+                    "on Total Number of Unique Reports",
+                ],
+                fontSize=15,
+            ),
         )
         .configure_axis(labelFontSize=18, titleFontSize=22)
     )
 
-    # chart = (
-    #     (x_zero + error_bars + points)
-    #     .properties(
-    #         width=600,
-    #         height=500,
-    #         title=alt.Title("Total Encampments Reported Per Tract", fontSize=30),
-    #     )
-    #     .configure_axis(labelFontSize=18, titleFontSize=22)
-    # )
     return chart.resolve_scale(color="independent")
 
 
-def scatter_encamp(
-    source_file: Path, start_date: str, end_date: str, col_name: str, agg: str = "mean"
-):
+def homeless_scatterplot(tract_id: str):
     """
     Add docstring
     """
 
+    df = pd.read_csv(MERGED)
 
-    df = pd.read_csv(source_file)
-    df["date"] = pd.to_datetime(df["date"])
+    df["tract"] = df["tract"].astype(str).str.zfill(11)
+
+    filtered_df = df[df["tract"] == tract_id]
+
+    chart = (
+        alt.Chart(filtered_df)
+        .mark_line(point=True)
+        .encode(x=alt.X("date:T"), y=alt.Y("estimate:Q"))
+        .properties(title="temporary title")
+    )
+
+    return chart
 
 
-    df = df.rename(
-            columns={
-                "tents": "Tents",
-                "vehicles": "Vehicles",
-                "structures": "Structures",
-                "tract": "Tract",
-                "date": "Date",
+def encampments_scatterplot(tract_id: str):
+    df = pd.read_csv(MERGED)
 
-            }
-        )    
+    df["tract"] = df["tract"].astype(str).str.zfill(11)
 
-
-    tract_select = alt.selection_point(
-            fields=['Tract'],
-            bind=alt.binding_select(options=list(df['Tract'].unique()), name='Select Tract') 
-        )
-
+    filtered_df = df[df["tract"] == tract_id]
 
     folded_chart = (
-            alt.Chart(df)
+            alt.Chart(filtered_df)
             .mark_line()
             .transform_fold(
-                fold= ['Structures', 'Tents', 'Vehicles'],
-                as_=["measurement", "value"],
-            ) .transform_filter(tract_select)
+                fold= ["Structures", "Tents", "Vehicles"],
+                as_=["measurement", "value"],)
             .encode(
-                x=alt.X("Date", type="temporal", timeUnit="yearmonth"),
-                y=alt.Y("value", type="quantitative"),
-                color=alt.Color("measurement", type="nominal"),
-            ).add_params(tract_select)
+                x=alt.X("date:T"),
+                y=alt.Y("value:Q"),
+                color=alt.Color("measurement:N"),
         )
-    folded_chart
-    
-    
+    )
 
-  
+    return folded_chart
 
 
-    
+def rent_scatterplot(zip_code: str):
+    df = pd.read_csv(CLEAN_ZILLOW)
+
+    df["zip"] = df["zip"].astype(str).str.zfill(5)
+
+    filtered_df = df[df["zip"] == zip_code]
+
+    chart = (
+            alt.Chart(filtered_df)
+            .mark_line()
+            .encode(
+                x=alt.X("date:T"),
+                y=alt.Y("rent:Q"),
+        )
+    )
+
+    return chart
+
 
 if __name__ == "__main__":
-    print(create_tract_map(MERGED, "2020-01", "2024-12", "estimate"))
+    print(create_tract_map("2020-01", "2024-12", "estimate"))
     # create_scatterplot(
     #     MERGED,
     #     "estimate",
@@ -277,4 +290,3 @@ if __name__ == "__main__":
     #     "median_rent",
     #     "mean",
     # )
-
