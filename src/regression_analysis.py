@@ -48,10 +48,8 @@ def run_reg():
     # 2. Fit the model with clustered standard errors
     results = model.fit(cov_type='cluster', cov_kwds={'groups': merged_df['geoid']})
 
-    # 3. Print the summary with the corrected standard errors and p-values
-    print(results.summary())
 
-    # 4. Test with year-month fixed effects
+    # 3. Test with year-month fixed effects
     model2 = smf.ols(formula='total_encampments ~ med_rent + med_hh_inc + white_pct  + tents + structures + vehicles + C(date)', data=merged_df)
     results2 = model2.fit(cov_type='cluster', cov_kwds={'groups': merged_df['geoid']})
     
