@@ -189,57 +189,9 @@ def create_reg_chart():
     #     .configure_axis(labelFontSize=18, titleFontSize=22)
     # )
     return chart.resolve_scale(color="independent")
-
-
-def scatter_encamp(
-    source_file: Path, start_date: str, end_date: str, col_name: str, agg: str = "mean"
-):
-    """
-    Add docstring
-    """
-
-
-    df = pd.read_csv(source_file)
-    df["date"] = pd.to_datetime(df["date"])
-
-
-    df = df.rename(
-            columns={
-                "tents": "Tents",
-                "vehicles": "Vehicles",
-                "structures": "Structures",
-                "tract": "Tract",
-                "date": "Date",
-
-            }
-        )    
-
-
-    tract_select = alt.selection_point(
-            fields=['Tract'],
-            bind=alt.binding_select(options=list(df['Tract'].unique()), name='Select Tract') 
-        )
-
-
-    folded_chart = (
-            alt.Chart(df)
-            .mark_line()
-            .transform_fold(
-                fold= ['Structures', 'Tents', 'Vehicles'],
-                as_=["measurement", "value"],
-            ) .transform_filter(tract_select)
-            .encode(
-                x=alt.X("Date", type="temporal", timeUnit="yearmonth"),
-                y=alt.Y("value", type="quantitative"),
-                color=alt.Color("measurement", type="nominal"),
-            ).add_params(tract_select)
-        )
-    folded_chart
-    
     
 
-  
-def amy_homeless_scatterplot(source_file: Path, tract_id: str):
+def homeless_scatterplot(source_file: Path, tract_id: str):
     """
     Add docstring
     """
@@ -260,7 +212,76 @@ def amy_homeless_scatterplot(source_file: Path, tract_id: str):
     )
 
     return chart
+
+
+def encampments_scatterplot(source_file: Path, tract_id: str):
+    df = pd.read_csv(source_file)
+
+    df["tract"] = df["tract"].astype(str).str.zfill(11)
+
+    filtered_df = df[df["tract"] == tract_id]
+
+    folded_chart = (
+            alt.Chart(filtered_df)
+            .mark_line()
+            .transform_fold(
+                fold= ["Structures", "Tents", "Vehicles"],
+                as_=["measurement", "value"],)
+            .encode(
+                x=alt.X("Date:T"),
+                y=alt.Y("value:Q"),
+                color=alt.Color("measurement:N"),
+        )
+    )
+
+    return folded_chart
     
+
+# def scatter_encamp(
+#     source_file: Path, start_date: str, end_date: str, col_name: str, agg: str = "mean"
+# ):
+#     """
+#     Add docstring
+#     """
+
+
+#     df = pd.read_csv(source_file)
+#     df["date"] = pd.to_datetime(df["date"])
+
+
+#     df = df.rename(
+#             columns={
+#                 "tents": "Tents",
+#                 "vehicles": "Vehicles",
+#                 "structures": "Structures",
+#                 "tract": "Tract",
+#                 "date": "Date",
+
+#             }
+#         )    
+
+
+#     tract_select = alt.selection_point(
+#             fields=['Tract'],
+#             bind=alt.binding_select(options=list(df['Tract'].unique()), name='Select Tract') 
+#         )
+
+
+#     folded_chart = (
+#             alt.Chart(df)
+#             .mark_line()
+#             .transform_fold(
+#                 fold= ['Structures', 'Tents', 'Vehicles'],
+#                 as_=["measurement", "value"],
+#             ) .transform_filter(tract_select)
+#             .encode(
+#                 x=alt.X("Date", type="temporal", timeUnit="yearmonth"),
+#                 y=alt.Y("value", type="quantitative"),
+#                 color=alt.Color("measurement", type="nominal"),
+#             ).add_params(tract_select)
+#         )
+#     folded_chart
+
 
 if __name__ == "__main__":
     print(create_tract_map(MERGED, "2020-01", "2024-12", "estimate"))
