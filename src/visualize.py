@@ -156,7 +156,7 @@ def create_reg_chart():
             ),
             tooltip=[
                 alt.Tooltip("variable:N", title="Variable"),
-                alt.Tooltip("coefficient:Q", title="Coefficient", format=".3f"),
+                alt.Tooltip("coefficient:Q", title="Coefficient (Unique 311 Reports)", format=".3f"),
                 alt.Tooltip("significant:N", title="Significant"),
             ],
         ))
@@ -174,7 +174,7 @@ def create_reg_chart():
             width="container",
             height=450,
             padding={"left": 10, "right": 10, "top": 20, "bottom": 20},
-            title=alt.Title(['"Regression Analysis: Impact of Tract Features', 'on Total Number of Unique Reports'], fontSize=15),
+            title=alt.Title(['Regression Analysis: Impact of Tract Features', 'on Total Number of Unique Reports'], fontSize=15),
         )
         .configure_axis(labelFontSize=18, titleFontSize=22)
     )
@@ -190,6 +190,58 @@ def create_reg_chart():
     # )
     return chart.resolve_scale(color="independent")
 
+
+def scatter_encamp(
+    source_file: Path, start_date: str, end_date: str, col_name: str, agg: str = "mean"
+):
+    """
+    Add docstring
+    """
+
+
+    df = pd.read_csv(source_file)
+    df["date"] = pd.to_datetime(df["date"])
+
+
+    df = df.rename(
+            columns={
+                "tents": "Tents",
+                "vehicles": "Vehicles",
+                "structures": "Structures",
+                "tract": "Tract",
+                "date": "Date",
+
+            }
+        )    
+
+
+    tract_select = alt.selection_point(
+            fields=['Tract'],
+            bind=alt.binding_select(options=list(df['Tract'].unique()), name='Select Tract') 
+        )
+
+
+    folded_chart = (
+            alt.Chart(df)
+            .mark_line()
+            .transform_fold(
+                fold= ['Structures', 'Tents', 'Vehicles'],
+                as_=["measurement", "value"],
+            ) .transform_filter(tract_select)
+            .encode(
+                x=alt.X("Date", type="temporal", timeUnit="yearmonth"),
+                y=alt.Y("value", type="quantitative"),
+                color=alt.Color("measurement", type="nominal"),
+            ).add_params(tract_select)
+        )
+    folded_chart
+    
+    
+
+  
+
+
+    
 
 if __name__ == "__main__":
     print(create_tract_map(MERGED, "2020-01", "2024-12", "estimate"))
