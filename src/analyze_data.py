@@ -15,7 +15,6 @@ TENTS_EST = 1.9
 STRUCTURES_EST = 1.7
 VEHICLES_EST = 1.6
 
-acs_df = pd.read_csv(SF_CENSUS_TRACTS)
 
 def generate_rent_by_zip_dict():
     """
@@ -114,15 +113,19 @@ def total_evictions_by_tract():
     return total_evic_per_mon
 
 
-def calculate_eviction_rate():
+def grab_acs_data():
+    acs_df = pd.read_csv(SF_CENSUS_TRACTS)
+    acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str).str.zfill(11)
+    return acs_df
+
+def calculate_eviction_rate(acs_df):
     """
     Divide total number of evictions within a tract for a given month
     by avg monthly num renter hh to get evictions rate
     return eviction_mon / rent_units
     """
-
+    acs_df = grab_acs_data()
     agg_eviction_df = total_evictions_by_tract()
-    acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str).str.zfill(11)
 
     merged = pd.merge(
         agg_eviction_df,
@@ -171,10 +174,11 @@ def count_encampments_by_tract():
     )
 
 
-def generate_tidy_csv():
+def generate_tidy_csv(acs_df):
     """
     Add docstring
     """
+    acs_df = grab_acs_data()
     # Convert monthly median rent per SF census tract dictionary into rows of tidy CSV
     rent_by_zip = generate_rent_by_zip_dict()
     crosswalks = generate_crosswalks_dict()
@@ -192,10 +196,6 @@ def generate_tidy_csv():
     tidy_df = pd.DataFrame(data)
 
     census_tracts = tidy_df["tract"].unique()
-
-    acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str)
-    # Ensure tract is 11 characters (add 0 to front as needed)
-    acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].str.zfill(11)
 
     # Scale calculated monthly median rent by census median rent value (one value
     # for 2020-2024)

@@ -2,7 +2,10 @@ import pandas as pd
 import geopandas as gpd
 import altair as alt
 from pathlib import Path
+
 from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
+
+# from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
 
 def create_tract_map(
@@ -236,8 +239,27 @@ def scatter_encamp(
     
 
   
+def amy_homeless_scatterplot(source_file: Path, tract_id: str):
+    """
+    Add docstring
+    """
 
+    df = pd.read_csv(source_file)
 
+    df["tract"] = df["tract"].astype(str).str.zfill(11)
+
+    filtered_df = df[df["tract"] == tract_id]
+
+    chart = (
+        alt.Chart(filtered_df)
+        .mark_line(point=True)
+        .encode(
+            x=alt.X("date:T"),
+            y=alt.Y("estimate:Q"))
+        .properties(title="temporary title")
+    )
+
+    return chart
     
 
 if __name__ == "__main__":
