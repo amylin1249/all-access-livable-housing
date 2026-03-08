@@ -119,7 +119,7 @@ def grab_acs_data():
     return acs_df
 
 
-def calculate_eviction_rate(acs_df):
+def calculate_eviction_rate():
     """
     Divide total number of evictions within a tract for a given month
     by avg monthly num renter hh to get evictions rate
@@ -175,7 +175,7 @@ def count_encampments_by_tract():
     )
 
 
-def generate_tidy_csv(acs_df):
+def generate_tidy_csv():
     """
     Add docstring
     """

@@ -62,9 +62,9 @@ def main():
             "Matched all point data to tracts for those that fall within a matching SF tract"
         )
 
-        # Run function from analyze module to generate a consolidated data file with key metrics for visualization
-        generate_tidy_csv()
-        print("Generated a consolidated CSV to be used in visualization")
+        # # Run function from analyze module to generate a consolidated data file with key metrics for visualization
+        # generate_tidy_csv()
+        # print("Generated a consolidated CSV to be used in visualization")
 
     # Run dashboard with interactive visualizations
     if args.dashboard:
