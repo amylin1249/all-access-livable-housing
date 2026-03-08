@@ -188,15 +188,6 @@ def create_reg_chart():
         .configure_axis(labelFontSize=18, titleFontSize=22)
     )
 
-    # chart = (
-    #     (x_zero + error_bars + points)
-    #     .properties(
-    #         width=600,
-    #         height=500,
-    #         title=alt.Title("Total Encampments Reported Per Tract", fontSize=30),
-    #     )
-    #     .configure_axis(labelFontSize=18, titleFontSize=22)
-    # )
     return chart.resolve_scale(color="independent")
 
 
@@ -229,7 +220,6 @@ def encampments_scatterplot(tract_id: str):
     filtered_df = df[df["tract"] == tract_id]
 
     folded_chart = (
-<<<<<<< HEAD
             alt.Chart(filtered_df)
             .mark_line()
             .transform_fold(
@@ -239,18 +229,6 @@ def encampments_scatterplot(tract_id: str):
                 x=alt.X("date:T"),
                 y=alt.Y("value:Q"),
                 color=alt.Color("measurement:N"),
-=======
-        alt.Chart(filtered_df)
-        .mark_line()
-        .transform_fold(
-            fold=["Structures", "Tents", "Vehicles"],
-            as_=["measurement", "value"],
-        )
-        .encode(
-            x=alt.X("Date:T"),
-            y=alt.Y("value:Q"),
-            color=alt.Color("measurement:N"),
->>>>>>> 3028bb6e564a481d967e84239ffc2c917599cb20
         )
     )
 
@@ -273,42 +251,7 @@ def rent_scatterplot(zip_code: str):
         )
     )
 
-<<<<<<< HEAD
     return chart
-=======
-#     df = df.rename(
-#             columns={
-#                 "tents": "Tents",
-#                 "vehicles": "Vehicles",
-#                 "structures": "Structures",
-#                 "tract": "Tract",
-#                 "date": "Date",
-
-#             }
-#         )
-
-
-#     tract_select = alt.selection_point(
-#             fields=['Tract'],
-#             bind=alt.binding_select(options=list(df['Tract'].unique()), name='Select Tract')
-#         )
-
-
-#     folded_chart = (
-#             alt.Chart(df)
-#             .mark_line()
-#             .transform_fold(
-#                 fold= ['Structures', 'Tents', 'Vehicles'],
-#                 as_=["measurement", "value"],
-#             ) .transform_filter(tract_select)
-#             .encode(
-#                 x=alt.X("Date", type="temporal", timeUnit="yearmonth"),
-#                 y=alt.Y("value", type="quantitative"),
-#                 color=alt.Color("measurement", type="nominal"),
-#             ).add_params(tract_select)
-#         )
-#     folded_chart
->>>>>>> 3028bb6e564a481d967e84239ffc2c917599cb20
 
 
 if __name__ == "__main__":
