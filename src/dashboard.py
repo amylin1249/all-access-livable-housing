@@ -16,7 +16,6 @@ from .datatypes import MERGED
 #     col_name="eviction_rate",
 # )
 
-<<<<<<< HEAD
 # homeless_scatterplot = create_homeless_scatterplot(
 #     source_file=MERGED,
 #     tract_id="tract_id"
@@ -74,11 +73,6 @@ from .datatypes import MERGED
 #     return folded_chart
     
 app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH],suppress_callback_exceptions=True)
-=======
-app = Dash(
-    __name__, external_stylesheets=[dbc.themes.MORPH], suppress_callback_exceptions=True
-)
->>>>>>> b4f756848a5114f80f8eeae872f9ad4a49541f9c
 
 app.layout = html.Div(
     [
@@ -566,22 +560,16 @@ def update_regression(tab_value):
 
     return new_reg.to_dict(), reg_title
 
-<<<<<<< HEAD
 @app.callback(
     [Output("rent-scatter-plot", "spec")],
     [Input("tabs-content", "value")]
 )
-=======
-
-@app.callback(Output("rent-scatter-plot", "spec"), [Input("tabs-content", "value")])
->>>>>>> b4f756848a5114f80f8eeae872f9ad4a49541f9c
 def update_rent_scatter(tab_value):
     if tab_value != "tab-rent":
         raise dash.exceptions.PreventUpdate
     return {}
 
 
-<<<<<<< HEAD
 @app.callback(
     [
         Output("homeless-1", "spec"), 
@@ -589,9 +577,6 @@ def update_rent_scatter(tab_value):
     ],
     [Input("tabs-content", "value")]
 )
-=======
-@app.callback(Output("homeless-scatter-plot", "spec"), [Input("tabs-content", "value")])
->>>>>>> b4f756848a5114f80f8eeae872f9ad4a49541f9c
 def update_homeless_scatter(tab_value):
     if tab_value != "tab-homeless":
         raise dash.exceptions.PreventUpdate
