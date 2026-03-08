@@ -42,7 +42,7 @@ RAW_CROSSWALKS = Path(__file__).parent.parent / "raw-data/raw_crosswalks"
 CLEAN_EVICTIONS = Path(__file__).parent.parent / "clean-data/api_evictions_data.csv"
 CLEAN_ENCAMP = Path(__file__).parent.parent / "clean-data/clean_encampments_data.csv"
 CLEAN_311 = Path(__file__).parent.parent / "clean-data/clean_311_data.csv"
-CLEAN_ZILLOW = Path(__file__).parent.parent / "clean-data/clean_311_zillow_data.csv"
+CLEAN_ZILLOW = Path(__file__).parent.parent / "clean-data/clean_zillow_data.csv"
 CLEAN_CROSSWALKS = Path(__file__).parent.parent / "clean-data/clean_crosswalks.csv"
 
 

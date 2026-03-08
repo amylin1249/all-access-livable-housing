@@ -15,6 +15,7 @@ TENTS_EST = 1.9
 STRUCTURES_EST = 1.7
 VEHICLES_EST = 1.6
 
+acs_df = pd.read_csv(SF_CENSUS_TRACTS)
 
 def generate_rent_by_zip_dict():
     """
@@ -119,7 +120,6 @@ def calculate_eviction_rate():
     by avg monthly num renter hh to get evictions rate
     return eviction_mon / rent_units
     """
-    acs_df = pd.read_csv(SF_CENSUS_TRACTS)
 
     agg_eviction_df = total_evictions_by_tract()
     acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str).str.zfill(11)
@@ -190,6 +190,20 @@ def generate_tidy_csv():
             data.append(dict)
 
     tidy_df = pd.DataFrame(data)
+
+    census_tracts = tidy_df["tract"].unique()
+
+    acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str)
+    # Ensure tract is 11 characters (add 0 to front as needed)
+    acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].str.zfill(11)
+
+    # Scale calculated monthly median rent by census median rent value (one value
+    # for 2020-2024)
+    for tract in census_tracts:
+        median_rent_col = tidy_df[tidy_df["tract"] == tract]["median_rent"]
+        avg_rent = median_rent_col.mean()
+        scaling_factor = acs_df.loc[acs_df["TL_GEO_ID"] == tract, "med_rent"].item() / avg_rent
+        median_rent_col = scaling_factor * median_rent_col
 
     # Merge eviction data
     eviction_records = calculate_eviction_rate()
