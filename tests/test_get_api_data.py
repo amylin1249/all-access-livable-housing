@@ -1,5 +1,4 @@
 import pytest
-from datetime import datetime
 from src.get_api_data import get_evictions_data
 
 
@@ -10,7 +9,7 @@ def eviction_results():
 
 def test_api_fetch(eviction_results):
     assert isinstance(eviction_results, list)
-    assert len(eviction_results) > 0
+    assert len(eviction_results)
 
 
 def test_api_conversion(eviction_results):

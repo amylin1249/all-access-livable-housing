@@ -4,6 +4,7 @@ import pandas as pd
 import geopandas as gpd
 from pathlib import Path
 from datetime import datetime
+import warnings
 from .datatypes import (
     RAW_SF_TRACTS,
     RAW_ACS_POP,
@@ -345,7 +346,8 @@ def generate_encampments_csv():
 
     # Filter for years of interest: 2020-2024
     df["date"] = pd.to_datetime(df["date"])
-    df = df[df["date"].between("2020-01-01", "2024-12-31")]
+    # Include Jan 2025 to successfully interpolate for last few months of 2024
+    df = df[df["date"].between("2020-01-01", "2025-01-31")]
 
     # Convert date to standardized format: YYYY-MM
     df["date"] = df["date"].dt.strftime("%Y-%m")
@@ -426,7 +428,11 @@ def process_crosswalks_xlsx(file_path, zips, tracts):
     Returns:
         filtered_df: Pandas dataframe
     """
-    df = pd.read_excel(file_path, engine="openpyxl")
+    # Suppress Excel warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
+        df = pd.read_excel(file_path, engine="openpyxl")
+
     zip_col = None
     # Pull zip, tract, and res_ratio columns
     for column in df.columns:
