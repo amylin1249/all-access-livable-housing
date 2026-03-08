@@ -22,7 +22,6 @@ from datatypes import (
 
 def run_reg():
     # Step 1: Load in encampmment-tract crosswalk
-    breakpoint
     df_crosswalk = pd.read_csv(JOINED_ENCAMP_TRACTS)
     
     # Step 2: Aggregate up to the quarter date, tract level
@@ -56,6 +55,6 @@ def run_reg():
     model2 = smf.ols(formula='total_encampments ~ med_rent + med_hh_inc + white_pct  + tents + structures + vehicles + C(date)', data=merged_df)
     results2 = model2.fit(cov_type='cluster', cov_kwds={'groups': merged_df['geoid']})
     
-    return results2.summary()
+    return results2
 
 
