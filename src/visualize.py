@@ -97,8 +97,16 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
         .interactive()
     )
 
+<<<<<<< Updated upstream
     return background + chart
 
+=======
+    #return background + chart.resolve_scale(color="independent").configure_view(stroke=None)
+    combined_chart = (background + chart).resolve_scale(color="independent")
+    
+    # 🎯 여기서 마지막에 딱 한 번만 설정을 입혀줍니다.
+    return combined_chart.configure_view(stroke=None)
+>>>>>>> Stashed changes
 
 def create_reg_chart():
 

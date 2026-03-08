@@ -19,68 +19,22 @@ try:
 except:
     all_zips = []
 
-# map_chart = create_tract_map(
-#     source_file=MERGED,
-#     start_date="2020-01",
-#     end_date="2024-12",
-#     col_name="eviction_rate",
-# )
+map_chart = create_tract_map(
+    start_date="2020-01",
+    end_date="2024-12",
+    col_name="eviction_rate",
+)
 
-# homeless_scatterplot = create_homeless_scatterplot(
-#     source_file=MERGED,
-#     tract_id="tract_id"
-# )
+homeless_scatterplot = create_homeless_scatterplot(
+    source_file=MERGED,
+    tract_id="tract_id"
+)
 
-# encampments_scatterplot = create_encampments_scatterplot(
-#     source_file=MERGED,
-#     tract_id="tract_id"
-# )
+encampments_scatterplot = create_encampments_scatterplot(
+    source_file=MERGED,
+    tract_id="tract_id"
+)
 
-
-#     def homeless_scatterplot(source_file: Path, tract_id: str):
-#     """
-#     Add docstring
-#     """
-
-#     df = pd.read_csv(source_file)
-
-#     df["tract"] = df["tract"].astype(str).str.zfill(11)
-
-#     filtered_df = df[df["tract"] == tract_id]
-
-#     chart = (
-#         alt.Chart(filtered_df)
-#         .mark_line(point=True)
-#         .encode(
-#             x=alt.X("date:T"),
-#             y=alt.Y("estimate:Q"))
-#         .properties(title="temporary title")
-#     )
-
-#     return chart
-
-
-# def encampments_scatterplot(source_file: Path, tract_id: str):
-#     df = pd.read_csv(source_file)
-
-#     df["tract"] = df["tract"].astype(str).str.zfill(11)
-
-#     filtered_df = df[df["tract"] == tract_id]
-
-#     folded_chart = (
-#             alt.Chart(filtered_df)
-#             .mark_line()
-#             .transform_fold(
-#                 fold= ["Structures", "Tents", "Vehicles"],
-#                 as_=["measurement", "value"],)
-#             .encode(
-#                 x=alt.X("Date:T"),
-#                 y=alt.Y("value:Q"),
-#                 color=alt.Color("measurement:N"),
-#         )
-#     )
-
-#     return folded_chart
     
 app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH],suppress_callback_exceptions=True)
 
@@ -581,12 +535,14 @@ def update_regression(tab_value):
 
     return new_reg.to_dict(), reg_title
 
+# tab3
 @app.callback(
     [Output("rent-scatter-plot", "spec")],
-    [Input("tabs-content", "value")]
+    [Input("tabs-content", "value"),
+     Input("zip-dropdown", "value")]
 )
 def update_rent_scatter(tab_value, selected_zip):
-    if tab_value != "tab-rent":
+    if tab_value != "tab-rent" or not selected_zip:
         raise dash.exceptions.PreventUpdate
     rent_scatterplot = create_rent_scatterplot(
         zip_code=selected_zip
