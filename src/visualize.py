@@ -2,10 +2,7 @@ import pandas as pd
 import geopandas as gpd
 import altair as alt
 from pathlib import Path
-
-from datatypes import MERGED_SF_TRACTS_SHP, MERGED
-
-# from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
+from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
 
 def create_tract_map(
