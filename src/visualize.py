@@ -230,8 +230,8 @@ def create_homeless_scatterplot(tract_id: str):
     chart = (
         alt.Chart(filtered_df)
         .mark_line(point=True)
-        .encode(x=alt.X("date:T"), y=alt.Y("estimate:Q"))
-        .properties(title="temporary title")
+        .encode(x=alt.X("date:T", title = "Date"), y=alt.Y("estimate:Q", title = "Homeless Population Estimate"))
+        .properties(title=f"Homeless population estimate over time in census tract {tract_id}")
     )
 
     return chart
@@ -253,9 +253,9 @@ def create_encampments_scatterplot(tract_id: str):
             .encode(
                 x=alt.X("date:T"),
                 y=alt.Y("value:Q"),
-                color=alt.Color("measurement:N"),
+                color=alt.Color("measurement:N"))
+            .properties(title=f"temporary title")
         )
-    )
 
     return folded_chart
 
@@ -269,11 +269,11 @@ def create_rent_scatterplot(zip_code: str):
 
     chart = (
             alt.Chart(filtered_df)
-            .mark_line()
+            .mark_line(point=True)
             .encode(
-                x=alt.X("date:T"),
-                y=alt.Y("rent:Q"),
+                x=alt.X("date:T", title = "Date"),
+                y=alt.Y("rent:Q", title = "Median rent (per month)"))
+            .properties(title=f"Median rent (per month) over time in zip code {zip_code}")
         )
-    )
 
     return chart
