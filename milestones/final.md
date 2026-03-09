@@ -31,10 +31,6 @@ Key gaps or challenges include:
 The data flows through a centralized pipeline starting with automated API extraction and CSV loading, followed by a transformation stage where ZIP-level ZORI data is crosswalked to Census Tracts and scaled using ACS median rent values to adjust local median rent variations. 311 calls and eviction records are grouped by month and tract to calculate monthly rates. Quarterly encampment data is interpolated to fill monthly gaps for tents, structures, and vehicles. A weighted homelessness estimate is calculated using predefined conservative multipliers for different encampment types. All processed streams are merged into a single Tidy CSV (merged_data.csv) regression analysis, spatial join, visualization and dashboard.
 
 In order to understand this project, one would need to know that our project required interpolation in order to get all of our data onto the same spatial and temporal scale. While the original data sources may be on the zip code or quarterly levels, we normalized all data to the monthly census tract level. In addition, it's important to note that the quarterly encampment counts data required emailing with the SF Open Data Portal to get access to the underlying data. While a PowerBI map is regularly updated, the underlying data linked to the map is not. 
-<<<<<<< HEAD
-
-=======
->>>>>>> b17fea0b32a81627a83b7a6954f2280bdd14c64f
 
 ## Project Structure
 Write a page or so describing the structure of your project. What modules exist? What do they do? A diagram may be helpful here.
