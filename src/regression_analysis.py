@@ -7,12 +7,7 @@ import altair as alt
 import geopandas as gpd
 from pathlib import Path
 from datetime import datetime
-<<<<<<< HEAD
-from datatypes import (
-  
-=======
 from .datatypes import (
->>>>>>> 46936f3dccbf3ab648f8f4479bb4f6c64122a606
     CLEAN_311,
     CLEAN_ENCAMP,
     CLEAN_ZILLOW,
