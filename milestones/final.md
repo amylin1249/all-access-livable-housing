@@ -1,7 +1,6 @@
 # Project: All Access Livable Housing
 
 ## Members
-
 - Haeji Ahn <ahaeji925@uchicago.edu>
 - Lily Hoffman <lshoffman@uchicago.edu>
 - Amy Lin <amsylin@uchicago.edu>
@@ -9,47 +8,25 @@
 
 
 ## Data Documentation
-List the sources of data, any gaps or challenges in the data. Explain how data flows through the project. What else would someone picking this project up for the first time need to understand?
-
-Sources of data
+Sources of data and any key gaps include:
 #1: DataSF Open Data Portal
-    #1.1: 311 Cases
-    #1.2: Quarterly count of tents, structures, and lived-in vehicles
+    #1.1: 311 Cases - Deduplicating data was required
+    #1.2: Quarterly count of tents, structures, and lived-in vehicles - Data interpolocation was required
     #1.3: Evictions data
-#2: Census Data
+#2: Census Data - Negative values were present for rent and household income, requiring us to manually impute these values.
     #2.1: ACS data on rental costs and demographic data
     #2.2: Listing and geographic boundaries of census tracts in SF
-#3: Zillow Observed Renter Index (ZORI)
-#4: HUD Crosswalks
+#3: Zillow Observed Renter Index (ZORI) - Data was missing and required us to impute these values.
+#4: HUD Crosswalks - Columns were inconsistently name; data was separated across Excel files, and there was missing data that required us to impute.
 #5: Sacramento 2024 PIT Count Report
-
-Key gaps or challenges include: 
-- #1 DataSF Open Data Portal:
-    - Encampments: Interpolating data
-    - 311: deduplicating
-- #2 Census Data: Negative values were present in a few tracts for metrics such as rent and household income, requiring us to manually impute these values with the mean of the positive values in the dataset.
-- #3 Zillow: Missing data
-- #4 HUD Crosswalks: Inconsistently named columns, separated excel files, missing data
-
 
 The data flows through a centralized pipeline starting with automated API extraction and CSV loading, followed by a transformation stage where ZIP-level ZORI data is crosswalked to Census Tracts and scaled using ACS median rent values to adjust local median rent variations. 311 calls and eviction records are grouped by month and tract to calculate monthly rates. Quarterly encampment data is interpolated to fill monthly gaps for tents, structures, and vehicles. A weighted homelessness estimate is calculated using predefined conservative multipliers for different encampment types. All processed streams are merged into a single Tidy CSV (merged_data.csv) regression analysis, spatial join, visualization and dashboard.
 
 In order to understand this project, one would need to know that our project required interpolation in order to get all of our data onto the same spatial and temporal scale. While the original data sources may be on the zip code or quarterly levels, we normalized all data to the monthly census tract level. In addition, it's important to note that the quarterly encampment counts data required emailing with the SF Open Data Portal to get access to the underlying data. While a PowerBI map is regularly updated, the underlying data linked to the map is not. 
 
-## Project Structure
-Write a page or so describing the structure of your project. What modules exist? What do they do? A diagram may be helpful here.
 
-Tree structure of first level of directories and files in root:
-├── README.md
-├── __pycache__
-├── clean-data
-├── milestones
-├── pyproject.toml
-├── raw-data
-├── scratch
-├── src
-├── tests
-└── uv.lock
+## Project Structure
+The roots consists mainly of src (directory containing our source files), and other key directories (tests, raw-data, clean-data).
 
 Tree structure of first level of directories and files in src:
 ├── __init__.py
@@ -63,7 +40,7 @@ Tree structure of first level of directories and files in src:
 ├── spatial_join.py
 └── visualize.py
 
-Focusing on the src directory where we have our source code, we have 7 main modules spanning 3 key sections that later feed into __main__.py. The 3 key sections are as follows:
+Focusing on the src directory, we have 7 main modules spanning 3 key sections that feed into __main__.py. The 3 key sections are:
 1. Retrieving data (get_api_data)
 2. Cleaning and processing data (process_data, spatial_join, analyze_data, run_regression)
 3. Visualizing data (visualize, dashboard)
@@ -71,9 +48,9 @@ The above modules are supported by datatypes, which contain global variables use
 
 Our project pipeline begins with data retrieval. The get_api_data module retrieves eviction data from an external API and saves the results to a CSV file for use in subsequent steps.
 
-The next stage focuses on data cleaning and processing, beginning with the process_data module. This module processes and merges ACS data with census tract shapefiles, cleans encampments and 311 homelessness reports data, filters and imputes missing Zillow data, and processes crosswalks Excel files. Processing the ACS files requires imputing negative values, while cleaning the 311 encampment reports involves additional address string processing and the removal of duplicate latitude–longitude–month combinations. This ensures that we measure the unique number of encampments reported in a given month, rather than simply counting the total number of reports submitted. Processing the crosswalks files also requires interpolation and matching ZIP code-level data to census tracts in order to obtain tract-level estimates. More broadly, this module deduplicates key variables, standardizes selected fields, and exports the cleaned datasets as CSV files and shapefiles in the cleaned-data folder.
+The next stage focuses on data cleaning and processing, beginning with the process_data module. This module processes and merges ACS data with census tract shapefiles, cleans encampments and 311 homelessness reports data, filters and imputes missing Zillow data, and processes crosswalks Excel files. Processing the ACS files requires imputing negative values, while cleaning the 311 encampment reports involves additional address string processing and the removal of duplicate latitude–longitude–month combinations. Processing the crosswalks files also requires interpolation and matching ZIP code-level data to census tracts in order to obtain tract-level estimates. More broadly, this module deduplicates key variables, standardizes selected fields, and exports the cleaned datasets as CSV files and shapefiles in the cleaned-data folder.
 
-The next processing step is implemented in the spatial_join module, which applies the quadtree-based spatial matching algorithm to match point latitude-longitude coordinates to their appropriate census tract polygons. This approach was adapted from PA4 and modified to fit the specifications of our project. We apply this procedure to three cleaned datasets: evictions (api_evictions_data.csv), quarterly encampments (clean_encampments_data.csv), and 311 reports (clean_311_data.csv). The module outputs three files, each pertaining to a cleaned dataset, with an additional column that has the matched tract ID. 
+The next processing step is implemented in the spatial_join module, which applies the quadtree-based spatial matching algorithm to match point latitude-longitude coordinates to their appropriate census tract polygons. This approach was adapted from PA4 and modified to fit the specifications of our project. We apply this procedure to three cleaned datasets on evictions, quarterly encampments, and 311 reports, outputting three files, each pertaining to a cleaned dataset, with an additional column that has the matched tract ID. 
 
 Under data processing, the analyze_data module then aggregates counts from the spatially joined datasets to compute the total counts for each tract. It also combines all calculated metrics into a consolidated dataset, which forms the basis for our analysis and visualizations.
 
@@ -95,7 +72,7 @@ The above modules feed into our __main__.py file, which allows the entire pipeli
 - Calculated tract-level eviction rates by merging multi-source datasets and structuring results into a unified data dictionary
 - Wrote `pytest` tests to validate the accuracy of data extraction, filtering, and mathematical calculations.
 - Refactored core map, plots, regression codes of visualizing to optimize visualization performance and ensure seamless interactivity within the dashboard
-- Spearheaded the development of a dashboard, designing the main interface and logic to synthesize housing and homelessness metrics into a functional user experience
+- Spearheaded the development of a dashboard, designing the main interface and logic to synthesize housing and homelessness metrics 
 
 ### Lily
 - Wrote the initial draft of the clean encampment process and clean 311 process
@@ -119,14 +96,12 @@ The above modules feed into our __main__.py file, which allows the entire pipeli
 
 
 ## Final thoughts
-Reflect on what the project intended to accomplish and what it did.
-
 Our project set out to examine the relationship between the number of unsheltered individuals and housing prices in San Francisco from 2020 to 2024 at the census tract level. Specifically, we sought to have a better understanding on the spatial patterns of homelessness across the city, and  the drivers that affect variation in homelessness across tracts. 
 
 Through this project, we constructed our data pipeline from the ground up, retrieving data from multiple sources (including bulk datasets from the DataSF Open Data Portal, ACS data, and API for evictions data). We then cleaned and processed these datasets using skills that we learnt in class, such as string cleaning to standardize data formats, interpolation to increase temporal granularity, and quadtrees to improve data efficiency. We also created visualizations using tools introduced in class and developed an interactive dashboard using additional tools that we independently researched.
 
-We managed to produce several intersting insights on the relationship between homelessness and rent prices patterns, as well as individual trends in both variables during the period of analysis, such as during the COVID-19 pandemic. We also observed clear spatial concentrations of homelessness in certain tracts, particularly in the Tenderloin and the Mission. At the same time, our analysis showed that the distribution of homelessness has gradually shifted South toward areas such as India Basin in Bayview Hunters Point, with a growing proportion of individuals residing in vehicles rather than tents. This shift could be due to policy changes in recent years that targeted tents but led to increases in vehicle-based homelessness. 
+We managed to produce several intersting insights and observed clear spatial concentrations of homelessness in certain tracts, such as in the Tenderloin and the Mission. At the same time, our analysis showed that the distribution of homelessness has gradually shifted South toward areas such as India Basin in Bayview Hunters Point, with a growing proportion of individuals residing in vehicles rather than tents. This shift could be due to policy changes in recent years that targeted tents but led to increases in vehicle-based homelessness. 
 
 We also conducted statistical analyses examining correlations between demographics, official encampment counts, and citizen-reported encampments. One key observation was that tracts with a higher percentage of White residents seemed to have higher numbers of citizen-reported encampments. 
 
-Beyond these findings, this project enabled us to further develop our technical and analytical skills. We applied foundational skills that we learnt in CAPP30121, while building on the more advanced skills introduced in CAPP30122 through lectures and assignments. These included retrieving data, cleaning and processing data, spatial analysis, and visualizing data. Overall, this project has truly helped us consolidate technical skills that we have developed over the last two quarters and produce analyses related to real-world issues. 
+Beyond these findings, this project enabled us to further develop our technical and analytical skills that we learnt in CAPP30121 and CAPP30122. These included retrieving data, cleaning and processing data, spatial analysis, and visualizing data. Overall, this project has truly helped us consolidate technical skills that we have developed over the last two quarters and produce analyses related to real-world issues. 
