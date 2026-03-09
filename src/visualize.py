@@ -92,7 +92,7 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
             from_=alt.LookupData(filtered_df, "tract", ["metric"]),
         )
         .project("albersUsa")
-        # .properties(width="container", height=550)
+        .properties(width="container", height=550)
         # .configure_view(stroke=None)
         .interactive()
     )
@@ -215,6 +215,23 @@ def create_reg_chart():
 
     return chart.resolve_scale(color="independent")
 
+def create_rent_scatterplot(zip_code: str):
+    df = pd.read_csv(CLEAN_ZILLOW)
+
+    df["zip"] = df["zip"].astype(str).str.zfill(5)
+
+    filtered_df = df[df["zip"] == zip_code]
+
+    chart = (
+            alt.Chart(filtered_df)
+            .mark_line(point=True)
+            .encode(
+                x=alt.X("date:T", title = "Date"),
+                y=alt.Y("rent:Q", title = "Median rent (per month)",scale=alt.Scale(zero=False)))
+            .properties(width="container", height=450,autosize=alt.AutoSizeParams(type='fit', contains='padding'))
+        )
+
+    return chart
 
 def create_homeless_scatterplot(tract_id: str):
     """
@@ -231,8 +248,8 @@ def create_homeless_scatterplot(tract_id: str):
         alt.Chart(filtered_df)
         .mark_line(point=True)
         .encode(x=alt.X("date:T", title = "Date"), y=alt.Y("estimate:Q", title = "Homeless Population Estimate"))
-        .properties(title=f"Homeless population estimate over time in census tract {tract_id}")
-    )
+        .properties(width="container", height=450, autosize=alt.AutoSizeParams(type='fit', contains='padding'))
+     )
 
     return chart
 
@@ -251,29 +268,11 @@ def create_encampments_scatterplot(tract_id: str):
                 fold= ["structures", "tents", "vehicles"],
                 as_=["measurement", "value"],)
             .encode(
-                x=alt.X("date:T"),
+                x=alt.X("date:T", axis=alt.Axis(format="%Y", tickCount=12, labelAngle=0)),
                 y=alt.Y("value:Q"),
                 color=alt.Color("measurement:N"))
-            .properties(title=f"temporary title")
+            .properties(width="container", height=350)
         )
 
     return folded_chart
 
-
-def create_rent_scatterplot(zip_code: str):
-    df = pd.read_csv(CLEAN_ZILLOW)
-
-    df["zip"] = df["zip"].astype(str).str.zfill(5)
-
-    filtered_df = df[df["zip"] == zip_code]
-
-    chart = (
-            alt.Chart(filtered_df)
-            .mark_line(point=True)
-            .encode(
-                x=alt.X("date:T", title = "Date"),
-                y=alt.Y("rent:Q", title = "Median rent (per month)"))
-            .properties(title=f"Median rent (per month) over time in zip code {zip_code}")
-        )
-
-    return chart
