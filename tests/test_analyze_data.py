@@ -60,7 +60,7 @@ def merged_data():
     return df
 
 
-def test_tidy_col_num(processed_data):
+def test_tidy_col_num(merged_data):
     expected_columns = [
         "date",
         "tract",
@@ -72,7 +72,7 @@ def test_tidy_col_num(processed_data):
         "vehicles",
         "estimate",
     ]
-    actual_columns = processed_data.columns.tolist()
+    actual_columns = merged_data.columns.tolist()
 
     assert len(actual_columns) == len(expected_columns)
 
@@ -80,8 +80,8 @@ def test_tidy_col_num(processed_data):
         assert col in actual_columns
 
 
-def test_homelessness_estimate_calculation(processed_data):
-    sample = processed_data.iloc[0]
+def test_homelessness_estimate_calculation(merged_data):
+    sample = merged_data.iloc[0]
     expected_estimate = (
         sample["tents"] * TENTS_EST
         + sample["structures"] * STRUCTURES_EST
