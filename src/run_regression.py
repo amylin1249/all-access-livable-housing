@@ -10,7 +10,7 @@ from .datatypes import (
 def run_reg():
     """
     Runs a regression to understand the relationship between tract features and
-    the unique number of reporte 311 addresses in a month
+    the unique number of reported 311 addresses in a given month witih available point estimates
 
     Parameters:
         Read in several cleaned data files for process, including

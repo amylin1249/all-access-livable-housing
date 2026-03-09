@@ -15,12 +15,28 @@ List the sources of data, any gaps or challenges in the data. Explain how data f
 ## Project Structure
 Write a page or so describing the structure of your project. What modules exist? What do they do? A diagram may be helpful here.
 
+The first module in our data pipeline, process_data, imports the raw datasets, deduplicates key variables,standardizes selected fields, and exports the cleaned output to a CSV file in the cleaned-data folder. 
+Cleaning the 311 encampment reports requires additional processing of address strings and the removal of 
+duplicate latitude–longitude–month combinations. This step ensures that we measure the unique number of 
+encampments reported in a given month, rather than simply counting the total number of reports submitted. 
+
+To include: Overview of process_acs_data and get_sf_geoid, create_sf_shapefiles. 
+
+The second component of our pipeline is spatial_join.py, which implements the quadtree-based spatial matching algoirthm developed in our programming assignment. 
+This script matches point lat/lon coordinates to their appropriate census tract polygons. We apply this procedure to three cleaned datasets: the eviction records, 
+the quarterly encampment estimates, and 311 encampment reports.
 
 
 ## Team responsibilities
 
 ### Haeji
-- 
+- Processed and filtered Zillow Observed Renter Index (ZORI) data to analyze longitudinal rental trends across 23 San Francisco ZIP codes from 2020 to 2024
+- Built an automated API pipeline to retrieve, filter, and store real-time eviction records of SF into standardized CSV formats.
+- Defined a weighted estimation logic using PIT data to calculate unsheltered population counts across various housing types
+- Calculated tract-level eviction rates by merging multi-source datasets and structuring results into a unified data dictionary
+- Wrote 'pytest' tests to validate the accuracy of data extraction, filtering, and mathematical calculations.
+- Refactored core plotting code of visualizing to optimize visualization performance and ensure seamless interactivity within the dashboard
+- Spearheaded the development of a dashboard, designing the main interface and logic to synthesize housing and homelessness metrics into a functional user experience
 
 ### Lily
 - Wrote the initial draft of the clean encampment process and clean 311 process
