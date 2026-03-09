@@ -111,7 +111,7 @@ def count_evictions_by_tract() -> pd.DataFrame:
 
     Returns:
         A pandas.DataFrame object aggregating the number of evictions by tract
-        and month
+        and month.
     """
     evictions_df = pd.read_csv(JOINED_EVICTIONS_TRACTS)
 
@@ -127,7 +127,7 @@ def generate_acs_df() -> pd.DataFrame:
     Convert SF census tracts' ACS data from CSV to DataFrame.
     
     Returns:
-        A pandas.DataFrame object with SF census tracts' ACS data
+        A pandas.DataFrame object with SF census tracts' ACS data.
     """
     acs_df = pd.read_csv(SF_CENSUS_TRACTS)
     acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str).str.zfill(11)
