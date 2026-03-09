@@ -1,12 +1,16 @@
 from dash import Dash, html, dcc, Input, Output, exceptions
 import dash_bootstrap_components as dbc
-from .visualize import create_tract_map, create_reg_chart, create_rent_scatterplot, create_homeless_scatterplot, create_encampments_scatterplot
+from .visualize import (
+    create_tract_map,
+    create_reg_chart,
+    create_rent_scatterplot,
+    create_homeless_scatterplot,
+    create_encampments_scatterplot,
+)
 import dash_vega_components as dvc
 import calendar
 import matplotlib
-
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 from .datatypes import MERGED, CLEAN_ZILLOW
 import pandas as pd
 
@@ -16,7 +20,7 @@ all_tracts = sorted(df_merged["tract"].astype(str).str.zfill(11).unique())
 try:
     df_zillow = pd.read_csv(CLEAN_ZILLOW)
     all_zips = sorted(df_zillow["zip"].astype(str).str.zfill(5).unique())
-except:
+except Exception:
     all_zips = []
 
 map_chart = create_tract_map(
@@ -25,16 +29,14 @@ map_chart = create_tract_map(
     col_name="eviction_rate",
 )
 
-homeless_scatterplot = create_homeless_scatterplot(
-    tract_id="tract_id"
-)
+homeless_scatterplot = create_homeless_scatterplot(tract_id="tract_id")
 
-encampments_scatterplot = create_encampments_scatterplot(
-    tract_id="tract_id"
-)
+encampments_scatterplot = create_encampments_scatterplot(tract_id="tract_id")
 
-    
-app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH],suppress_callback_exceptions=True)
+
+app = Dash(
+    __name__, external_stylesheets=[dbc.themes.MORPH], suppress_callback_exceptions=True
+)
 
 app.layout = html.Div(
     [
@@ -66,22 +68,38 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [html.B("Eviction Rate"), html.Br(), f"{df_merged['eviction_rate'].mean():.2%}"],
+                    [
+                        html.B("Eviction Rate"),
+                        html.Br(),
+                        f"{df_merged['eviction_rate'].mean():.2%}",
+                    ],
                     style={"flex": "1", "textAlign": "center"},
                 ),
                 html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
                 html.Div(
-                    [html.B("Average Rent"), html.Br(), f"${df_merged['median_rent'].mean():,.0f}"],
+                    [
+                        html.B("Average Rent"),
+                        html.Br(),
+                        f"${df_merged['median_rent'].mean():,.0f}",
+                    ],
                     style={"flex": "1", "textAlign": "center"},
                 ),
                 html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
                 html.Div(
-                    [html.B("311 Calls"), html.Br(), f"{df_merged['311_calls'].mean():,.0f}"],
+                    [
+                        html.B("311 Calls"),
+                        html.Br(),
+                        f"{df_merged['311_calls'].mean():,.0f}",
+                    ],
                     style={"flex": "1", "textAlign": "center"},
                 ),
                 html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
                 html.Div(
-                    [html.B("Homelessness Estimate"), html.Br(), f"{df_merged['estimate'].mean():,.0f}"],
+                    [
+                        html.B("Homelessness Estimate"),
+                        html.Br(),
+                        f"{df_merged['estimate'].mean():,.0f}",
+                    ],
                     style={"flex": "1", "textAlign": "center"},
                 ),
             ],
@@ -117,8 +135,6 @@ app.layout = html.Div(
 @app.callback(
     Output("tabs-content-container", "children"), Input("tabs-content", "value")
 )
-
-
 def render_content(tab):
     # [tab 1. map]
     if tab == "tab-map":
@@ -276,7 +292,7 @@ def render_content(tab):
                                 "width": "100%",
                                 "height": "600px",
                                 "borderRadius": "10px",
-                                "margin": "0 auto"
+                                "margin": "0 auto",
                             },
                         ),
                     ],
@@ -285,7 +301,7 @@ def render_content(tab):
                         "border": "1px solid #ddd",
                         "borderRadius": "10px",
                         "backgroundColor": "white",
-                        #"boxSizing": "border-box",
+                        # "boxSizing": "border-box",
                     },
                 ),
             ]
@@ -325,8 +341,7 @@ def render_content(tab):
                 "padding": "10px",
             },
         )
-  
-  
+
     # [tab 3. Rent Scatter Plot]
     elif tab == "tab-rent":
         return html.Div(
@@ -349,9 +364,11 @@ def render_content(tab):
                         html.Label("Select Zip-code:", style={"fontWeight": "bold"}),
                         dcc.Dropdown(
                             id="zip-dropdown",
-                            options=[{"label": str(z), "value": str(z)} for z in all_zips],
+                            options=[
+                                {"label": str(z), "value": str(z)} for z in all_zips
+                            ],
                             value=all_zips[0] if all_zips else None,
-                            clearable=False
+                            clearable=False,
                         ),
                     ],
                     style={
@@ -364,9 +381,7 @@ def render_content(tab):
                 # scatter plot
                 html.Div(
                     [
-                        html.H3(
-                            id="rent-plot-title", style={"textAlign": "center"}
-                        ),
+                        html.H3(id="rent-plot-title", style={"textAlign": "center"}),
                         html.Hr(),
                         dvc.Vega(
                             id="rent-scatter-plot",
@@ -392,33 +407,35 @@ def render_content(tab):
                     [
                         html.B("Analysis: "),
                         "Homelessness estimate : tents + vehicles + structures",
-                    html.Br(),
-                    html.Label("Select Tract ID:"),
-                
-                    dcc.Dropdown(
-                        id="tract-dropdown",
-                        options=[{"label": str(t), "value": str(t)} for t in all_tracts],
-                        value=all_tracts[0] if all_tracts else None, 
-                        clearable=False,
-                    style={"width": "300px", "color": "black"}
-                ),
-                ],
+                        html.Br(),
+                        html.Label("Select Tract ID:"),
+                        dcc.Dropdown(
+                            id="tract-dropdown",
+                            options=[
+                                {"label": str(t), "value": str(t)} for t in all_tracts
+                            ],
+                            value=all_tracts[0] if all_tracts else None,
+                            clearable=False,
+                            style={"width": "300px", "color": "black"},
+                        ),
+                    ],
                     style={
                         "padding": "20px",
                         "backgroundColor": "#f1f3f5",
                         "borderRadius": "10px",
                         "marginBottom": "30px",
-                        "border": "1px solid #e9ecef"
+                        "border": "1px solid #e9ecef",
                     },
                 ),
-
-                #scatter plots
+                # scatter plots
                 html.Div(
                     [
                         # left plot
                         html.Div(
                             [
-                                html.H4(id="homeless-title-1", style={"textAlign": "center"}),
+                                html.H4(
+                                    id="homeless-title-1", style={"textAlign": "center"}
+                                ),
                                 dvc.Vega(
                                     id="homeless-1",
                                     spec={},
@@ -435,7 +452,9 @@ def render_content(tab):
                         # right plot
                         html.Div(
                             [
-                                html.H4(id="homeless-title-2", style={"textAlign": "center"}),
+                                html.H4(
+                                    id="homeless-title-2", style={"textAlign": "center"}
+                                ),
                                 dvc.Vega(
                                     id="homeless-2",
                                     spec={},
@@ -462,7 +481,7 @@ def render_content(tab):
         )
 
 
-# tab1 : map 
+# tab1 : map
 @app.callback(
     [
         Output("sf-map", "spec"),  # update
@@ -509,6 +528,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
 
     return map_chart.to_dict(), map_title
 
+
 # tab2 :regression
 @app.callback(
     [
@@ -529,48 +549,48 @@ def update_regression(tab_value):
 
     return new_reg.to_dict(), reg_title
 
+
 # tab3 : rent scatterplot
 @app.callback(
-    [Output("rent-scatter-plot", "spec"),Output("rent-plot-title", "children")],
-    [Input("tabs-content", "value"),
-     Input("zip-dropdown", "value")]
+    [Output("rent-scatter-plot", "spec"), Output("rent-plot-title", "children")],
+    [Input("tabs-content", "value"), Input("zip-dropdown", "value")],
 )
 def update_rent_scatter(tab_value, selected_zip):
     if tab_value != "tab-rent" or not selected_zip:
         raise exceptions.PreventUpdate
-    
-    rent_scatterplot = create_rent_scatterplot(
-        zip_code=selected_zip
-    )
+
+    rent_scatterplot = create_rent_scatterplot(zip_code=selected_zip)
     rent_title = f"Median rent (per month) over time in zip code {selected_zip}"
-        
+
     return rent_scatterplot.to_dict(), rent_title
+
 
 # tab 4 : homeless scatterplot
 @app.callback(
     [
-        Output("homeless-1", "spec"),Output("homeless-title-1", "children"),
-        Output("homeless-2", "spec"),Output("homeless-title-2", "children")
+        Output("homeless-1", "spec"),
+        Output("homeless-title-1", "children"),
+        Output("homeless-2", "spec"),
+        Output("homeless-title-2", "children"),
     ],
-    [Input("tabs-content", "value"), 
-     Input("tract-dropdown", "value")]
+    [Input("tabs-content", "value"), Input("tract-dropdown", "value")],
 )
-def update_homeless_scatter(tab_value,selected_tract):
+def update_homeless_scatter(tab_value, selected_tract):
     if tab_value != "tab-homeless" or not selected_tract:
         raise exceptions.PreventUpdate
-    
-    homeless_scatterplot = create_homeless_scatterplot(
-    tract_id=selected_tract
-    )
+
+    homeless_scatterplot = create_homeless_scatterplot(tract_id=selected_tract)
     homeless_title1 = f"Homeless Population Estimate for Tract {selected_tract}"
 
-   
-    encampments_scatterplot = create_encampments_scatterplot(
-    tract_id=selected_tract
-    )
+    encampments_scatterplot = create_encampments_scatterplot(tract_id=selected_tract)
     encampment_title = f"City-reported encampments (official counts) over time in census tract {selected_tract}"
 
-    return homeless_scatterplot.to_dict(), homeless_title1, encampments_scatterplot.to_dict(), encampment_title
+    return (
+        homeless_scatterplot.to_dict(),
+        homeless_title1,
+        encampments_scatterplot.to_dict(),
+        encampment_title,
+    )
 
 
 if __name__ == "__main__":
