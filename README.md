@@ -67,8 +67,7 @@ Overall, our project has a strong focus on spatial analysis and mapping, visuali
 
 
 ## Project video
-<Insert link to project video>
-
+https://drive.google.com/file/d/1T6SVS_VbMjVPbhwko3zUDULbmq6zvg9c/view?usp=sharing
 
 ## Acknowledgments
 Many thanks to our CAPP122 instructor, James Turk, and our assigned TA, Andrés Camacho, for their support and guidance.
