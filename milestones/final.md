@@ -20,7 +20,7 @@ Sources of data and any key gaps include:
 #4: HUD Crosswalks - Columns were inconsistently name; data was separated across Excel files, and there was missing data that required us to impute.
 #5: Sacramento 2024 PIT Count Report
 
-The data flows through a centralized pipeline starting with automated API extraction and CSV loading, followed by a transformation stage where ZIP-level ZORI data is crosswalked to Census Tracts and scaled using ACS median rent values to adjust local median rent variations. 311 calls and eviction records are grouped by month and tract to calculate monthly rates. Quarterly encampment data is interpolated to fill monthly gaps for tents, structures, and vehicles. A weighted homelessness estimate is calculated using predefined conservative multipliers for different encampment types. All processed streams are merged into a single Tidy CSV (merged_data.csv) regression analysis, spatial join, visualization and dashboard.
+The data flows through a centralized pipeline starting with automated API extraction and CSV loading, followed by a transformation stage where ZIP-level ZORI data is crosswalked to tracts and scaled using ACS median rent values to adjust local median rent variations. 311 calls and eviction records are grouped by month and tract to calculate monthly rates. Quarterly encampment data is interpolated to fill monthly gaps for tents, structures, and vehicles. A weighted homelessness estimate is calculated using predefined conservative multipliers for different encampment types. All processed streams are merged into a single Tidy CSV (merged_data.csv) regression analysis, spatial join, visualization and dashboard.
 
 In order to understand this project, one would need to know that our project required interpolation in order to get all of our data onto the same spatial and temporal scale. While the original data sources may be on the zip code or quarterly levels, we normalized all data to the monthly census tract level. In addition, it's important to note that the quarterly encampment counts data required emailing with the SF Open Data Portal to get access to the underlying data. While a PowerBI map is regularly updated, the underlying data linked to the map is not. 
 
@@ -48,7 +48,7 @@ The above modules are supported by datatypes, which contain global variables use
 
 Our project pipeline begins with data retrieval. The get_api_data module retrieves eviction data from an external API and saves the results to a CSV file for use in subsequent steps.
 
-The next stage focuses on data cleaning and processing, beginning with the process_data module. This module processes and merges ACS data with census tract shapefiles, cleans encampments and 311 homelessness reports data, filters and imputes missing Zillow data, and processes crosswalks Excel files. Processing the ACS files requires imputing negative values, while cleaning the 311 encampment reports involves additional address string processing and the removal of duplicate latitude–longitude–month combinations. Processing the crosswalks files also requires interpolation and matching ZIP code-level data to census tracts in order to obtain tract-level estimates. More broadly, this module deduplicates key variables, standardizes selected fields, and exports the cleaned datasets as CSV files and shapefiles in the cleaned-data folder.
+The next stage focuses on data cleaning and processing, beginning with the process_data module. This module processes and merges ACS data with census tract shapefiles, cleans encampments and 311 homelessness reports data, filters and imputes missing Zillow data, and processes crosswalks Excel files. More broadly, this module deduplicates key variables, standardizes selected fields, and exports the cleaned datasets as CSV files and shapefiles in the cleaned-data folder.
 
 The next processing step is implemented in the spatial_join module, which applies the quadtree-based spatial matching algorithm to match point latitude-longitude coordinates to their appropriate census tract polygons. This approach was adapted from PA4 and modified to fit the specifications of our project. We apply this procedure to three cleaned datasets on evictions, quarterly encampments, and 311 reports, outputting three files, each pertaining to a cleaned dataset, with an additional column that has the matched tract ID. 
 
@@ -66,11 +66,11 @@ The above modules feed into our __main__.py file, which allows the entire pipeli
 ## Team responsibilities
 
 ### Haeji
-- Processed and filtered Zillow Observed Renter Index (ZORI) data to analyze longitudinal rental trends across 23 San Francisco ZIP codes from 2020 to 2024
+- Processed and filtered Zillow Observed Renter Index (ZORI) data to analyze longitudinal rental trends across SF ZIP codes
 - Built an automated API pipeline to retrieve, filter, and store real-time eviction records of SF into standardized CSV formats.
 - Defined a weighted estimation logic using PIT data to calculate unsheltered population counts across various housing types
 - Calculated tract-level eviction rates by merging multi-source datasets and structuring results into a unified data dictionary
-- Wrote `pytest` tests to validate the accuracy of data extraction, filtering, and mathematical calculations.
+- Wrote `pytest` tests to validate the accuracy of data extraction, filtering, and mathematical calculations
 - Refactored core map, plots, regression codes of visualizing to optimize visualization performance and ensure seamless interactivity within the dashboard
 - Spearheaded the development of a dashboard, designing the main interface and logic to synthesize housing and homelessness metrics 
 
