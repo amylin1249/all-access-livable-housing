@@ -66,61 +66,57 @@ app.layout = html.Div(
             style={"padding": "10px 40px", "color": "#34495e"},
         ),
         # [basic number showing]
-html.Div(
-    [
         html.Div(
             [
-                html.B("Monthly Median Rent"),
-                html.Br(),
-                f"2021 (average): ${df_merged[df_merged['date'].between('2021-01','2021-12')]['median_rent'].mean():,.0f}",
-                html.Br(),
-                f"2024 (average): ${df_merged[df_merged['date'].between('2024-01','2024-12')]['median_rent'].mean():,.0f}",
-                html.Br(),
-                f"Annual % change: {((df_merged[df_merged['date'].between('2024-01','2024-12')]['median_rent'].mean() / df_merged[df_merged['date'].between('2021-01','2021-12')]['median_rent'].mean())**(1/3)-1):.2%}",
+                html.Div(
+                    [
+                        html.B("Street Homeless Population Estimate"),
+                        html.Br(),
+                        f"2021 (average): {df_merged[df_merged['date'].between('2021-01', '2021-12')]['estimate'].mean():,.0f}",
+                        html.Br(),
+                        f"2024 (average): {df_merged[df_merged['date'].between('2024-01', '2024-12')]['estimate'].mean():,.0f}",
+                        html.Br(),
+                        f"Annual % change: {((df_merged[df_merged['date'].between('2024-01', '2024-12')]['estimate'].mean() / df_merged[df_merged['date'].between('2021-01', '2021-12')]['estimate'].mean()) ** (1 / 3) - 1):.2%}",
+                    ],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+                html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+                html.Div(
+                    [
+                        html.B("Monthly Median Rent"),
+                        html.Br(),
+                        f"2021 (average): ${df_merged[df_merged['date'].between('2021-01', '2021-12')]['median_rent'].mean():,.0f}",
+                        html.Br(),
+                        f"2024 (average): ${df_merged[df_merged['date'].between('2024-01', '2024-12')]['median_rent'].mean():,.0f}",
+                        html.Br(),
+                        f"Annual % change: {((df_merged[df_merged['date'].between('2024-01', '2024-12')]['median_rent'].mean() / df_merged[df_merged['date'].between('2021-01', '2021-12')]['median_rent'].mean()) ** (1 / 3) - 1):.2%}",
+                    ],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+                html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+                html.Div(
+                    [
+                        html.B("311 Calls for Encampments"),
+                        html.Br(),
+                        f"2021 (average): {df_merged[df_merged['date'].between('2021-01', '2021-12')]['311_calls'].mean():,.0f}",
+                        html.Br(),
+                        f"2024 (average): {df_merged[df_merged['date'].between('2024-01', '2024-12')]['311_calls'].mean():,.0f}",
+                        html.Br(),
+                        f"Annual % change: {((df_merged[df_merged['date'].between('2024-01', '2024-12')]['311_calls'].mean() / df_merged[df_merged['date'].between('2021-01', '2021-12')]['311_calls'].mean()) ** (1 / 3) - 1):.2%}",
+                    ],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
             ],
-            style={"flex": "1", "textAlign": "center"},
+            style={
+                "display": "flex",
+                "alignItems": "center",
+                "padding": "20px",
+                "margin": "20px 40px",
+                "backgroundColor": "white",
+                "borderRadius": "10px",
+                "border": "1px solid #eee",
+            },
         ),
-
-        html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
-
-        html.Div(
-            [
-                html.B("311 Calls"),
-                html.Br(),
-                f"2021 (average): {df_merged[df_merged['date'].between('2021-01','2021-12')]['311_calls'].mean():,.0f}",
-                html.Br(),
-                f"2024 (average): {df_merged[df_merged['date'].between('2024-01','2024-12')]['311_calls'].mean():,.0f}",
-                html.Br(),
-                f"Annual % change: {((df_merged[df_merged['date'].between('2024-01','2024-12')]['311_calls'].mean() / df_merged[df_merged['date'].between('2021-01','2021-12')]['311_calls'].mean())**(1/3)-1):.2%}",
-            ],
-            style={"flex": "1", "textAlign": "center"},
-        ),
-
-        html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
-
-        html.Div(
-            [
-                html.B("Street Homeless Population Estimate"),
-                html.Br(),
-                f"2021 (average): {df_merged[df_merged['date'].between('2021-01','2021-12')]['estimate'].mean():,.0f}",
-                html.Br(),
-                f"2024 (average): {df_merged[df_merged['date'].between('2024-01','2024-12')]['estimate'].mean():,.0f}",
-                html.Br(),
-                f"Annual % change: {((df_merged[df_merged['date'].between('2024-01','2024-12')]['estimate'].mean() / df_merged[df_merged['date'].between('2021-01','2021-12')]['estimate'].mean())**(1/3)-1):.2%}",
-            ],
-            style={"flex": "1", "textAlign": "center"},
-        ),
-    ],
-    style={
-        "display": "flex",
-        "alignItems": "center",
-        "padding": "20px",
-        "margin": "20px 40px",
-        "backgroundColor": "#f8f9fa",
-        "borderRadius": "10px",
-        "border": "1px solid #eee",
-    },
-),
         # [Tabs]
         dcc.Tabs(
             id="tabs-content",
@@ -128,8 +124,8 @@ html.Div(
             children=[
                 dcc.Tab(label="Geospatial Map", value="tab-map"),
                 dcc.Tab(label="Regression Analysis", value="tab-reg"),
-                dcc.Tab(label="Rent", value="tab-rent"),
-                dcc.Tab(label="Homeless", value="tab-homeless"),
+                dcc.Tab(label="Monthly Rent", value="tab-rent"),
+                dcc.Tab(label="Homelessness", value="tab-homeless"),
             ],
             style={"margin": "20px 40px"},
         ),
@@ -150,12 +146,15 @@ def render_content(tab):
             [
                 html.Div(
                     [
-                                                html.Div(
+                        html.Div(
                             [
-                                html.B("Which parts of San Francisco have a higher concentration of street homeless individuals?"),
+                                html.B(
+                                    "Which parts of San Francisco have a higher concentration of street homeless individuals?"
+                                ),
                                 html.Br(),
-                                html.B("Where are median rents higher, and where are people being evicted?")
-
+                                html.B(
+                                    "Where are median rents higher, and where are people being evicted?"
+                                ),
                             ],
                             style={
                                 "fontSize": "20px",
@@ -164,12 +163,11 @@ def render_content(tab):
                                 "textAlign": "center",
                             },
                         ),
-                         
-                                               html.Div(
+                        html.Div(
                             [
                                 "These questions can be answered using the ",
                                 html.B("interactive map"),
-                                " below."
+                                " below.",
                             ],
                             style={
                                 "fontSize": "16px",
@@ -203,8 +201,9 @@ def render_content(tab):
                                     "label": "Street Homeless Population Estimate",
                                     "value": "estimate",
                                 },
+                                {"label": "Monthly Median Rent", "value": "median_rent"},
                                 {"label": "Eviction Rate", "value": "eviction_rate"},
-                                {"label": "Median Rent", "value": "median_rent"},
+                                
                                 {
                                     "label": "Citizen-Reported Encampments (311 Calls)",
                                     "value": "311_calls",
@@ -303,7 +302,7 @@ def render_content(tab):
                     ],
                     style={
                         "padding": "20px",
-                        "backgroundColor": "#f9f9f9",
+                        "backgroundColor": "white",
                         "borderRadius": "10px",
                         "marginBottom": "20px",
                     },
@@ -424,19 +423,26 @@ def render_content(tab):
                     [
                         html.Div(
                             [
-                                html.B("How has the monthly rent in my neighborhood changed over time? What was the impact of the COVID-19 pandemic on rents?")
+                                html.B(
+                                    "How has the monthly rent in my neighborhood changed over time?"
+                                ),
+                                html.Br(),
+                                html.B(
+                                    "What was the impact of the COVID-19 pandemic on rents?"
+                                ),
                             ],
                             style={
-                                "fontSize": "16px",
-                                "lineHeight": "1.5",
+                                "fontSize": "20px",
+                                "lineHeight": "1",
                                 "marginBottom": "20px",
+                                "textAlign": "center",
                             },
                         ),
-                                        html.Div(
+                        html.Div(
                             [
                                 "These questions can be answered using the ",
                                 html.B("interactive scatterplot"),
-                                " below."
+                                " below.",
                             ],
                             style={
                                 "fontSize": "16px",
@@ -472,7 +478,7 @@ def render_content(tab):
                     ],
                     style={
                         "padding": "20px",
-                        "backgroundColor": "#f9f9f9",
+                        "backgroundColor":"white",
                         "borderRadius": "10px",
                         "marginBottom": "20px",
                     },
@@ -504,21 +510,28 @@ def render_content(tab):
             [
                 html.Div(
                     [
-                                      html.Div(
+                        html.Div(
                             [
-                                html.B("How has the street homeless population in my neighborhood changed over time? What is the distribution of tents, structures, and lived-in vehicles?")
+                                html.B(
+                                    "How has the street homeless population in my neighborhood changed over time?"
+                                ),
+                                html.Br(),
+                                html.B(
+                                    "What is the distribution of tents, structures, and lived-in vehicles?"
+                                ),
                             ],
                             style={
-                                "fontSize": "16px",
-                                "lineHeight": "1.5",
+                                "fontSize": "20px",
+                                "lineHeight": "1",
                                 "marginBottom": "20px",
+                                "textAlign": "center",
                             },
                         ),
-                                        html.Div(
+                        html.Div(
                             [
                                 "These questions can be answered using the ",
                                 html.B("interactive scatterplot"),
-                                " below."
+                                " below.",
                             ],
                             style={
                                 "fontSize": "16px",
@@ -554,7 +567,7 @@ def render_content(tab):
                     ],
                     style={
                         "padding": "20px",
-                        "backgroundColor": "#f1f3f5",
+                        "backgroundColor": "white",
                         "borderRadius": "10px",
                         "marginBottom": "30px",
                         "border": "1px solid #e9ecef",
@@ -580,6 +593,7 @@ def render_content(tab):
                                 "padding": "10px",
                                 "border": "1px solid #eee",
                                 "borderRadius": "10px",
+                                "backgroundColor": "white"
                             },
                         ),
                         # right plot
@@ -600,6 +614,7 @@ def render_content(tab):
                                 "border": "1px solid #eee",
                                 "borderRadius": "10px",
                                 "marginLeft": "4%",
+                                "backgroundColor": "white"
                             },
                         ),
                     ],
@@ -628,6 +643,7 @@ def render_content(tab):
         Input("end-month", "value"),
     ],
 )
+
 def update_map(selected_col, start_year, start_month, end_year, end_month):
     if any(
         v is None for v in [selected_col, start_year, start_month, end_year, end_month]
@@ -635,13 +651,28 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
         raise exceptions.PreventUpdate
 
     METRIC_NAMES = {
-        "311_calls": "311 calls",
+        "311_calls": "Citizen-reported encampments (311 calls)",
         "eviction_rate": "Eviction rate",
-        "median_rent": "Median rent",
-        "tents": "Tents",
-        "structures": "Structures",
-        "vehicles": "Vehicles",
-        "estimate": "Homelessness estimate",
+        "median_rent": "Monthly median rent",
+        "tents": "Official city tent count",
+        "structures": "Official city structure count",
+        "vehicles": "Official city lived-in vehicle count",
+        "estimate": "Street homeless population estimate",
+    }
+
+    MONTHS = {
+        "01": "January",
+        "02": "February",
+        "03": "March",
+        "04": "April",
+        "05": "May",
+        "06": "June",
+        "07": "July",
+        "08": "August",
+        "09": "September",
+        "10": "October",
+        "11": "November",
+        "12": "December",
     }
 
     start_dt = f"{start_year}-{start_month}-01"
@@ -657,7 +688,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
         # agg="mean",
     )
 
-    map_title = f"Average {METRIC_NAMES[selected_col].lower()} in SF tracts ({start_year}-{start_month} to {end_year}-{end_month})"
+    map_title = f"{METRIC_NAMES[selected_col]}, averaged over {MONTHS[start_month]} {start_year} to {MONTHS[end_month]} {end_year}"
 
     return map_chart.to_dict(), map_title
 
