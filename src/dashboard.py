@@ -66,61 +66,57 @@ app.layout = html.Div(
             style={"padding": "10px 40px", "color": "#34495e"},
         ),
         # [basic number showing]
-html.Div(
-    [
         html.Div(
             [
-                html.B("Monthly Median Rent"),
-                html.Br(),
-                f"2021 (average): ${df_merged[df_merged['date'].between('2021-01','2021-12')]['median_rent'].mean():,.0f}",
-                html.Br(),
-                f"2024 (average): ${df_merged[df_merged['date'].between('2024-01','2024-12')]['median_rent'].mean():,.0f}",
-                html.Br(),
-                f"Annual % change: {((df_merged[df_merged['date'].between('2024-01','2024-12')]['median_rent'].mean() / df_merged[df_merged['date'].between('2021-01','2021-12')]['median_rent'].mean())**(1/3)-1):.2%}",
+                html.Div(
+                    [
+                        html.B("Street Homeless Population Estimate"),
+                        html.Br(),
+                        f"2021 (average): {df_merged[df_merged['date'].between('2021-01', '2021-12')]['estimate'].mean():,.0f}",
+                        html.Br(),
+                        f"2024 (average): {df_merged[df_merged['date'].between('2024-01', '2024-12')]['estimate'].mean():,.0f}",
+                        html.Br(),
+                        f"Annual % change: {((df_merged[df_merged['date'].between('2024-01', '2024-12')]['estimate'].mean() / df_merged[df_merged['date'].between('2021-01', '2021-12')]['estimate'].mean()) ** (1 / 3) - 1):.2%}",
+                    ],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+                html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+                html.Div(
+                    [
+                        html.B("Monthly Median Rent"),
+                        html.Br(),
+                        f"2021 (average): ${df_merged[df_merged['date'].between('2021-01', '2021-12')]['median_rent'].mean():,.0f}",
+                        html.Br(),
+                        f"2024 (average): ${df_merged[df_merged['date'].between('2024-01', '2024-12')]['median_rent'].mean():,.0f}",
+                        html.Br(),
+                        f"Annual % change: {((df_merged[df_merged['date'].between('2024-01', '2024-12')]['median_rent'].mean() / df_merged[df_merged['date'].between('2021-01', '2021-12')]['median_rent'].mean()) ** (1 / 3) - 1):.2%}",
+                    ],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+                html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+                html.Div(
+                    [
+                        html.B("311 Calls for Encampments"),
+                        html.Br(),
+                        f"2021 (average): {df_merged[df_merged['date'].between('2021-01', '2021-12')]['311_calls'].mean():,.0f}",
+                        html.Br(),
+                        f"2024 (average): {df_merged[df_merged['date'].between('2024-01', '2024-12')]['311_calls'].mean():,.0f}",
+                        html.Br(),
+                        f"Annual % change: {((df_merged[df_merged['date'].between('2024-01', '2024-12')]['311_calls'].mean() / df_merged[df_merged['date'].between('2021-01', '2021-12')]['311_calls'].mean()) ** (1 / 3) - 1):.2%}",
+                    ],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
             ],
-            style={"flex": "1", "textAlign": "center"},
+            style={
+                "display": "flex",
+                "alignItems": "center",
+                "padding": "20px",
+                "margin": "20px 40px",
+                "backgroundColor": "white",
+                "borderRadius": "10px",
+                "border": "1px solid #eee",
+            },
         ),
-
-        html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
-
-        html.Div(
-            [
-                html.B("311 Calls"),
-                html.Br(),
-                f"2021 (average): {df_merged[df_merged['date'].between('2021-01','2021-12')]['311_calls'].mean():,.0f}",
-                html.Br(),
-                f"2024 (average): {df_merged[df_merged['date'].between('2024-01','2024-12')]['311_calls'].mean():,.0f}",
-                html.Br(),
-                f"Annual % change: {((df_merged[df_merged['date'].between('2024-01','2024-12')]['311_calls'].mean() / df_merged[df_merged['date'].between('2021-01','2021-12')]['311_calls'].mean())**(1/3)-1):.2%}",
-            ],
-            style={"flex": "1", "textAlign": "center"},
-        ),
-
-        html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
-
-        html.Div(
-            [
-                html.B("Street Homeless Population Estimate"),
-                html.Br(),
-                f"2021 (average): {df_merged[df_merged['date'].between('2021-01','2021-12')]['estimate'].mean():,.0f}",
-                html.Br(),
-                f"2024 (average): {df_merged[df_merged['date'].between('2024-01','2024-12')]['estimate'].mean():,.0f}",
-                html.Br(),
-                f"Annual % change: {((df_merged[df_merged['date'].between('2024-01','2024-12')]['estimate'].mean() / df_merged[df_merged['date'].between('2021-01','2021-12')]['estimate'].mean())**(1/3)-1):.2%}",
-            ],
-            style={"flex": "1", "textAlign": "center"},
-        ),
-    ],
-    style={
-        "display": "flex",
-        "alignItems": "center",
-        "padding": "20px",
-        "margin": "20px 40px",
-        "backgroundColor": "#f8f9fa",
-        "borderRadius": "10px",
-        "border": "1px solid #eee",
-    },
-),
         # [Tabs]
         dcc.Tabs(
             id="tabs-content",
@@ -128,8 +124,8 @@ html.Div(
             children=[
                 dcc.Tab(label="Geospatial Map", value="tab-map"),
                 dcc.Tab(label="Regression Analysis", value="tab-reg"),
-                dcc.Tab(label="Rent", value="tab-rent"),
-                dcc.Tab(label="Homeless", value="tab-homeless"),
+                dcc.Tab(label="Monthly Rent", value="tab-rent"),
+                dcc.Tab(label="Homelessness", value="tab-homeless"),
             ],
             style={"margin": "20px 40px"},
         ),
@@ -152,14 +148,43 @@ def render_content(tab):
                     [
                         html.Div(
                             [
-                                html.B("Instruction: "),
-                                "Use the ",
-                                html.B("dropdown"),
+                                html.B(
+                                    "Which parts of San Francisco have a higher concentration of street homeless individuals?"
+                                ),
+                                html.Br(),
+                                html.B(
+                                    "Where are median rents higher, and where are people being evicted?"
+                                ),
+                            ],
+                            style={
+                                "fontSize": "20px",
+                                "lineHeight": "1",
+                                "marginBottom": "20px",
+                                "textAlign": "center",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                "These questions can be answered using the ",
+                                html.B("interactive map"),
+                                " below.",
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                html.B("How to use: "),
+                                "Select your ",
+                                html.B("metric of interest"),
                                 " and ",
-                                html.B("date selectors"),
-                                " below to select your metric and time period of interest. The ",
-                                html.B("map"),
-                                " will update automatically based on your selection.",
+                                html.B("start and end dates"),
+                                " from the ",
+                                html.B("dropdown menu"),
+                                " below. The map will automatically update based on your selection.",
                             ],
                             style={
                                 "fontSize": "16px",
@@ -176,8 +201,9 @@ def render_content(tab):
                                     "label": "Street Homeless Population Estimate",
                                     "value": "estimate",
                                 },
+                                {"label": "Monthly Median Rent", "value": "median_rent"},
                                 {"label": "Eviction Rate", "value": "eviction_rate"},
-                                {"label": "Median Rent", "value": "median_rent"},
+                                
                                 {
                                     "label": "Citizen-Reported Encampments (311 Calls)",
                                     "value": "311_calls",
@@ -276,7 +302,7 @@ def render_content(tab):
                     ],
                     style={
                         "padding": "20px",
-                        "backgroundColor": "#f9f9f9",
+                        "backgroundColor": "white",
                         "borderRadius": "10px",
                         "marginBottom": "20px",
                     },
@@ -314,73 +340,79 @@ def render_content(tab):
                 ),
             ]
         )
+    
+    #[tab2. reg]
+    if tab == "tab-reg":
+        return html.Div([
+            html.Div([
+                html.Div([
+                    html.B("How does the number of citizen-reported encampments (311 calls) correlate with tract-level characteristics?"),
+                ], style={
+                                "fontSize": "20px",
+                                "lineHeight": "1",
+                                "marginBottom": "20px",
+                                "textAlign": "center",
+                        }),
+            ], style={
+                "padding": "30px", 
+                "backgroundColor": "#f9f9f9", 
+                "borderRadius": "10px", 
+                "marginBottom": "20px", 
+                "border": "1px solid #ddd"  
+            }),
 
-    # [tab 2.regression]
-    elif tab == "tab-reg":
-        return html.Div(
-            [
-                html.Div(
-                    [
-                        html.H3(
-                            id="regression-title",
-                            style={"textAlign": "center", "color": "#2c3e50"},
-                        ),
-                        html.Hr(),
-                        dvc.Vega(
-                            id="reg-chart",
-                            spec={},
-                            style={
-                                "width": "100%",
-                                "height": "500px",
-                                "marginBottom": "30px",
-                            },
-                        ),
-                        # explaining regression
-                        html.Div(
-                            [
-                                html.P(
-                                    "We ran a regression to examine how tract-level characteristics are associated with "
-                                    "the number of encampments reported (measured as the total number of unique addresses "
-                                    "reported through 311). For each month in which point-in-time encampment estimates "
-                                    "were calculated, we matched those estimates to the total number of unique encampment "
-                                    "addresses reported in the 311 call data for that month, along with tract-level "
-                                    "demographic and socioeconomic characteristics from the ACS.",
-                                    style={"marginBottom": "15px"},
-                                ),
-                                html.P(
-                                    "The regression included month fixed effects. The results indicate that median household income "
-                                    "and median household rent are not significantly associated with the number of reported 311 "
-                                    "encampment addresses. However, a tract's racial composition appears to be related to reporting "
-                                    "behavior among residents: for every 10-percentage-point increase in the share of tract residents "
-                                    "who are White, approximately one additional encampment address is reported per month. "
-                                    "Note this does not include duplicate reports.",
-                                    style={"marginBottom": "15px"},
-                                ),
-                                html.P(
-                                    "Encampment characteristics are also strongly associated with reporting. Each additional tent "
-                                    "observed is associated with roughly 0.9 additional reported addresses in a month, and each "
-                                    "additional structure is associated with 0.64 additional reported addresses reported in a month. "
-                                    "In contrast, the number of vehicles in an encampment has no clear relationship with the number "
-                                    "of unique addresses reported. One possible explanation is that vehicles blend more easily into "
-                                    "the surrounding environment and are therefore less noticeably part of a homeless encampment."
-                                ),
-                            ],
-                            style={
-                                "width": "80%",
-                                "margin": "0 auto",
-                                "padding": "25px",
-                                "border": "1px solid #ddd",
-                                "borderRadius": "10px",
-                                "backgroundColor": "white",
-                            },
-                        ),
-                    ],
-                    style={
-                        "padding": "10px",
-                    },
-                )
-            ]
-        )
+            
+            html.Div([
+                 html.Div([
+                    # explaination
+                    html.P(
+                        "We ran a regression to examine how tract-level characteristics are associated with "
+                        "the number of encampments reported (measured as the total number of unique addresses "
+                        "reported through 311). For each month in which point-in-time encampment estimates "
+                        "were calculated, we matched those estimates to the total number of unique encampment "
+                        "addresses reported in the 311 call data for that month, along with tract-level "
+                        "demographic and socioeconomic characteristics from the ACS.",
+                        style={"marginBottom": "15px"},
+                    ),
+                    html.P(
+                        "The regression included month fixed effects. The results indicate that median household income "
+                        "and median household rent are not significantly associated with the number of reported 311 "
+                        "encampment addresses. However, a tract's racial composition appears to be related to reporting "
+                        "behavior among residents: for every 10-percentage-point increase in the share of tract residents "
+                        "who are White, approximately one additional encampment address is reported per month. "
+                        "Note this excludes duplicate reports.",
+                        style={"marginBottom": "15px"},
+                    ),
+                    html.P(
+                        "Encampment characteristics are also strongly associated with reporting. Each additional tent "
+                        "observed is associated with roughly 0.9 additional reported addresses in a month, and each "
+                        "additional structure is associated with 0.64 additional reported addresses reported in a month. "
+                        "In contrast, the number of vehicles in an encampment has no clear relationship with the number "
+                        "of unique addresses reported. One possible explanation is that vehicles blend more easily into "
+                        "the surrounding environment and are therefore less noticeably part of a homeless encampment."
+                    ),
+                    # regression
+                    dvc.Vega(
+                        id="reg-chart", 
+                        spec={}, 
+                        style={"width": "100%", "height": "500px"}
+                    ),
+                ], style={
+                    "padding": "25px", 
+                    "border": "1px solid #eee", 
+                    "borderRadius": "10px", 
+                    "backgroundColor": "#fff", 
+                    "lineHeight": "1.6"
+                })
+            ], style={
+                "padding": "25px", 
+                "border": "1px solid #ddd", 
+                "borderRadius": "10px", 
+                "backgroundColor": "white",
+                "boxShadow": "0 2px 4px rgba(0,0,0,0.05)"
+            })
+        ])
+
 
     # [tab 3. Rent Scatter Plot]
     elif tab == "tab-rent":
@@ -390,9 +422,41 @@ def render_content(tab):
                     [
                         html.Div(
                             [
-                                html.B("Instruction: "),
-                                "Explore the cmedian rent trends by zip code."
-                                "The chart updates automatically based on your selection.",
+                                html.B(
+                                    "How has the monthly rent in my neighborhood changed over time?"
+                                ),
+                                html.Br(),
+                                html.B(
+                                    "What was the impact of the COVID-19 pandemic on rents?"
+                                ),
+                            ],
+                            style={
+                                "fontSize": "20px",
+                                "lineHeight": "1",
+                                "marginBottom": "20px",
+                                "textAlign": "center",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                "These questions can be answered using the ",
+                                html.B("interactive scatterplot"),
+                                " below.",
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                html.B("How to use: "),
+                                "Select your ",
+                                html.B("zip code"),
+                                " from the ",
+                                html.B("dropdown menu"),
+                                " below. The graph will automatically update based on your selection.",
                             ],
                             style={
                                 "fontSize": "16px",
@@ -401,7 +465,7 @@ def render_content(tab):
                             },
                         ),
                         # dropdown
-                        html.Label("Select Zip-code:", style={"fontWeight": "bold"}),
+                        html.Label("Select Zip Code:"),
                         dcc.Dropdown(
                             id="zip-dropdown",
                             options=[
@@ -413,7 +477,7 @@ def render_content(tab):
                     ],
                     style={
                         "padding": "20px",
-                        "backgroundColor": "#f9f9f9",
+                        "backgroundColor":"white",
                         "borderRadius": "10px",
                         "marginBottom": "20px",
                     },
@@ -445,10 +509,51 @@ def render_content(tab):
             [
                 html.Div(
                     [
-                        html.B("Analysis: "),
-                        "Homelessness estimate : tents + vehicles + structures",
-                        html.Br(),
-                        html.Label("Select Tract ID:"),
+                        html.Div(
+                            [
+                                html.B(
+                                    "How has the street homeless population in my neighborhood changed over time?"
+                                ),
+                                html.Br(),
+                                html.B(
+                                    "What is the distribution of tents, structures, and lived-in vehicles?"
+                                ),
+                            ],
+                            style={
+                                "fontSize": "20px",
+                                "lineHeight": "1",
+                                "marginBottom": "20px",
+                                "textAlign": "center",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                "These questions can be answered using the ",
+                                html.B("interactive scatterplot"),
+                                " below.",
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                html.B("How to use: "),
+                                "Select your ",
+                                html.B("census tract ID"),
+                                " from the ",
+                                html.B("dropdown menu"),
+                                " below. The graph will automatically update based on your selection.",
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        html.Label("Select Census Tract ID:"),
                         dcc.Dropdown(
                             id="tract-dropdown",
                             options=[
@@ -461,7 +566,7 @@ def render_content(tab):
                     ],
                     style={
                         "padding": "20px",
-                        "backgroundColor": "#f1f3f5",
+                        "backgroundColor": "white",
                         "borderRadius": "10px",
                         "marginBottom": "30px",
                         "border": "1px solid #e9ecef",
@@ -487,6 +592,7 @@ def render_content(tab):
                                 "padding": "10px",
                                 "border": "1px solid #eee",
                                 "borderRadius": "10px",
+                                "backgroundColor": "white"
                             },
                         ),
                         # right plot
@@ -507,6 +613,7 @@ def render_content(tab):
                                 "border": "1px solid #eee",
                                 "borderRadius": "10px",
                                 "marginLeft": "4%",
+                                "backgroundColor": "white"
                             },
                         ),
                     ],
@@ -535,6 +642,7 @@ def render_content(tab):
         Input("end-month", "value"),
     ],
 )
+
 def update_map(selected_col, start_year, start_month, end_year, end_month):
     if any(
         v is None for v in [selected_col, start_year, start_month, end_year, end_month]
@@ -542,13 +650,28 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
         raise exceptions.PreventUpdate
 
     METRIC_NAMES = {
-        "311_calls": "311 calls",
+        "311_calls": "Citizen-reported encampments (311 calls)",
         "eviction_rate": "Eviction rate",
-        "median_rent": "Median rent",
-        "tents": "Tents",
-        "structures": "Structures",
-        "vehicles": "Vehicles",
-        "estimate": "Homelessness estimate",
+        "median_rent": "Monthly median rent",
+        "tents": "Official city tent count",
+        "structures": "Official city structure count",
+        "vehicles": "Official city lived-in vehicle count",
+        "estimate": "Street homeless population estimate",
+    }
+
+    MONTHS = {
+        "01": "January",
+        "02": "February",
+        "03": "March",
+        "04": "April",
+        "05": "May",
+        "06": "June",
+        "07": "July",
+        "08": "August",
+        "09": "September",
+        "10": "October",
+        "11": "November",
+        "12": "December",
     }
 
     start_dt = f"{start_year}-{start_month}-01"
@@ -564,7 +687,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
         # agg="mean",
     )
 
-    map_title = f"Average {METRIC_NAMES[selected_col].lower()} in SF tracts ({start_year}-{start_month} to {end_year}-{end_month})"
+    map_title = f"{METRIC_NAMES[selected_col]}, averaged over {MONTHS[start_month]} {start_year} to {MONTHS[end_month]} {end_year}"
 
     return map_chart.to_dict(), map_title
 
@@ -573,8 +696,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
 @app.callback(
     [
         Output("reg-chart", "spec"),  # update
-        Output("regression-title", "children"),  # title-regression
-    ],
+                ],
     [
         Input("tabs-content", "value"),  # change in column
     ],
@@ -585,9 +707,8 @@ def update_regression(tab_value):
         raise exceptions.PreventUpdate
 
     new_reg = create_reg_chart()
-    reg_title = "Total Encampments Reported per Tract"
 
-    return new_reg.to_dict(), reg_title
+    return [new_reg.to_dict()]
 
 
 # tab3 : rent scatterplot
@@ -633,3 +754,7 @@ def update_homeless_scatter(tab_value, selected_tract):
         encampments_scatterplot.to_dict(),
         encampment_title,
     )
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -54,7 +54,9 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
         alt.Tooltip("median_rent:Q", format=",.0f", title="Median rent (per month)"),
         alt.Tooltip("eviction_rate:Q", format=".3%", title="Average eviction rate"),
         alt.Tooltip(
-            "estimate:Q", format=",.0f", title="Average homeless population estimate"
+            "estimate:Q",
+            format=",.0f",
+            title="Average street homeless population estimate",
         ),
         alt.Tooltip(
             "311_calls:Q",
@@ -269,7 +271,9 @@ def create_rent_scatterplot(zip_code: str):
         alt.Chart(filtered_df)
         .mark_line(point=True)
         .encode(
-            x=alt.X("date:T", title="Date", axis=alt.Axis(format="%Y", tickCount="year")),
+            x=alt.X(
+                "date:T", title="Date", axis=alt.Axis(format="%Y", tickCount="year")
+            ),
             y=alt.Y(
                 "rent:Q", title="Median rent (per month)", scale=alt.Scale(zero=False)
             ),
@@ -305,7 +309,9 @@ def create_homeless_scatterplot(tract_id: str):
         alt.Chart(filtered_df)
         .mark_line(point=True)
         .encode(
-            x=alt.X("date:T", title="Date", axis=alt.Axis(format="%Y", tickCount="year")),
+            x=alt.X(
+                "date:T", title="Date", axis=alt.Axis(format="%Y", tickCount="year")
+            ),
             y=alt.Y("estimate:Q", title="Homeless Population Estimate"),
         )
         .properties(
@@ -345,9 +351,11 @@ def create_encampments_scatterplot(tract_id: str):
             measurement_label="{'structures':'Structures', 'tents':'Tents', 'vehicles':'Lived-in Vehicles'}[datum.measurement]"
         )
         .encode(
-            x=alt.X("date:T", title = "Date", axis=alt.Axis(format="%Y", tickCount="year")),
-            y=alt.Y("value:Q", title = "Official Count"),
-            color=alt.Color("measurement_label:N", title = "Encampment Type"),
+            x=alt.X(
+                "date:T", title="Date", axis=alt.Axis(format="%Y", tickCount="year")
+            ),
+            y=alt.Y("value:Q", title="Official Count"),
+            color=alt.Color("measurement_label:N", title="Encampment Type"),
         )
         .properties(width="container", height=350)
     )
