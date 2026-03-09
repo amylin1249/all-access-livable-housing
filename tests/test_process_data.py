@@ -1,11 +1,21 @@
 import pandas as pd
 import math
-from src.process_data import get_sf_geoid, clean_parenthesis, clean_address, generate_311_csv, generate_encampments_csv
+from src.process_data import (
+    get_sf_geoid,
+    clean_parenthesis,
+    clean_address,
+    generate_311_csv,
+    generate_encampments_csv,
+)
 from src.datatypes import RAW_SF_TRACTS, SF_CENSUS_TRACTS
 
+<<<<<<< HEAD
 from src.datatypes import (
     CLEAN_311, CLEAN_ENCAMP    
 )
+=======
+from src.datatypes import CLEAN_311
+>>>>>>> 46936f3dccbf3ab648f8f4479bb4f6c64122a606
 
 
 ### Add tests on generate encampments and 311 CSVs
@@ -14,18 +24,25 @@ from src.datatypes import (
 
 
 
+
 def test_clean_address():
     assert clean_address("Intersection of ALABAMA ST and 15TH ST") == "alabama 15th"
-    assert clean_address("Intersection of CESAR CHAVEZ ST and HWY 101 N ON RAMP") == "cesar chavez hwy 101 n ramp"
+    assert (
+        clean_address("Intersection of CESAR CHAVEZ ST and HWY 101 N ON RAMP")
+        == "cesar chavez hwy 101 n ramp"
+    )
     assert clean_address("Intersection of ELM ST and END (200 BLOCK OF)") == "elm end"
-    assert clean_address("1499 POTRERO AVE, SAN FRANCISCO, CA, 94110") == '1499 potrero san francisco ca 94110'
+    assert (
+        clean_address("1499 POTRERO AVE, SAN FRANCISCO, CA, 94110")
+        == "1499 potrero san francisco ca 94110"
+    )
     assert clean_address("the cliff(f(google) and the .. street") == "cliff"
-    assert clean_address("? street i poi 45 yellow") == '45 yellow'
-
+    assert clean_address("? street i poi 45 yellow") == "45 yellow"
 
 
 def test_generate_311_csv():
     df_311 = pd.read_csv(CLEAN_311)
+<<<<<<< HEAD
     assert(sum(df_311.duplicated(subset=['date', 'lat', 'lon']))) == 0
     assert min(df_311['lat']) < 38 and min(df_311['lat']) > 36
     assert min(df_311['lon']) < -119 and min(df_311['lon']) > -123
@@ -36,6 +53,11 @@ def test_generate_encampments_csv():
 
 
 
+=======
+    assert (sum(df_311.duplicated(subset=["date", "lat", "lon"]))) == 0
+    assert min(df_311["lat"]) < 38 and min(df_311["lat"]) > 36
+    assert min(df_311["lon"]) < -119 and min(df_311["lon"]) > -123
+>>>>>>> 46936f3dccbf3ab648f8f4479bb4f6c64122a606
 
 
 ACS_DF = pd.read_csv(SF_CENSUS_TRACTS)

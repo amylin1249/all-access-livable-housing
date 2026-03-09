@@ -20,8 +20,8 @@ def generate_rent_by_zip_dict() -> dict[dict]:
     """
     Generates the median monthly rent for each SF zip code.
 
-    Returns: 
-        A dictionary of median rent for each month and SF zip code 
+    Returns:
+        A dictionary of median rent for each month and SF zip code
     """
     rent_by_zip = {}
 
@@ -41,7 +41,7 @@ def generate_crosswalks_dict() -> dict[tuple]:
     Generates percentage contribution of a tract's population to the zip code's
     population for a given month.
 
-    Returns: 
+    Returns:
         A dictionary of monthly crosswalk data (tract's population contribution)
         for each SF zip code, where each value is a tuple of (tract, res_ratio)
     """
@@ -125,7 +125,7 @@ def count_evictions_by_tract() -> pd.DataFrame:
 def generate_acs_df() -> pd.DataFrame:
     """
     Convert SF census tracts' ACS data from CSV to DataFrame.
-    
+
     Returns:
         A pandas.DataFrame object with SF census tracts' ACS data.
     """

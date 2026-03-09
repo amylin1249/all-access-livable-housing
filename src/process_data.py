@@ -320,9 +320,11 @@ def generate_311_csv():
     # Drop observations where lat/lon = 0
     df = df[(df["lat"] != 0) & (df["lon"] != 0)]
 
+    # De-dupe by lat, lon, and month (keep only one row per lat/lon pair per month)
+    df = df.drop_duplicates(subset=["date", "lat", "lon"], keep="first")
+
     # Reorder columns for readability
     df = df.reindex(columns=["id", "date", "lat", "lon"])
-
 
     df.to_csv(CLEAN_311, index=False)
 
@@ -512,8 +514,29 @@ def generate_crosswalks_csv():
             sf_df = process_crosswalks_xlsx(file_path, sf_zips, sf_tracts)
             list_of_dfs.append(sf_df)
 
-    # Aggregate and output to CSV
+    # Aggregate dfs
     aggregated_df = pd.concat(list_of_dfs)
+
+    # Grab unique zip, tract pairs
+    zip_tract_pairs_df = aggregated_df[["zip", "tract"]].drop_duplicates()
+    zip_tract_pairs = list(zip_tract_pairs_df.itertuples(index=False, name=None))
+
+    # Grab unique dates
+    dates = aggregated_df["date"].unique()
+
+    # Fill in missing dates for zip, tract pairs with mean of existing data
+    for zip, tract in zip_tract_pairs:
+        zip_tract_df = aggregated_df[
+            (aggregated_df["zip"] == zip) & (aggregated_df["tract"] == tract)
+        ]
+        if len(zip_tract_df) < 20:
+            average_res_ratio = zip_tract_df["res_ratio"].mean()
+            for date in dates:
+                if zip_tract_df[zip_tract_df["date"] == date].empty:
+                    new_row_data = [zip, tract, average_res_ratio, date]
+                    aggregated_df.loc[len(aggregated_df)] = new_row_data
+
+    # Output to CSV
     aggregated_df.to_csv(CLEAN_CROSSWALKS, index=None, header=True)
 
 

@@ -68,6 +68,7 @@ def main():
     # Run dashboard with interactive visualizations
     if args.dashboard:
         from .dashboard import app
+
         print(
             "Copy the link below from Dash and paste it into your web browser to view our interactive visualizations."
         )
