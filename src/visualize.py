@@ -227,7 +227,7 @@ def create_rent_scatterplot(zip_code: str):
             .mark_line(point=True)
             .encode(
                 x=alt.X("date:T", title = "Date"),
-                y=alt.Y("rent:Q", title = "Median rent (per month)"))
+                y=alt.Y("rent:Q", title = "Median rent (per month)",scale=alt.Scale(zero=False)))
             .properties(width="container", height=450,autosize=alt.AutoSizeParams(type='fit', contains='padding'))
         )
 
