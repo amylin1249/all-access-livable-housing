@@ -415,7 +415,7 @@ def render_content(tab):
                 #scatter plots
                 html.Div(
                     [
-                        # left
+                        # left plot
                         html.Div(
                             [
                                 html.H4(id="homeless-title-1", style={"textAlign": "center"}),
@@ -432,7 +432,7 @@ def render_content(tab):
                                 "borderRadius": "10px",
                             },
                         ),
-                        # right
+                        # right plot
                         html.Div(
                             [
                                 html.H4(id="homeless-title-2", style={"textAlign": "center"}),
@@ -462,7 +462,7 @@ def render_content(tab):
         )
 
 
-
+# tab1 : map 
 @app.callback(
     [
         Output("sf-map", "spec"),  # update
@@ -509,7 +509,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
 
     return map_chart.to_dict(), map_title
 
-# tab2
+# tab2 :regression
 @app.callback(
     [
         Output("reg-chart", "spec"),  # update
@@ -529,7 +529,7 @@ def update_regression(tab_value):
 
     return new_reg.to_dict(), reg_title
 
-# tab3
+# tab3 : rent scatterplot
 @app.callback(
     [Output("rent-scatter-plot", "spec"),Output("rent-plot-title", "children")],
     [Input("tabs-content", "value"),
@@ -546,7 +546,7 @@ def update_rent_scatter(tab_value, selected_zip):
         
     return rent_scatterplot.to_dict(), rent_title
 
-# tab 4
+# tab 4 : homeless scatterplot
 @app.callback(
     [
         Output("homeless-1", "spec"),Output("homeless-title-1", "children"),
