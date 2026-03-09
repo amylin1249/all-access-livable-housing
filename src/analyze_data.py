@@ -16,11 +16,13 @@ STRUCTURES_EST = 1.7
 VEHICLES_EST = 1.6
 
 
-def generate_rent_by_zip_dict():
+def generate_rent_by_zip_dict() -> dict[dict]:
     """
-    Returns: rent_by_zip: [dict] monthly median rent for each SF zip code
-    """
+    Generates the median monthly rent for each SF zip code.
 
+    Returns: 
+        A dictionary of median rent for each month and SF zip code 
+    """
     rent_by_zip = {}
 
     with open(CLEAN_ZILLOW) as f:
@@ -34,13 +36,17 @@ def generate_rent_by_zip_dict():
     return rent_by_zip
 
 
-def generate_crosswalks_dict():
+def generate_crosswalks_dict() -> dict[tuple]:
     """
-    Returns: crosswalks: [dict] monthly crosswalk data per SF zip code, with
-        (tract, res_ratio)
+    Generates percentage contribution of a tract's population to the zip code's
+    population for a given month.
+
+    Returns: 
+        A dictionary of monthly crosswalk data (tract's population contribution)
+        for each SF zip code, where each value is a tuple of (tract, res_ratio)
     """
-    # Generate dictionary with crosswalks data
     crosswalks = {}
+
     with open(CLEAN_CROSSWALKS) as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -99,34 +105,43 @@ def weight_to_census_tract(crosswalks, rent_by_zip):
     return rent_by_tract
 
 
-def total_evictions_by_tract():
+def count_evictions_by_tract() -> pd.DataFrame:
     """
-    Combine current evictions data with census tracts
-    to get total number of evictions within a tract for a given month
+    Aggregate number of evictions in each tract and month.
+
+    Returns:
+        A pandas.DataFrame object aggregating the number of evictions by tract
+        and month
     """
     evictions_df = pd.read_csv(JOINED_EVICTIONS_TRACTS)
 
     evictions_df["geoid"] = evictions_df["geoid"].astype(str).str.zfill(11)
     group_by_month = evictions_df.groupby(["geoid", "year_mon"])
-    total_evic_per_mon = group_by_month.size().reset_index(name="total_evictions")
+    evictions_per_month = group_by_month.size().reset_index(name="total_evictions")
 
-    return total_evic_per_mon
+    return evictions_per_month
 
 
-def grab_acs_data():
+def generate_acs_df() -> pd.DataFrame:
+    """
+    Convert SF census tracts' ACS data from CSV to DataFrame.
+    
+    Returns:
+        A pandas.DataFrame object with SF census tracts' ACS data
+    """
     acs_df = pd.read_csv(SF_CENSUS_TRACTS)
     acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str).str.zfill(11)
     return acs_df
 
 
-def calculate_eviction_rate():
+def calculate_eviction_rate() -> dict:
     """
     Divide total number of evictions within a tract for a given month
     by avg monthly num renter hh to get evictions rate
     return eviction_mon / rent_units
     """
-    acs_df = grab_acs_data()
-    agg_eviction_df = total_evictions_by_tract()
+    acs_df = generate_acs_df()
+    agg_eviction_df = count_evictions_by_tract()
 
     merged = pd.merge(
         agg_eviction_df,
@@ -140,7 +155,7 @@ def calculate_eviction_rate():
     return merged.to_dict(orient="records")
 
 
-def count_311_by_tract():
+def count_311_by_tract() -> pd.DataFrame:
     """
     Aggregate number of 311 calls in each tract and month.
 
@@ -154,7 +169,7 @@ def count_311_by_tract():
     return df.groupby(["geoid", "date"]).size().reset_index(name="311_calls")
 
 
-def count_encampments_by_tract():
+def count_encampments_by_tract() -> pd.DataFrame:
     """
     Aggregate number of encampments (tents, structures, vehicles) in each tract
     and month.
@@ -179,7 +194,7 @@ def generate_tidy_csv():
     """
     Add docstring
     """
-    acs_df = grab_acs_data()
+    acs_df = generate_acs_df()
     # Convert monthly median rent per SF census tract dictionary into rows of tidy CSV
     rent_by_zip = generate_rent_by_zip_dict()
     crosswalks = generate_crosswalks_dict()

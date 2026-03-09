@@ -250,15 +250,15 @@ def clean_parenthesis(phrase: str) -> str:
     return " ".join(output_list)
 
 
-def clean_address(address):
+def clean_address(address: str) -> str:
     """
-    Cleans addresses for deduplication
+    Cleans addresses for deduplication.
 
     Parameters:
-        address [str]: Address in the 311 reports
+        address: a string of an address in the 311 reports
 
     Returns:
-        clean_string [str]: A cleaned string for the address
+        A cleaned string for the address.
     """
     address = address.lower()
     address = address.replace("i poi", "")
@@ -268,19 +268,18 @@ def clean_address(address):
     cleaned_list = [word for word in cleaned_list if word != ""]
     cleaned_list = [word for word in cleaned_list if word not in STOPWORDS]
     clean_string = " ".join(cleaned_list)
+
     return clean_string
 
 
 def generate_311_csv():
     """
-    Clean 311 files and export results to a CSV. This includes:
+    Cleans 311 files and exports results to a CSV. This includes:
         (1) Converting dates to standardized format
         (2) Filtering for years of interest
-        (3) Adding a unique id column
+        (3) Adding a unique ID column
         (4) Deduplicating by cleaned address strings
         (5) Dropping observations with zero geographic information
-
-    Returns: A CSV file in the cleaned data folder
     """
     # Load raw data
     df = pd.read_csv(RAW_311)
@@ -329,14 +328,12 @@ def generate_311_csv():
 
 def generate_encampments_csv():
     """
-    Clean point-in-time quarterly encampment files and export results to a CSV. This includes:
+    Cleans point-in-time quarterly encampment files and exports results to a CSV. This includes:
         (1) Renaming columns
         (2) Filtering for years of interest
         (3) Converting dates to standardized format
         (4) Creating an aggregate vehicles column
         (5) Adding a unique ID column
-
-    Returns: A CSV file in the cleaned data folder
     """
     # Top row (row 0) is not a real header row
     df = pd.read_excel(RAW_ENCAMP, header=1)
@@ -392,13 +389,13 @@ def generate_encampments_csv():
     df.to_csv(CLEAN_ENCAMP, index=False)
 
 
-def generate_zillow_csv():
+def generate_zillow_csv() -> list:
     """
     Loads Zillow CSV file, filters for SF zip codes and the years 2020-2024, imputes
     to fill missing data, and outputs tidy Zillow CSV.
 
     Returns:
-        zips: [list] SF zip codes
+        A list of SF zip codes.
     """
     # Load raw data
     df = pd.read_csv(RAW_ZILLOW)
@@ -435,7 +432,7 @@ def generate_zillow_csv():
     tidy_df.to_csv(CLEAN_ZILLOW, index=False)
 
 
-def process_crosswalks_xlsx(file_path, zips, tracts):
+def process_crosswalks_xlsx(file_path: Path, zips: set, tracts: set):
     """
     Loads crosswalks XLSX file, selects necessary columns (zip, tract, res_ratio),
     filters for specified zips and tracts, and saves date column by extracting
