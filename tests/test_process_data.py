@@ -27,7 +27,7 @@ def test_generate_311_csv():
     assert (sum(df_311.duplicated(subset=["date", "lat", "lon"]))) == 0
     assert min(df_311["lat"]) < 38 and min(df_311["lat"]) > 36
     assert min(df_311["date"]) == "2020-01"
-    assert max(df_311["date"]) == "2025-01"
+    assert max(df_311["date"]) == "2024-12"
     assert min(df_311["lon"]) < -119 and min(df_311["lon"]) > -123
 
 

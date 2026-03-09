@@ -297,12 +297,13 @@ def generate_311_csv():
         }
     )
 
-    # Convert date to standardized format: YYYY-MM
     df["date"] = pd.to_datetime(df["date"])
-    df["date"] = df["date"].dt.strftime("%Y-%m")
 
     # Filter for years of interest: 2020-2024
     df = df[df["date"].between("2020-01-01", "2024-12-31")]
+
+    # Convert date to standardized format: YYYY-MM
+    df["date"] = df["date"].dt.strftime("%Y-%m")
 
     # Add id column
     df["id"] = range(1, len(df) + 1)
@@ -367,6 +368,7 @@ def generate_encampments_csv():
 
     # Filter for years of interest: 2020-2024
     df["date"] = pd.to_datetime(df["date"])
+    
     # Include Jan 2025 to successfully interpolate for last few months of 2024
     df = df[df["date"].between("2020-01-01", "2025-01-31")]
 
