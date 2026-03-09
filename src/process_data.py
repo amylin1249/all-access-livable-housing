@@ -222,7 +222,7 @@ STOPWORDS = [
 ]
 
 
-PUNCTUATION = ".,?-#/()[]"
+PUNCTUATION = ".,?-#/()[]$_"
 
 
 def clean_parenthesis(phrase: str) -> str:
@@ -322,6 +322,7 @@ def generate_311_csv():
 
     # Reorder columns for readability
     df = df.reindex(columns=["id", "date", "lat", "lon"])
+
 
     df.to_csv(CLEAN_311, index=False)
 
