@@ -72,7 +72,7 @@ def main():
         print(
             "Copy the link below from Dash and paste it into your web browser to view our interactive visualizations."
         )
-        app.run(debug=True, use_reloader=False)
+        app.run(debug=False, use_reloader=False)
 
 
 if __name__ == "__main__":

@@ -770,7 +770,3 @@ def update_regression(tab_value):
     new_reg = create_reg_chart()
 
     return [new_reg.to_dict()]
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
