@@ -11,6 +11,22 @@
 ## Data Documentation
 List the sources of data, any gaps or challenges in the data. Explain how data flows through the project. What else would someone picking this project up for the first time need to understand?
 
+Source of Data
+#1: DataSF Open Data Portal
+    #1.1: 311 Cases
+    #1.2: Quarterly count of tents, structures, and lived-in vehicles
+    #1.3: Evictions data
+#2: Census Data
+    #2.1: ACS data on rental costs and demographic data
+    #2.2: Listing and geographic boundaries of census tracts in SF
+#3: Zillow Observed Renter Index (ZORI)
+#4: HUD Crosswalks
+#5: Sacramento 2024 PIT Count Report
+
+The data flows through a centralized pipeline starting with automated API extraction and CSV loading, followed by a transformation stage where ZIP-level ZORI data is crosswalked to Census Tracts and scaled using ACS median rent values to adjust local median rent variations. 311 calls and eviction records are grouped by month and tract to calculate monthly rates. Quarterly encampment data is interpolated to fill monthly gaps for tents, structures, and vehicles. A weighted homelessness estimate is calculated using predefined conservative multipliers for different encampment types. All processed streams are merged into a single Tidy CSV (merged_data.csv) regression analysis, spatial join, visualization and dashboard.
+
+
+
 
 ## Project Structure
 Write a page or so describing the structure of your project. What modules exist? What do they do? A diagram may be helpful here.
@@ -66,7 +82,7 @@ The last section is focused on visualizations and dashboarding. The visualize mo
 - Built an automated API pipeline to retrieve, filter, and store real-time eviction records of SF into standardized CSV formats.
 - Defined a weighted estimation logic using PIT data to calculate unsheltered population counts across various housing types
 - Calculated tract-level eviction rates by merging multi-source datasets and structuring results into a unified data dictionary
-- Wrote 'pytest' tests to validate the accuracy of data extraction, filtering, and mathematical calculations.
+- Wrote `pytest` tests to validate the accuracy of data extraction, filtering, and mathematical calculations.
 - Refactored core plotting code of visualizing to optimize visualization performance and ensure seamless interactivity within the dashboard
 - Spearheaded the development of a dashboard, designing the main interface and logic to synthesize housing and homelessness metrics into a functional user experience
 
