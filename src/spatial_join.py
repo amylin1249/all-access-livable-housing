@@ -10,12 +10,6 @@ import pandas as pd
 
 from .datatypes import (
     MERGED_SF_TRACTS_SHP,
-    CLEAN_EVICTIONS,
-    CLEAN_ENCAMP,
-    CLEAN_311,
-    JOINED_EVICTIONS_TRACTS,
-    JOINED_ENCAMP_TRACTS,
-    JOINED_311_TRACTS,
 )
 
 

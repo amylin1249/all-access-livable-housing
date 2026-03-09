@@ -112,13 +112,13 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
 
 def create_reg_chart():
     """
-    Create an Altair coefficient plot representing the results of a
+    Creates an Altair coefficient plot representing the results of a
     regression analysis on 311 service reports.
     The chart visualizes the point estimates and 95% confidence intervals
     for predictors such as rent, income, and physical encampment counts.
 
     Returns:
-        An Altair chart object visualizing regression coefficients with  color encoding.
+        An Altair chart object visualizing regression coefficients with color encoding.
     """
 
     variables = [
