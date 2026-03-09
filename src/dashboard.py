@@ -402,8 +402,7 @@ def render_content(tab):
                     "border": "1px solid #eee", 
                     "borderRadius": "10px", 
                     "backgroundColor": "#fff", 
-                    "lineHeight": "1.6",
-                    "color": "#34495e"
+                    "lineHeight": "1.6"
                 })
             ], style={
                 "padding": "25px", 
