@@ -1,7 +1,6 @@
 # Project: All Access Livable Housing
 
 ## Members
-
 - Haeji Ahn <ahaeji925@uchicago.edu>
 - Lily Hoffman <lshoffman@uchicago.edu>
 - Amy Lin <amsylin@uchicago.edu>
@@ -9,7 +8,6 @@
 
 
 ## Abstract
-
 Several cities in the United States are experiencing a homelessness crisis, with San Francisco often cited due to its high housing prices and limited housing supply. Our project examines the relationship between the count of unsheltered persons and housing prices in San Francisco from 2020 to 2024 at the census tract level. Specifically, we compare monthly estimates of unsheltered individuals with average monthly rent, both of which require interpolation and estimation to obtain sufficiently granular, temporal data.
 
 Building on the city’s publicly available encampment location data, we use statistical methods to integrate quarterly structure-based counts with monthly aggregates of homelessness-related 311 service requests and eviction rates to generate tract-level monthly estimates of unsheltered homelessness. To obtain monthly rental price estimates, we use ACS 5-year average rent data to establish baseline neighborhood rent levels and combine them with monthly Zillow Observed Rent Index data at the ZIP code level.
@@ -17,14 +15,15 @@ Building on the city’s publicly available encampment location data, we use sta
 Overall, our project has a strong focus on spatial analysis and mapping, visualizing key homelessness-related metrics across tracts for selected time periods through a heatmap, as well as the relationship between encampments, rent prices, and demographics across tracts.
 
 
-## Screenshot of project
-![alt text](Dashboard_mainpage.png)
-![alt text](Tab1_map.png)
-![alt text](Tab2_homelessness_estimate.png)
-![alt text](Tab3_montlyrent.png)
-![alt text](Tab4_regression.png)
+## Screenshots of project
+![Dashboard Mainpage](docs/dash_mainpage.png)
+![Dashboard Tab 1: Map](docs/dash_tab1_map.png)
+![Dashboard Tab 2: Linechart - Homelessness](docs/dash_tab2_linechart_homelessness.png)
+![Dashboard Tab 3: Linechart - Rent](docs/dash_tab3_linechart_rent.png)
+![Dashboard Tab 4: Regression](docs/dash_tab4_regression.png)
 
-## Instructions to our project 
+
+## Instructions to run our project 
 1. Clone our repository by running `git clone git@github.com:uchicago-2026-capp30122/project-all-access-livable-housing.git` in your terminal.
 2. After cloning the repository, run `uv sync` in the project root directory to install the required packages and set up the virtual environment.
 3. *[Optional -- these files should already be included in the repository]* To retrieve API data and regenerate the clean data files, run `uv run python -m src --data` in the root directory. This will take around 3 minutes to run.
