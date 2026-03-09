@@ -20,7 +20,13 @@ Write a page or so describing the structure of your project. What modules exist?
 ## Team responsibilities
 
 ### Haeji
-- 
+- Processed and filtered Zillow Observed Renter Index (ZORI) data to analyze longitudinal rental trends across 23 San Francisco ZIP codes from 2020 to 2024
+- Built an automated API pipeline to retrieve, filter, and store real-time eviction records of SF into standardized CSV formats.
+- Defined a weighted estimation logic using PIT data to calculate unsheltered population counts across various housing types
+- Calculated tract-level eviction rates by merging multi-source datasets and structuring results into a unified data dictionary
+- Wrote 'pytest' tests to validate the accuracy of data extraction, filtering, and mathematical calculations.
+- Refactored core plotting code of visualizing to optimize visualization performance and ensure seamless interactivity within the dashboard
+- Spearheaded the development of a dashboard, designing the main interface and logic to synthesize housing and homelessness metrics into a functional user experience
 
 ### Lily
 - 
