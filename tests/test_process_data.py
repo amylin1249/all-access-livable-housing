@@ -4,7 +4,7 @@ from src.process_data import get_sf_geoid, clean_parenthesis, clean_address, gen
 from src.datatypes import RAW_SF_TRACTS, SF_CENSUS_TRACTS
 
 from src.datatypes import (
-    CLEAN_311    
+    CLEAN_311, CLEAN_ENCAMP    
 )
 
 
@@ -12,12 +12,7 @@ from src.datatypes import (
 
 ## Tests for Lily to add on encampments and 311 CSVs
 
-## Ensure your cleaned dataset has the expected columns.
-## Verify cleaning removed or handled nulls.
-## Ensure values fall in expected ranges.clean_df["value"].between(0, 100).all()
-## Duplicate Checks
-## Row count checks
-## can test particular values
+
 
 def test_clean_address():
     assert clean_address("Intersection of ALABAMA ST and 15TH ST") == "alabama 15th"
@@ -35,7 +30,9 @@ def test_generate_311_csv():
     assert min(df_311['lat']) < 38 and min(df_311['lat']) > 36
     assert min(df_311['lon']) < -119 and min(df_311['lon']) > -123
 
-
+def test_generate_encampments_csv():
+    df_encamp = pd.read_csv(CLEAN_ENCAMP)
+    
 
 
 
