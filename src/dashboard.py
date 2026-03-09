@@ -322,25 +322,57 @@ def render_content(tab):
                         dvc.Vega(
                             id="reg-chart",
                             spec={},
-                            style={"width": "100%", "height": "500px"},
+                            style={
+                                "width": "100%",
+                                "height": "500px",
+                                "marginBottom": "30px",
+                            },
+                        ),
+                        # explaining regression
+                        html.Div(
+                            [
+                                html.P(
+                                    "We ran a regression to examine how tract-level characteristics are associated with "
+                                    "the number of encampments reported (measured as the total number of unique addresses "
+                                    "reported through 311). For each month in which point-in-time encampment estimates "
+                                    "were calculated, we matched those estimates to the total number of unique encampment "
+                                    "addresses reported in the 311 call data for that month, along with tract-level "
+                                    "demographic and socioeconomic characteristics from the ACS.",
+                                    style={"marginBottom": "15px"},
+                                ),
+                                html.P(
+                                    "The regression included month fixed effects. The results indicate that median household income "
+                                    "and median household rent are not significantly associated with the number of reported 311 "
+                                    "encampment addresses. However, a tract's racial composition appears to be related to reporting "
+                                    "behavior among residents: for every 10-percentage-point increase in the share of tract residents "
+                                    "who are White, approximately one additional encampment address is reported per month. "
+                                    "Note this does not include duplicate reports.",
+                                    style={"marginBottom": "15px"},
+                                ),
+                                html.P(
+                                    "Encampment characteristics are also strongly associated with reporting. Each additional tent "
+                                    "observed is associated with roughly 0.9 additional reported addresses in a month, and each "
+                                    "additional structure is associated with 0.64 additional reported addresses reported in a month. "
+                                    "In contrast, the number of vehicles in an encampment has no clear relationship with the number "
+                                    "of unique addresses reported. One possible explanation is that vehicles blend more easily into "
+                                    "the surrounding environment and are therefore less noticeably part of a homeless encampment."
+                                ),
+                            ],
+                            style={
+                                "width": "80%",
+                                "margin": "0 auto",
+                                "padding": "25px",
+                                "border": "1px solid #ddd",
+                                "borderRadius": "10px",
+                                "backgroundColor": "white",
+                            },
                         ),
                     ],
                     style={
-                        "width": "100%",
-                        "padding": "20px",
-                        "marginLeft": "20px",
-                        "border": "1px solid #ddd",
-                        "borderRadius": "10px",
-                        "backgroundColor": "white",
+                        "padding": "10px",
                     },
-                ),
-            ],
-            style={
-                "display": "flex",
-                "flexDirection": "row",
-                "alignItems": "flex-start",
-                "padding": "10px",
-            },
+                )
+            ]
         )
 
     # [tab 3. Rent Scatter Plot]
