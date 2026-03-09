@@ -11,7 +11,6 @@ from .process_data import (
 )
 from .spatial_join import join_tracts_csv
 from .analyze_data import generate_tidy_csv
-from .dashboard import app
 
 from .datatypes import (
     CLEAN_EVICTIONS,
@@ -68,6 +67,7 @@ def main():
 
     # Run dashboard with interactive visualizations
     if args.dashboard:
+        from .dashboard import app
         print(
             "Copy the link below from Dash and paste it into your web browser to view our interactive visualizations."
         )
