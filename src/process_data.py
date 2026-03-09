@@ -31,7 +31,7 @@ from .datatypes import (
     CLEAN_CROSSWALKS,
 )
 
-EXCLUDE_GEOID = "06075980401"
+EXCLUDE_GEOID = "06075980401" # Farallon Islands
 
 SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/sf_shapefiles"
 MERGED_SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/merged_sf_shapefiles"

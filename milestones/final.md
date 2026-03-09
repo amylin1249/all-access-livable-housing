@@ -15,6 +15,18 @@ List the sources of data, any gaps or challenges in the data. Explain how data f
 ## Project Structure
 Write a page or so describing the structure of your project. What modules exist? What do they do? A diagram may be helpful here.
 
+Tree structure of src repository
+├── __init__.py
+├── __main__.py
+├── analyze_data.py
+├── dashboard.py
+├── datatypes.py
+├── get_api_data.py
+├── process_data.py
+├── run_regression.py
+├── spatial_join.py
+└── visualize.py
+
 The first module in our data pipeline, process_data, imports the raw datasets, deduplicates key variables,standardizes selected fields, and exports the cleaned output to a CSV file in the cleaned-data folder. 
 Cleaning the 311 encampment reports requires additional processing of address strings and the removal of 
 duplicate latitude–longitude–month combinations. This step ensures that we measure the unique number of 
