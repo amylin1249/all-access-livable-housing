@@ -1,10 +1,10 @@
 import pandas as pd
 import pytest
-from src.analyze_data import total_evictions_by_tract, calculate_eviction_rate
+from src.analyze_data import count_evictions_by_tract, calculate_eviction_rate
 
 
 def test_total_evictions_format():
-    results = total_evictions_by_tract()
+    results = count_evictions_by_tract()
     df = pd.DataFrame(results)
     assert df["geoid"].str.len().unique()[0] == 11
     # made a new column : total eviction
@@ -12,7 +12,7 @@ def test_total_evictions_format():
 
 
 def test_total_evictions_grouping():
-    results = total_evictions_by_tract()
+    results = count_evictions_by_tract()
     # Nan
     assert not results["total_evictions"].isnull().any()
     # total num of eviction
