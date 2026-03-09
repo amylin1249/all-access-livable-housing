@@ -27,7 +27,6 @@ The data flows through a centralized pipeline starting with automated API extrac
 
 
 
-
 ## Project Structure
 Write a page or so describing the structure of your project. What modules exist? What do they do? A diagram may be helpful here.
 
@@ -61,18 +60,21 @@ Focusing on the src directory where we have our source code, we have 7 main modu
 3. Visualizing data (visualize, dashboard)
 The above modules are supported by datatypes, which contain global variables used across them.
 
-Starting from the first stage of retrieving data, the get_api_data module retrieves data from the evictions data API, which is saved to a CSV file.
+Our project pipeline begins with data retrieval. The get_api_data module retrieves eviction data from an external API and saves the results to a CSV file for use in subsequent steps.
 
-Under data cleaning and processing, we begin with process_data. This module processes and merges ACS data and census shapefiles, cleans and generates encampments and 311 homelessness reports data, filters and imputes missing Zillow data, and processes crosswalks excel files. Processing the ACS files requires imputing negative values. Cleaning the 311 encampment reports requires additional processing of address strings and the removal of duplicate latitude–longitude–month combinations. This step ensures that we measure the unique number of encampments reported in a given month, rather than simply counting the total number of reports submitted. Processing crosswalks also requires interpolation and matching of data from zip codes to tracts to get numbers for each tract. More generally, this module deduplicates key variables, standardizes selected fields, and exports the cleaned output to CSV files and shapefiles in the cleaned-data folder.
+The next stage focuses on data cleaning and processing, beginning with the process_data module. This module processes and merges ACS data with census tract shapefiles, cleans encampments and 311 homelessness reports data, filters and imputes missing Zillow data, and processes crosswalks Excel files. Processing the ACS files requires imputing negative values, while cleaning the 311 encampment reports involves additional address string processing and the removal of duplicate latitude–longitude–month combinations. This ensures that we measure the unique number of encampments reported in a given month, rather than simply counting the total number of reports submitted. Processing the crosswalks files also requires interpolation and matching ZIP code-level data to census tracts in order to obtain tract-level estimates. More broadly, this module deduplicates key variables, standardizes selected fields, and exports the cleaned datasets as CSV files and shapefiles in the cleaned-data folder.
 
-spatial_join is the next module under data processing, which implements the quadtree-based spatial matching algorithm to match point lat/lon coordinates to their appropriate census tract polygons. This has been adapted from PA4 and modified to fit the specifications of our model. We apply this procedure to three cleaned datasets: evictions (api_evictions_data.csv), quarterly encampments (clean_encampments_data.csv), and 311 reports (clean_311_data.csv). It then outputs 3 files, one pertaining to each of the cleaned files, with an additional column with the matched tract ID. 
+The next processing step is implemented in the spatial_join module, which applies the quadtree-based spatial matching algorithm to match point latitude-longitude coordinates to their appropriate census tract polygons. This approach was adapted from PA4 and modified to fit the specifications of our project. We apply this procedure to three cleaned datasets: evictions (api_evictions_data.csv), quarterly encampments (clean_encampments_data.csv), and 311 reports (clean_311_data.csv). The module outputs three files, each pertaining to a cleaned dataset, with an additional column that has the matched tract ID. 
 
-Under data processing, we also have the analyze_data module, where we aggregate counts from the joined files (with tract IDs) to get the total counts for each tract, and combine all calculated metrics into a consolidated file. This file forms the basis of our analysis and subsequent visualizations.
+Under data processing, the analyze_data module then aggregates counts from the spatially joined datasets to compute the total counts for each tract. It also combines all calculated metrics into a consolidated dataset, which forms the basis for our analysis and visualizations.
 
-The final module under data processing is run_regression, whose primary purpose is to run a regression model to deepen understanding of the relationship between tract features and the unique number of reported 311 addresses in a given month with available point estimates. This employs statistical analysis, including ordinary least squares and year-month fixed effects to strengthen our analysis. 
+The final module in the data processing stage, run_regression, conducts statistical analysis to further examine the relationship between tract characteristics and the number of unique 311-reported addresses in a given month. This employs ordinary least squares regression with year-month fixed effects to strengthen our analysis. 
 
-The last section is focused on visualizations and dashboarding. The visualize module forms the basis of the graphs that provide a visual representation of our data and analysis. These include a choropleth map representing different metrics across tracts over specified time periods, a regression chart that shows the results of regression analysis on 311 reports, and  
+The last section focuses on visualizations and dashboarding. The visualize module generates several graphs that provide a visual representation of our data and analysis. These include a choropleth map illustrating tract-level metrics over specified time periods, a regression chart showing the results of our statistical analysis of 311 reports, and scatterplots depicting the temporal trends of monthly rent and encampments within individual tracts. 
 
+Lastly, the dashboard module integrates all our visualizations into an interactive interface. The dashboard provides users with background information on our project, highlights key statistics observed, and presents a series of visualizations that illustrate how homelessness trends in SF have evolved over time.
+
+The above modules feed into our __main__.py file, which allows the entire pipeline to be executed from the command line. Given that our modules are all interlinked, this enables users to launch the dashboard, or even regenerate clean data files, ensuring the reproducibility of our files and analysis. 
 
 
 ## Team responsibilities
