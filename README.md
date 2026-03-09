@@ -18,8 +18,11 @@ Overall, our project has a strong focus on spatial analysis and mapping, visuali
 
 
 ## Screenshot of project
-
-
+![alt text](Dashboard_mainpage.png)
+![alt text](Tab1_map.png)
+![alt text](Tab2_homelessness_estimate.png)
+![alt text](Tab3_montlyrent.png)
+![alt text](Tab4_regression.png)
 
 ## Instructions to our project 
 1. Clone our repository by running `git clone git@github.com:uchicago-2026-capp30122/project-all-access-livable-housing.git` in your terminal.
