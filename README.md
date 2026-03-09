@@ -60,6 +60,8 @@ Overall, our project has a strong focus on spatial analysis and mapping, visuali
 - https://www.huduser.gov/portal/datasets/usps_crosswalk.html
 
 ### Data Source #5: Sacramento 2024 PIT Count Report
+- https://www.sacramentostepsforward.org/wp-content/uploads/2025/08/PIT-Report-2024-06-04-Final-with-Cover.pdf (to obtain homelessness estimates across encampment types)
+
 
 ## Project video
 <Insert link to project video>

@@ -11,7 +11,7 @@
 ## Data Documentation
 List the sources of data, any gaps or challenges in the data. Explain how data flows through the project. What else would someone picking this project up for the first time need to understand?
 
-Source of Data
+Sources of data
 #1: DataSF Open Data Portal
     #1.1: 311 Cases
     #1.2: Quarterly count of tents, structures, and lived-in vehicles
@@ -23,13 +23,15 @@ Source of Data
 #4: HUD Crosswalks
 #5: Sacramento 2024 PIT Count Report
 
+Key gaps or challenges include: 
+- #1 DataSF Open Data Portal:
+- #2 Census Data: Negative values were present in a few tracts for metrics such as rent and household income, requiring us to manually impute these values with the mean of the positive values in the dataset.
+- #4 HUD Crosswalks: 
+
 The data flows through a centralized pipeline starting with automated API extraction and CSV loading, followed by a transformation stage where ZIP-level ZORI data is crosswalked to Census Tracts and scaled using ACS median rent values to adjust local median rent variations. 311 calls and eviction records are grouped by month and tract to calculate monthly rates. Quarterly encampment data is interpolated to fill monthly gaps for tents, structures, and vehicles. A weighted homelessness estimate is calculated using predefined conservative multipliers for different encampment types. All processed streams are merged into a single Tidy CSV (merged_data.csv) regression analysis, spatial join, visualization and dashboard.
 
-<<<<<<< HEAD
-
-=======
 In order to understand this project, one would need to know that our project required interpolation in order to get all of our data onto the same spatial and temporal scale. While the original data sources may be on the zip code or quarterly levels, we normalized all data to the monthly census tract level. In addition, it's important to note that the quarterly encampment counts data required emailing with the SF Open Data Portal to get access to the underlying data. While a PowerBI map is regularly updated, the underlying data linked to the map is not. 
->>>>>>> 1b543f3255a20e9ef66712d3d073f7de1b3a722e
+
 
 ## Project Structure
 Write a page or so describing the structure of your project. What modules exist? What do they do? A diagram may be helpful here.
