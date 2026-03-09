@@ -66,9 +66,3 @@ def save_evictions_to_csv(evictions_list):
         csv_writer = csv.DictWriter(f, fieldnames=fieldnames)
         csv_writer.writeheader()
         csv_writer.writerows(evictions_list)
-
-
-if __name__ == "__main__":
-    result = get_evictions_data()
-    if result:
-        save_evictions_to_csv(result)

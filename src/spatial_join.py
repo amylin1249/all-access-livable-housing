@@ -287,9 +287,3 @@ def join_tracts_csv(source_csv: Path, dest_csv: Path):
     merged_df = pd.merge(source_df, matched_df, on="id", how="right")
 
     merged_df.to_csv(dest_csv, index=False)
-
-
-if __name__ == "__main__":
-    join_tracts_csv(CLEAN_EVICTIONS, JOINED_EVICTIONS_TRACTS)
-    join_tracts_csv(CLEAN_ENCAMP, JOINED_ENCAMP_TRACTS)
-    join_tracts_csv(CLEAN_311, JOINED_311_TRACTS)
