@@ -70,6 +70,7 @@ html.Div(
     [
         html.Div(
             [
+<<<<<<< HEAD
                 html.B("Monthly Median Rent"),
                 html.Br(),
                 f"2021 (average): ${df_merged[df_merged['date'].between('2021-01','2021-12')]['median_rent'].mean():,.0f}",
@@ -92,6 +93,51 @@ html.Div(
                 f"2024 (average): {df_merged[df_merged['date'].between('2024-01','2024-12')]['311_calls'].mean():,.0f}",
                 html.Br(),
                 f"Annual % change: {((df_merged[df_merged['date'].between('2024-01','2024-12')]['311_calls'].mean() / df_merged[df_merged['date'].between('2021-01','2021-12')]['311_calls'].mean())**(1/3)-1):.2%}",
+=======
+                html.Div(
+                    [
+                        html.B("Eviction Rate"),
+                        html.Br(),
+                        f"{df_merged['eviction_rate'].mean():.2%}",  ##here
+                        html.Br(),
+                        f"{df_merged['eviction_rate'].mean():.2%}",
+                    ],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+                html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+                html.Div(
+                    [
+                        html.B("Average Rent"),
+                        html.Br(),
+                        f"${df_merged['median_rent'].mean():,.0f}",  ##here
+                        html.Br(),
+                        f"${df_merged['median_rent'].mean():,.0f}",
+                    ],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+                html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+                html.Div(
+                    [
+                        html.B("311 Calls"),
+                        html.Br(),
+                        f"{df_merged['311_calls'].mean():,.0f}",  ##here
+                        html.Br(),
+                        f"{df_merged['311_calls'].mean():,.0f}",
+                    ],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+                html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+                html.Div(
+                    [
+                        html.B("Homelessness Estimate"),
+                        html.Br(),
+                        f"{df_merged['estimate'].mean():,.0f}",  ##here
+                        html.Br(),
+                        f"{df_merged['estimate'].mean():,.0f}",
+                    ],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+>>>>>>> 634ae4cad52b52f27bb1f34c6255399ccf9a5400
             ],
             style={"flex": "1", "textAlign": "center"},
         ),
@@ -620,7 +666,9 @@ def update_homeless_scatter(tab_value, selected_tract):
         raise exceptions.PreventUpdate
 
     homeless_scatterplot = create_homeless_scatterplot(tract_id=selected_tract)
-    homeless_title1 = f"Homeless population estimate over time in census tract {selected_tract}"
+    homeless_title1 = (
+        f"Homeless population estimate over time in census tract {selected_tract}"
+    )
 
     encampments_scatterplot = create_encampments_scatterplot(tract_id=selected_tract)
     encampment_title = f"City-reported encampments (official counts) over time in census tract {selected_tract}"

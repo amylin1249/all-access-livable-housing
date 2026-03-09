@@ -2,7 +2,7 @@ import pandas as pd
 import geopandas as gpd
 import altair as alt
 from .datatypes import MERGED_SF_TRACTS_SHP, MERGED, CLEAN_ZILLOW
-from .regression_analysis import run_reg
+from .run_regression import run_reg
 
 
 def create_tract_map(start_date: str, end_date: str, col_name: str):

@@ -192,7 +192,24 @@ def count_encampments_by_tract() -> pd.DataFrame:
 
 def generate_tidy_csv():
     """
-    Add docstring
+    Integrating multi-source housing and homelessness datasets into a unified
+    tidy CSV for tract-level analysis.
+
+    This function executes the core data engineering pipeline:
+    1. Crosswalks ZIP-level ZORI rent data to Census Tracts and applies ACS-based
+       scaling factors to adjust for local median rent variations.
+    2. Merges calculated eviction rates and aggregates 311 encampment-related
+       service calls by tract and month.
+    3. Processes quarterly encampment point-in-time counts by performing linear
+       interpolation to generate monthly estimates (tents, structures, and vehicles).
+    4. Calculates a weighted homelessness estimate using predefined conservative
+       multipliers for different encampment types.
+    5. Exports the final integrated dataset to a 'merged' CSV file for
+       downstream visualization and regression analysis.
+
+    Returns:
+        None: Saves the processed DataFrame to the path specified by the
+        MERGED constant
     """
     acs_df = generate_acs_df()
     # Convert monthly median rent per SF census tract dictionary into rows of tidy CSV
