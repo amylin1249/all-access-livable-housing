@@ -324,7 +324,3 @@ def generate_tidy_csv():
     )
 
     tidy_df.to_csv(MERGED, index=False)
-
-
-if __name__ == "__main__":
-    generate_tidy_csv()

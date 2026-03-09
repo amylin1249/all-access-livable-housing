@@ -634,7 +634,3 @@ def update_homeless_scatter(tab_value, selected_tract):
         encampments_scatterplot.to_dict(),
         encampment_title,
     )
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
