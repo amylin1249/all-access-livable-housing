@@ -150,16 +150,43 @@ def render_content(tab):
             [
                 html.Div(
                     [
+                                                html.Div(
+                            [
+                                html.B("Which parts of San Francisco have a higher concentration of street homeless individuals?"),
+                                html.Br(),
+                                html.B("Where are median rents higher, and where are people being evicted?")
+
+                            ],
+                            style={
+                                "fontSize": "20px",
+                                "lineHeight": "1",
+                                "marginBottom": "20px",
+                                "textAlign": "center",
+                            },
+                        ),
+                         
+                                               html.Div(
+                            [
+                                "These questions can be answered using the ",
+                                html.B("interactive map"),
+                                " below."
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
                         html.Div(
                             [
-                                html.B("Instruction: "),
-                                "Use the ",
-                                html.B("dropdown"),
+                                html.B("How to use: "),
+                                "Select your ",
+                                html.B("metric of interest"),
                                 " and ",
-                                html.B("date selectors"),
-                                " below to select your metric and time period of interest. The ",
-                                html.B("map"),
-                                " will update automatically based on your selection.",
+                                html.B("start and end dates"),
+                                " from the ",
+                                html.B("dropdown menu"),
+                                " below. The map will automatically update based on your selection.",
                             ],
                             style={
                                 "fontSize": "16px",
@@ -390,9 +417,34 @@ def render_content(tab):
                     [
                         html.Div(
                             [
-                                html.B("Instruction: "),
-                                "Explore the cmedian rent trends by zip code."
-                                "The chart updates automatically based on your selection.",
+                                html.B("How has the monthly rent in my neighborhood changed over time? What was the impact of the COVID-19 pandemic on rents?")
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                                        html.Div(
+                            [
+                                "These questions can be answered using the ",
+                                html.B("interactive scatterplot"),
+                                " below."
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                html.B("How to use: "),
+                                "Select your ",
+                                html.B("zip code"),
+                                " from the ",
+                                html.B("dropdown menu"),
+                                " below. The graph will automatically update based on your selection.",
                             ],
                             style={
                                 "fontSize": "16px",
@@ -401,7 +453,7 @@ def render_content(tab):
                             },
                         ),
                         # dropdown
-                        html.Label("Select Zip-code:", style={"fontWeight": "bold"}),
+                        html.Label("Select Zip Code:"),
                         dcc.Dropdown(
                             id="zip-dropdown",
                             options=[
@@ -445,10 +497,44 @@ def render_content(tab):
             [
                 html.Div(
                     [
-                        html.B("Analysis: "),
-                        "Homelessness estimate : tents + vehicles + structures",
-                        html.Br(),
-                        html.Label("Select Tract ID:"),
+                                      html.Div(
+                            [
+                                html.B("How has the street homeless population in my neighborhood changed over time? What is the distribution of tents, structures, and lived-in vehicles?")
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                                        html.Div(
+                            [
+                                "These questions can be answered using the ",
+                                html.B("interactive scatterplot"),
+                                " below."
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                html.B("How to use: "),
+                                "Select your ",
+                                html.B("census tract ID"),
+                                " from the ",
+                                html.B("dropdown menu"),
+                                " below. The graph will automatically update based on your selection.",
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        html.Label("Select Census Tract ID:"),
                         dcc.Dropdown(
                             id="tract-dropdown",
                             options=[
@@ -585,7 +671,7 @@ def update_regression(tab_value):
         raise exceptions.PreventUpdate
 
     new_reg = create_reg_chart()
-    reg_title = "Total Encampments Reported per Tract"
+    reg_title = "How does the number of citizen-reported encampments (311 calls) correlate with tract-level characteristics?"
 
     return new_reg.to_dict(), reg_title
 
@@ -633,3 +719,7 @@ def update_homeless_scatter(tab_value, selected_tract):
         encampments_scatterplot.to_dict(),
         encampment_title,
     )
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

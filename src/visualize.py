@@ -54,7 +54,7 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
         alt.Tooltip("median_rent:Q", format=",.0f", title="Median rent (per month)"),
         alt.Tooltip("eviction_rate:Q", format=".3%", title="Average eviction rate"),
         alt.Tooltip(
-            "estimate:Q", format=",.0f", title="Average homeless population estimate"
+            "estimate:Q", format=",.0f", title="Average street homeless population estimate"
         ),
         alt.Tooltip(
             "311_calls:Q",
