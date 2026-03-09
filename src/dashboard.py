@@ -76,12 +76,12 @@ app.layout = html.Div(
                 ),
                 html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
                 html.Div(
-                    [html.B("311 Calls"), html.Br(), "###"],
+                    [html.B("311 Calls"), html.Br(), f"{df_merged['311_calls'].mean():,.0f}"],
                     style={"flex": "1", "textAlign": "center"},
                 ),
                 html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
                 html.Div(
-                    [html.B("Homelessness Estimate"), html.Br(), "###"],
+                    [html.B("Homelessness Estimate"), html.Br(), f"{df_merged['estimate'].mean():,.0f}"],
                     style={"flex": "1", "textAlign": "center"},
                 ),
             ],
