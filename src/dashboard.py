@@ -613,7 +613,7 @@ def update_homeless_scatter(tab_value, selected_tract):
         raise exceptions.PreventUpdate
 
     homeless_scatterplot = create_homeless_scatterplot(tract_id=selected_tract)
-    homeless_title1 = f"Homeless Population Estimate for Tract {selected_tract}"
+    homeless_title1 = f"Homeless population estimate over time in census tract {selected_tract}"
 
     encampments_scatterplot = create_encampments_scatterplot(tract_id=selected_tract)
     encampment_title = f"City-reported encampments (official counts) over time in census tract {selected_tract}"
