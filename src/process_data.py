@@ -368,7 +368,7 @@ def generate_encampments_csv():
 
     # Filter for years of interest: 2020-2024
     df["date"] = pd.to_datetime(df["date"])
-    
+
     # Include Jan 2025 to successfully interpolate for last few months of 2024
     df = df[df["date"].between("2020-01-01", "2025-01-31")]
 

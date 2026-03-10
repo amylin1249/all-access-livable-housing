@@ -192,40 +192,42 @@ def create_reg_chart():
 
     # Points (coefficient estimates)
     points = (
-    alt.Chart(df)
-    .mark_point(size=200, filled=True)
-    .encode(
-        x=alt.X("coefficient:Q", axis=alt.Axis(title="Coefficient Value")),
-        y=alt.Y(
-            "variable:N",
-            sort="x",
-            axis=alt.Axis(
-                title=None,
-                labelAlign="right",
-                labelFontSize=10,
-                labelAngle=-30,
-                labelPadding=10,
+        alt.Chart(df)
+        .mark_point(size=200, filled=True)
+        .encode(
+            x=alt.X("coefficient:Q", axis=alt.Axis(title="Coefficient Value")),
+            y=alt.Y(
+                "variable:N",
+                sort="x",
+                axis=alt.Axis(
+                    title=None,
+                    labelAlign="right",
+                    labelFontSize=10,
+                    labelAngle=-30,
+                    labelPadding=10,
+                ),
             ),
-        ),
-        color=alt.condition(
-            alt.datum.significant,
-            alt.value("blue"),
-            alt.value("black"),
-        ),
-        tooltip=[
-            alt.Tooltip("variable:N", title="Variable"),
-            alt.Tooltip(
-                "coefficient:Q",
-                title="Coefficient (311 Calls)",
-                format=".3f",
+            color=alt.condition(
+                alt.datum.significant,
+                alt.value("blue"),
+                alt.value("black"),
             ),
-            alt.Tooltip("significant_str:N", title="Statistically Significant"),  # <- use calculated field
-        ]
+            tooltip=[
+                alt.Tooltip("variable:N", title="Variable"),
+                alt.Tooltip(
+                    "coefficient:Q",
+                    title="Coefficient (311 Calls)",
+                    format=".3f",
+                ),
+                alt.Tooltip(
+                    "significant_str:N", title="Statistically Significant"
+                ),  # <- use calculated field
+            ],
+        )
+        .transform_calculate(
+            significant_str="datum.significant ? 'Yes' : 'No'"  # capitalize
+        )
     )
-    .transform_calculate(
-        significant_str="datum.significant ? 'Yes' : 'No'"  # capitalize
-    )
-)
 
     x_zero = (
         alt.Chart(pd.DataFrame({"x": [0]}))

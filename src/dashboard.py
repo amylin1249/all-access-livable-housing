@@ -1,7 +1,6 @@
+import calendar
 import pandas as pd
 import dash_bootstrap_components as dbc
-import matplotlib
-import calendar
 import dash_vega_components as dvc
 from dash import Dash, html, dcc, Input, Output, exceptions
 from .datatypes import MERGED, CLEAN_ZILLOW
@@ -12,8 +11,6 @@ from .visualize import (
     create_homeless_scatterplot,
     create_encampments_scatterplot,
 )
-
-matplotlib.use("Agg")
 
 
 df_merged = pd.read_csv(MERGED)
@@ -370,7 +367,9 @@ def render_content(tab):
                                 " over ",
                                 html.B("time"),
                                 ". While the graph on the right shows the distribution of encampment types (tents, structures, and lived-in vehicles), the graph on the left shows street homeless population estimates, calculated by multiplying each encampment count by the average number of people residing in a tent, structure, or lived-in vehicle. The ",
-                                html.B("highest average street homeless population estimates"),
+                                html.B(
+                                    "highest average street homeless population estimates"
+                                ),
                                 " from 2020 to 2024 are ",
                                 html.B("6075980900 (Islais Creek)"),
                                 ", ",
@@ -513,7 +512,7 @@ def render_content(tab):
                                 html.B("94105 (Financial District/South Beach)"),
                                 ", and ",
                                 html.B("94114 (the Castro/Noe Valley)"),
-                                ". Mission Bay and the Financial District/South Beach have a high concentration of luxury rental apartments and are located near major tech and finance employment centers, while Noe Valley is a historic and highly desirable residential neighborhood with limited housing supply."
+                                ". Mission Bay and the Financial District/South Beach have a high concentration of luxury rental apartments and are located near major tech and finance employment centers, while Noe Valley is a historic and highly desirable residential neighborhood with limited housing supply.",
                             ],
                             style={
                                 "fontSize": "16px",
@@ -720,6 +719,8 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
     ],
     [Input("tabs-content", "value"), Input("tract-dropdown", "value")],
 )
+
+
 def update_homeless_scatter(tab_value, selected_tract):
     if tab_value != "tab-homeless" or not selected_tract:
         raise exceptions.PreventUpdate
@@ -743,6 +744,8 @@ def update_homeless_scatter(tab_value, selected_tract):
     [Output("rent-scatter-plot", "spec"), Output("rent-plot-title", "children")],
     [Input("tabs-content", "value"), Input("zip-dropdown", "value")],
 )
+
+
 def update_rent_scatter(tab_value, selected_zip):
     if tab_value != "tab-rent" or not selected_zip:
         raise exceptions.PreventUpdate
@@ -762,6 +765,8 @@ def update_rent_scatter(tab_value, selected_zip):
         Input("tabs-content", "value"),  # change in column
     ],
 )
+
+
 def update_regression(tab_value):
 
     if tab_value != "tab-reg":
@@ -770,3 +775,8 @@ def update_regression(tab_value):
     new_reg = create_reg_chart()
 
     return [new_reg.to_dict()]
+
+
+if __name__ == "__main__":
+    logging.getLogger("werkzeug").setLevel(logging.ERROR)
+    app.run_server(debug=False, dev_tools_ui=False, dev_tools_props_check=False)

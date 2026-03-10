@@ -1,7 +1,11 @@
+import os
 import pandas as pd
 import pytest
-import os
 from src.analyze_data import (
+    generate_rent_by_zip_dict,
+    generate_crosswalks_dict,
+    weight_to_census_tract,
+    generate_acs_df,
     count_evictions_by_tract,
     calculate_eviction_rate,
     generate_tidy_csv,
@@ -12,12 +16,73 @@ from src.analyze_data import (
 )
 
 
+def test_generate_rent_by_zip_dict():
+    rents = generate_rent_by_zip_dict()
+
+    # Test it's a dictionary
+    assert isinstance(rents, dict)
+
+    # Test start and end date
+    dates = sorted(rents.keys())
+    assert dates[0] == "2020-01"
+    assert dates[-1] == "2024-12"
+
+    # Test rent is in reasonable range
+    for _, zips in rents.items():
+        for _, rent in zips.items():
+            assert 0 < rent < 6000
+
+
+def test_generate_crosswalks_dict():
+    crosswalks = generate_crosswalks_dict()
+
+    # Test it's a dictionary
+    assert isinstance(crosswalks, dict)
+
+    # Test start and end date
+    dates = sorted(crosswalks.keys())
+    assert dates[0] == "2020-01"
+    assert dates[-1] == "2024-12"
+
+    # Test weight is in reasonable range
+    for _, zips in crosswalks.items():
+        for _, tract_weights in zips.items():
+            for _, weight in tract_weights:
+                assert 0 <= weight <= 1
+
+
+def test_weight_to_census_tract():
+    rent_by_zip = generate_rent_by_zip_dict()
+    crosswalks = generate_crosswalks_dict()
+    rent_by_tract = weight_to_census_tract(crosswalks, rent_by_zip)
+
+    # Test it's a dictionary
+    assert isinstance(rent_by_tract, dict)
+
+    # Test start and end date
+    dates = sorted(rent_by_tract.keys())
+    assert dates[0] == "2020-01"
+    assert dates[-1] == "2024-12"
+
+    # Test final calculated rent is in reasonable range
+    for _, tracts in rent_by_tract.items():
+        for _, rent in tracts.items():
+            assert 0 < rent < 6000
+
+
+def test_generate_acs_df():
+    acs_df = generate_acs_df()
+
+    # Confirm each tract ID has 11 numbers
+    for tract in acs_df["TL_GEO_ID"]:
+        assert len(tract) == 11
+
+
 def test_total_evictions_format():
     results = count_evictions_by_tract()
-    df = pd.DataFrame(results)
-    assert df["geoid"].str.len().unique()[0] == 11
+    assert results["geoid"].str.len().unique()[0] == 11
     # made a new column : total eviction
-    assert "total_evictions" in df.columns
+    assert "total_evictions" in results.columns
 
 
 def test_total_evictions_grouping():
@@ -78,6 +143,28 @@ def test_tidy_col_num(merged_data):
 
     for col in expected_columns:
         assert col in actual_columns
+
+
+def test_no_missing_or_negative_values(merged_data):
+    numeric_cols = [
+        "median_rent",
+        "eviction_rate",
+        "311_calls",
+        "tents",
+        "structures",
+        "vehicles",
+        "estimate",
+    ]
+
+    # Test that numeric columns don't have missing or negative values
+    for col in numeric_cols:
+        assert merged_data[col].notnull().all()
+        assert (merged_data[col] >= 0).all()
+
+
+def test_merged_dates(merged_data):
+    assert merged_data["date"].min() == "2020-01"
+    assert merged_data["date"].max() == "2024-12"
 
 
 def test_homelessness_estimate_calculation(merged_data):
