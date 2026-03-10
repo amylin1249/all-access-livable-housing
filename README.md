@@ -15,7 +15,7 @@ Using multipliers from the literature applied to encampment counts, we generated
 Overall, our dashboard highlights spatial and temporal patterns in homelessness and housing, helping policymakers and community organizations better target interventions, allocate resources, and make informed housing policy decisions.
 
 
-## Screenshots of project
+## Interface Overview
 Dashboard Homepage
 ![Dashboard Homepage](docs/dash_homepage.png)
 
@@ -32,7 +32,7 @@ Dashboard Tab 4: Regression Analysis of 311 Calls
 ![Dashboard Tab 4: Regression Analysis of 311 Calls](docs/dash_tab4_regression.png)
 
 
-## Instructions to run our project 
+## Setup and Execution
 1. Clone our repository by running `git clone git@github.com:uchicago-2026-capp30122/project-all-access-livable-housing.git` in your terminal.
 2. After cloning the repository, run `uv sync` in the project root directory to install the required packages and set up the virtual environment.
 3. *[Optional -- these files should already be included in the repository]* To retrieve API data and regenerate the clean data files, run `uv run python -m src --data` in the root directory. This will take around 3 minutes to run.
@@ -40,38 +40,30 @@ Dashboard Tab 4: Regression Analysis of 311 Calls
 5. Copy the Dash URL printed in the terminal and paste it into your web browser to view the dashboard.
 
 
-## Citations for data sources
-
+## Data Sources
 ### Data Source #1: DataSF Open Data Portal
 #### Data Source #1.1: 311 Cases
 - https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/about_data
-
 #### Data Source #1.2: Quarterly count of tents, structures, and lived-in vehicles
 - https://app.powerbigov.us/view?r=eyJrIjoiY2FmZDNiY2ItMjA2OS00YjU5LWFkMDUtODlkNTgyZmQ3MmNhIiwidCI6IjIyZDVjMmNmLWNlM2UtNDQzZC05YTdmLWRmY2MwMjMxZjczZiJ9
 - Put in an offline email request and obtained a spreadsheet of historical tent counts from April 2019 to December 2025 that serves as the underlying dataset for the map 
-
 #### Data Source #1.3: Evictions data
 - https://data.sfgov.org/Housing-and-Buildings/Eviction-Notices/5cei-gny5/about_data
-
 ### Data Source #2: Census Data
 #### Data Source #2.1: ACS data on rental costs and demographic data
 - https://data2.nhgis.org/main (2020-24 ACS 5-year data for population, median rent, median household income, racial composition, and number of renter households by tract)
-
 #### Data Source #2.2: Listing and geographic boundaries of census tracts in SF
 - https://data.sfgov.org/Geographic-Locations-and-Boundaries/Census-2020-Tracts-for-San-Francisco/tmph-tgz9/about_data (to obtain SF census tract IDs)
 - https://www.census.gov/cgi-bin/geo/shapefiles/index.php (California census tracts shapefiles)
-
 ### Data Source #3: Zillow Observed Renter Index (ZORI)
 - https://www.zillow.com/research/data/ (ZORI Smoothed: All Homes Plus Multifamily Time Series)
-
 ### Data Source #4: HUD ZIP Code Crosswalks
 - https://www.huduser.gov/portal/datasets/usps_crosswalk.html (ZIP-TRACT crosswalks)
-
 ### Data Source #5: Sacramento 2024 PIT Count Report
 - https://www.sacramentostepsforward.org/wp-content/uploads/2025/08/PIT-Report-2024-06-04-Final-with-Cover.pdf (to obtain multipliers for street homeless population estimates)
 
 
-## Project video
+## Application Demo
 https://drive.google.com/file/d/1T6SVS_VbMjVPbhwko3zUDULbmq6zvg9c/view?usp=sharing
 
 
