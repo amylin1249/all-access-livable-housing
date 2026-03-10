@@ -55,7 +55,7 @@ The next processing step is implemented in the spatial_join module, which applie
 
 The analyze_data module then aggregates counts from spatially joined datasets and consolidates metrics for analysis and visualization. run_regression examines the relationship between tract characteristics and monthly 311-reported addresses using OLS regression with year-month fixed effects.
 
-The last section focuses on visualizations and dashboarding. The visualize module generates graphs including a choropleth map, regression chart, and scatterplots of rent and encampments over time. The dashboard module integrates these visualizations into an interactive interface with background information, key statistics, and a series of visualizations that illustrate how homelessness trends in SF have evolved over time.
+The last section focuses on visualizations and dashboarding. The visualize module generates graphs including a choropleth map, regression graph, and line graphs of rent and encampments over time. The dashboard module integrates these visualizations into an interactive interface with background information, key statistics, and a series of visualizations that illustrate how homelessness trends in SF have evolved over time.
 
 The above modules feed into our __main__.py file, which allows the entire pipeline to be executed from the command line. Given that our modules are all interlinked, this enables users to launch the dashboard, or even regenerate clean data files, ensuring the reproducibility of our files and analysis. 
 
@@ -75,7 +75,7 @@ The above modules feed into our __main__.py file, which allows the entire pipeli
 - Implemented initial cleaning functions for 311 and encampment datasets
 - Created run_regression.py to conduct tract-level regression analysis
 - Developed regression coefficient visualization (create_reg_chart) in visualize.py to support data interpretation
-- Built initial scatterplot visualizations for encampments and street homeless population estimates
+- Built initial line graph visualizations for encampments and street homeless population estimates
 - Reviewed interpolation, imputation, and other data processing choices, ensuring accuracy of derived metrics
 - Wrote `pytest` tests for relevant functions (de-duplication, 311 and encampment datasets) to validate dataset and pipeline
 
@@ -84,8 +84,8 @@ The above modules feed into our __main__.py file, which allows the entire pipeli
 - Implemented final cleaning functions for 311 and encampment datasets (converted to Pandas)
 - Built the complete ingestion and cleaning pipeline for monthly median rent data (aside from Haeji's initial filtering step): imputed missing ZORI values, processed 20 HUD crosswalk Excel files (including imputation), and calculated weighted averages to generate tract-level monthly rent estimates
 - Interpolated quarterly encampment data to estimate monthly counts for tents, structures, and vehicles 
-- Built final scatterplot visualizations for encampments and street homeless population estimates
-- Built scatterplot visualization for monthly median rent by ZIP code
+- Built final line graph visualizations for encampments and street homeless population estimates
+- Built line graph visualization for monthly median rent by ZIP code
 - Assisted Haeji with dashboard by leading dashboard design (determining layout, visual structure, and interactive flow)
 - Wrote textual content for dashboard
 - Wrote `pytest` tests for relevant functions (ZORI dataset, HUD crosswalks) to validate dataset and pipeline

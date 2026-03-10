@@ -10,26 +10,26 @@
 ## Abstract
 Several cities in the United States are experiencing a homelessness crisis, with San Francisco often cited due to its high housing prices and limited housing supply. Our project examines tract-level homelessness and housing indicators in San Francisco from 2020 to 2024. We aligned multiple datasets onto the same spatial-temporal scale, aggregating and interpolating point-level data (quarterly encampment counts, daily 311 calls, and daily eviction reports) to census tracts by month. We also disaggregated monthly ZIP code-level median rent data to census tracts by weighting with HUD crosswalks and normalizing with ACS baseline values.
 
-Using multipliers from the literature applied to encampment counts, we generated tract-level estimates of the street homeless population. These estimates and metrics were integrated into an interactive dashboard featuring: (1) a heatmap showing metrics by tract and month; (2) scatterplots of street homelessness and the distribution of tents, structures, and vehicles for a selected census tract; (3) a scatterplot of monthly median rent that updates by ZIP code; and (4) a regression analysis linking 311 calls to tract-level characteristics.
+Using multipliers from the literature applied to encampment counts, we generated tract-level estimates of the street homeless population. These estimates and metrics were integrated into an interactive dashboard featuring: (1) a choropleth map showing metrics by tract and month; (2) line graphs of street homelessness and the distribution of tents, structures, and vehicles for a selected census tract; (3) a line graph of monthly median rent that updates by ZIP code; and (4) a regression analysis linking 311 calls to tract-level characteristics.
 
 Overall, our dashboard highlights spatial and temporal patterns in homelessness and housing, helping policymakers and community organizations better target interventions, allocate resources, and make informed housing policy decisions.
 
 
 ## Screenshots of project
-Dashboard Mainpage
-![Dashboard Mainpage](docs/dash_mainpage.png)
+Dashboard Homepage
+![Dashboard Homepage](docs/dash_mainpage.png)
 
-Dashboard Tab 1: Map
-![Dashboard Tab 1: Map](docs/dash_tab1_map.png)
+Dashboard Tab 1: Geospatial Map
+![Dashboard Tab 1: Geospatial Map](docs/dash_tab1_map.png)
 
-Dashboard Tab 2: Linechart - Homelessness
-![Dashboard Tab 2: Linechart - Homelessness](docs/dash_tab2_linechart_homelessness.png)
+Dashboard Tab 2: Street Homeless Population Estimate
+![Dashboard Tab 2: Street Homeless Population Estimate](docs/dash_tab2_homelessness.png)
 
-Dashboard Tab 3: Linechart - Rent
-![Dashboard Tab 3: Linechart - Rent](docs/dash_tab3_linechart_rent.png)
+Dashboard Tab 3: Median Monthly Rent
+![Dashboard Tab 3: Median Monthly Rent](docs/dash_tab3_rent.png)
 
-Dashboard Tab 4: Regression
-![Dashboard Tab 4: Regression](docs/dash_tab4_regression.png)
+Dashboard Tab 4: Regression Analysis of 311 Calls
+![Dashboard Tab 4: Regression Analysis of 311 Calls](docs/dash_tab4_regression.png)
 
 
 ## Instructions to run our project 
