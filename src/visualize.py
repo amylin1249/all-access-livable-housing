@@ -105,7 +105,6 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
         )
         .project("albersUsa")
         .properties(width="container", height=550)
-        # .configure_view(stroke=None)
         .interactive()
     )
 
