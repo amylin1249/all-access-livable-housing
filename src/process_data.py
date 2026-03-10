@@ -1,10 +1,10 @@
 import csv
 import sys
+from datetime import datetime
+from pathlib import Path
+import warnings
 import pandas as pd
 import geopandas as gpd
-from pathlib import Path
-from datetime import datetime
-import warnings
 from .datatypes import (
     RAW_SF_TRACTS,
     RAW_ACS_POP,
@@ -229,7 +229,7 @@ def clean_parenthesis(phrase: str) -> str:
     """
     This function takes a phrase and removes any parenthesized portion.
 
-    Parameters:
+    Inputs:
         phrase: a string representing a phrase
 
     Returns:
@@ -254,7 +254,7 @@ def clean_address(address: str) -> str:
     """
     Cleans addresses for deduplication.
 
-    Parameters:
+    Inputs:
         address: a string of an address in the 311 reports
 
     Returns:
@@ -321,6 +321,9 @@ def generate_311_csv():
     # Drop observations where lat/lon = 0
     df = df[(df["lat"] != 0) & (df["lon"] != 0)]
 
+    # Drop observations where lat/lon = NA
+    df = df.dropna(subset=["lat", "lon"])
+    
     # De-dupe by lat, lon, and month (keep only one row per lat/lon pair per month)
     df = df.drop_duplicates(subset=["date", "lat", "lon"], keep="first")
 
@@ -418,7 +421,7 @@ def generate_zillow_csv() -> list:
     filtered_df = sf_zips[["RegionName"] + date_cols]
     filtered_df = filtered_df.rename(columns={"RegionName": "zip"})
 
-    # Imputes data to fill missing values
+    # Impute data to fill missing values
     zip_col = filtered_df["zip"]
     data = filtered_df.drop(columns=["zip"])
     data = data.interpolate(axis=1)
@@ -431,9 +434,10 @@ def generate_zillow_csv() -> list:
 
     # Convert date to standardized format: YYYY-MM
     tidy_df["date"] = pd.to_datetime(tidy_df["date"]).dt.strftime("%Y-%m")
+
     tidy_df["zip"] = tidy_df["zip"].astype(int).astype(str)
 
-    # Writes tidy CSV
+    # Write tidy CSV
     tidy_df.to_csv(CLEAN_ZILLOW, index=False)
 
 
@@ -443,13 +447,13 @@ def process_crosswalks_xlsx(file_path: Path, zips: set, tracts: set):
     filters for specified zips and tracts, and saves date column by extracting
     from filename.
 
-    Parameters:
+    Inputs:
         file_path: file path for XLSX file
-        zips: [set] zips of interest to filter on
-        tracts: [set] census tracts of interest to filter on
+        zips: a set of zips of interest to filter on
+        tracts: a set of census tracts of interest to filter on
 
     Returns:
-        filtered_df: Pandas dataframe
+        A filtered Pandas DataFrame with columns: zip, tract, res_ratio, date
     """
     # Suppress Excel warnings
     with warnings.catch_warnings():
@@ -474,19 +478,23 @@ def process_crosswalks_xlsx(file_path: Path, zips: set, tracts: set):
         if "res_ratio" in column.lower():
             res_ratio_col = column
             break
+
     # Add date column based on filename
     datetime_str = file_path.stem[-6:]
     datetime_object = datetime.strptime(datetime_str, "%m%Y")
+
     # Convert date to standardized format: YYYY-MM
     date = f"{datetime_object.year}-{datetime_object.month:02}"
     selected_cols_df = df.loc[:, [zip_col, tract_col, res_ratio_col]]
     selected_cols_df["date"] = date
     selected_cols_df.rename(
-        columns={"ZIP": "zip", "TRACT": "tract", "RES_RATIO": "res_ratio"},
+        columns={zip_col: "zip", tract_col: "tract", res_ratio_col: "res_ratio"},
         inplace=True,
     )
+
     # Filter to zips of interest
     filtered_by_zips_df = selected_cols_df[selected_cols_df["zip"].isin(zips)]
+
     # Filter to tracts of interest
     filtered_df = filtered_by_zips_df[filtered_by_zips_df["tract"].isin(tracts)]
 
@@ -509,6 +517,7 @@ def generate_crosswalks_csv():
     short_tracts = {str(tract) for tract in tracts_num}
     sf_tracts = {tract.zfill(11) for tract in short_tracts}
 
+    # Loop through crosswalk files (20 files - 5 years with 4 quarters each)
     list_of_dfs = []
     for file_path in Path(RAW_CROSSWALKS).iterdir():
         # Skip over hidden/system/temp files
@@ -520,23 +529,32 @@ def generate_crosswalks_csv():
     aggregated_df = pd.concat(list_of_dfs)
 
     # Grab unique zip, tract pairs
-    zip_tract_pairs_df = aggregated_df[["zip", "tract"]].drop_duplicates()
-    zip_tract_pairs = list(zip_tract_pairs_df.itertuples(index=False, name=None))
+    zip_tract_pairs = aggregated_df[["zip", "tract"]].drop_duplicates()
 
     # Grab unique dates
     dates = aggregated_df["date"].unique()
 
     # Fill in missing dates for zip, tract pairs with mean of existing data
-    for zip, tract in zip_tract_pairs:
-        zip_tract_df = aggregated_df[
-            (aggregated_df["zip"] == zip) & (aggregated_df["tract"] == tract)
-        ]
+    missing_zip_tract_rows = []
+    for _, row in zip_tract_pairs.iterrows():
+        zip_code = row["zip"]
+        tract = row["tract"]
+        zip_tract_df = aggregated_df[(aggregated_df["zip"] == zip_code) & (aggregated_df["tract"] == tract)]
         if len(zip_tract_df) < 20:
             average_res_ratio = zip_tract_df["res_ratio"].mean()
-            for date in dates:
-                if zip_tract_df[zip_tract_df["date"] == date].empty:
-                    new_row_data = [zip, tract, average_res_ratio, date]
-                    aggregated_df.loc[len(aggregated_df)] = new_row_data
+            for dt in dates:
+                if zip_tract_df[zip_tract_df["date"] == dt].empty:
+                    missing_zip_tract_rows.append([zip_code, tract, average_res_ratio, dt])
+
+    aggregated_df = pd.concat(
+        [
+            aggregated_df,
+            pd.DataFrame(
+                missing_zip_tract_rows, columns=["zip", "tract", "res_ratio", "date"]
+            ),
+        ],
+        ignore_index=True,
+    )
 
     # Output to CSV
-    aggregated_df.to_csv(CLEAN_CROSSWALKS, index=None, header=True)
+    aggregated_df.to_csv(CLEAN_CROSSWALKS, index=False, header=True)

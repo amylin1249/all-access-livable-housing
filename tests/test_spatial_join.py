@@ -202,7 +202,7 @@ def test_spatial_join_load_csv():
 
     assert len(evictions_locations) == 4765
     assert len(encamp_locations) == 9721
-    assert len(encamp_311_locations) == 104515
+    assert len(encamp_311_locations) == 104512
 
 
 def test_spatial_join_csv_cols():

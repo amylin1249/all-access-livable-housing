@@ -719,8 +719,6 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
     ],
     [Input("tabs-content", "value"), Input("tract-dropdown", "value")],
 )
-
-
 def update_homeless_scatter(tab_value, selected_tract):
     if tab_value != "tab-homeless" or not selected_tract:
         raise exceptions.PreventUpdate
@@ -744,8 +742,6 @@ def update_homeless_scatter(tab_value, selected_tract):
     [Output("rent-scatter-plot", "spec"), Output("rent-plot-title", "children")],
     [Input("tabs-content", "value"), Input("zip-dropdown", "value")],
 )
-
-
 def update_rent_scatter(tab_value, selected_zip):
     if tab_value != "tab-rent" or not selected_zip:
         raise exceptions.PreventUpdate
@@ -765,8 +761,6 @@ def update_rent_scatter(tab_value, selected_zip):
         Input("tabs-content", "value"),  # change in column
     ],
 )
-
-
 def update_regression(tab_value):
 
     if tab_value != "tab-reg":

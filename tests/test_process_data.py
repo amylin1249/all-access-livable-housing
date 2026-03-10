@@ -1,10 +1,10 @@
-import pandas as pd
 import math
+import pandas as pd
 from src.process_data import (
     get_sf_geoid,
     clean_address,
 )
-from src.datatypes import RAW_SF_TRACTS, SF_CENSUS_TRACTS, CLEAN_311, CLEAN_ENCAMP
+from src.datatypes import RAW_SF_TRACTS, SF_CENSUS_TRACTS, CLEAN_311, CLEAN_ENCAMP, CLEAN_ZILLOW, CLEAN_CROSSWALKS
 
 
 def test_clean_address():
@@ -24,18 +24,21 @@ def test_clean_address():
 
 def test_generate_311_csv():
     df_311 = pd.read_csv(CLEAN_311)
+    assert len(df_311) == df_311["id"].nunique()
     assert (sum(df_311.duplicated(subset=["date", "lat", "lon"]))) == 0
-    assert min(df_311["lat"]) < 38 and min(df_311["lat"]) > 36
+    assert (df_311["lat"] >= 36).all()
+    assert (df_311["lat"] <= 38).all()
+    assert (df_311["lon"] >= -123).all()
+    assert (df_311["lon"] <= -119).all()
     assert min(df_311["date"]) == "2020-01"
     assert max(df_311["date"]) == "2024-12"
-    assert min(df_311["lon"]) < -119 and min(df_311["lon"]) > -123
 
 
 def test_generate_encampments_csv():
     df_encamp = pd.read_csv(CLEAN_ENCAMP)
     assert len(df_encamp) == df_encamp["id"].nunique()
-    assert min(df_encamp["lat"]) < 38 and min(df_encamp["lat"]) > 36
-    assert min(df_encamp["lon"]) < -119 and min(df_encamp["lon"]) > -123
+    assert df_encamp["lat"].between(36, 38).all()
+    assert df_encamp["lon"].between(-123, -119).all()
     assert min(df_encamp["vehicles"]) == 0
     assert min(df_encamp["structures"]) == 0
     assert min(df_encamp["tents"]) == 0
@@ -44,7 +47,43 @@ def test_generate_encampments_csv():
     # set slightly arbitrary threshold
     assert max(df_encamp["vehicles"]) < 100
     assert max(df_encamp["structures"]) < 100
-    assert max(df_encamp["vehicles"]) < 100
+    assert max(df_encamp["tents"]) < 100
+
+
+def test_generate_zillow_csv():
+    df_zillow = pd.read_csv(CLEAN_ZILLOW)
+    
+    # Test start and end date
+    assert df_zillow["date"].min() == "2020-01"
+    assert df_zillow["date"].max() == "2024-12"
+    
+    # Test rent values are numeric and non-negative
+    assert pd.api.types.is_numeric_dtype(df_zillow["rent"])
+    assert (df_zillow["rent"] >= 0).all()
+    
+    # Test rent is in reasonable range
+    assert df_zillow["rent"].max() < 6000
+    assert df_zillow["rent"].min() > 0
+
+
+def test_generate_crosswalks_csv():
+    df_crosswalks = pd.read_csv(CLEAN_CROSSWALKS)
+
+    # Test expected columns exist
+    expected_columns = {"zip", "tract", "res_ratio", "date"}
+    assert set(df_crosswalks.columns) == expected_columns
+
+    # Test start and end date (quarterly crosswalks)
+    assert df_crosswalks["date"].min() == "2020-03"
+    assert df_crosswalks["date"].max() == "2024-12"
+
+    # Test res_ratio is in reasonable range
+    assert df_crosswalks["res_ratio"].min() >= 0
+    assert df_crosswalks["res_ratio"].max() <= 1
+
+    # Test each zip, tract pair has exactly 20 rows (quarterly data for 5 years)
+    counts_per_pair = df_crosswalks.groupby(["zip", "tract"]).size()
+    assert (counts_per_pair == 20).all()
 
 
 ACS_DF = pd.read_csv(SF_CENSUS_TRACTS)
@@ -124,6 +163,3 @@ def test_process_acs_calc_white_pct():
     assert math.isclose(
         ACS_DF[ACS_DF["TL_GEO_ID"] == "06075026201"]["white_pct"].item(), 366 / 3856
     )
-
-
-### Add tests on ZORI
