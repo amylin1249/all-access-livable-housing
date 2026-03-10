@@ -68,7 +68,7 @@ The above modules feed into our __main__.py file, which allows the entire pipeli
 - Computed tract-level eviction rates by normalizing monthly eviction counts with census tract populations
 - Spearheaded dashboard implementation, ensuring smooth integration of processed data into an interactive analytical tool
 - Optimized map, plot, and regression code for faster visualizations and seamless dashboard interactivity
-- Wrote `pytest` tests for relevant functions (eviction dataset) to validate dataset and pipeline
+- Wrote `pytest` tests for relevant functions (eviction dataset, api datasets, and tidying csv ) to validate dataset and pipeline
 
 ### Lily
 - Developed clean_address and clean_parenthesis functions to de-duplicate 311 service request data
