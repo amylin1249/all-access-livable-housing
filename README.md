@@ -17,7 +17,7 @@ Overall, our dashboard highlights spatial and temporal patterns in homelessness 
 
 ## Screenshots of project
 Dashboard Homepage
-![Dashboard Homepage](docs/dash_mainpage.png)
+![Dashboard Homepage](docs/dash_homepage.png)
 
 Dashboard Tab 1: Geospatial Map
 ![Dashboard Tab 1: Geospatial Map](docs/dash_tab1_map.png)
