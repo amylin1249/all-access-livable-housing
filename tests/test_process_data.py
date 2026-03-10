@@ -4,7 +4,14 @@ from src.process_data import (
     get_sf_geoid,
     clean_address,
 )
-from src.datatypes import RAW_SF_TRACTS, SF_CENSUS_TRACTS, CLEAN_311, CLEAN_ENCAMP, CLEAN_ZILLOW, CLEAN_CROSSWALKS
+from src.datatypes import (
+    RAW_SF_TRACTS,
+    SF_CENSUS_TRACTS,
+    CLEAN_311,
+    CLEAN_ENCAMP,
+    CLEAN_ZILLOW,
+    CLEAN_CROSSWALKS,
+)
 
 
 def test_clean_address():
@@ -52,15 +59,15 @@ def test_generate_encampments_csv():
 
 def test_generate_zillow_csv():
     df_zillow = pd.read_csv(CLEAN_ZILLOW)
-    
+
     # Test start and end date
     assert df_zillow["date"].min() == "2020-01"
     assert df_zillow["date"].max() == "2024-12"
-    
+
     # Test rent values are numeric and non-negative
     assert pd.api.types.is_numeric_dtype(df_zillow["rent"])
     assert (df_zillow["rent"] >= 0).all()
-    
+
     # Test rent is in reasonable range
     assert df_zillow["rent"].max() < 6000
     assert df_zillow["rent"].min() > 0
