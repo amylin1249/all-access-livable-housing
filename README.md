@@ -14,6 +14,8 @@ Using multipliers from the literature applied to encampment counts, we generated
 
 Overall, our dashboard highlights spatial and temporal patterns in homelessness and housing, helping policymakers and community organizations better target interventions, allocate resources, and make informed housing policy decisions.
 
+## Live Dashboard
+View the interactive dashboard here: [San Francisco Housing & Homelessness Dashboard](https://amylin1249-all-access-livable-housing.share.connect.posit.cloud/)
 
 ## Interface Overview
 Dashboard Homepage
@@ -36,7 +38,7 @@ Dashboard Tab 4: Regression Analysis of 311 Calls
 1. Clone our repository by running `git clone git@github.com:uchicago-2026-capp30122/project-all-access-livable-housing.git` in your terminal.
 2. After cloning the repository, run `uv sync` in the project root directory to install the required packages and set up the virtual environment.
 3. *[Optional -- these files should already be included in the repository]* To retrieve API data and regenerate the clean data files, run `uv run python -m src --data` in the root directory. This will take around 3 minutes to run.
-4. To launch our interactive dashboard and visualizations, run `uv run python -m src --dashboard` in the root directory.
+4. To launch our interactive dashboard locally, run `uv run python -m src --dashboard` in the root directory.
 5. Copy the Dash URL printed in the terminal and paste it into your web browser to view the dashboard.
 
 
