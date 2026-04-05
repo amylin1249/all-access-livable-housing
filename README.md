@@ -1,4 +1,4 @@
-# Project: All Access Livable Housing
+# All Access Livable Housing
 
 ## Members
 - Haeji Ahn <ahaeji925@uchicago.edu>
